@@ -25,7 +25,6 @@ all: \
 	retrospex_win_arm64.exe \
 	retrospex_win_amd64.exe \
 	retrospex_win_x86.exe
-	go build -v -trimpath -ldflags="-w -s -X main.Version=$(VERSION).$(REV)"
 
 .PHONY: clean
 clean:
