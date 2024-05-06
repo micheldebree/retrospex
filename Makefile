@@ -6,11 +6,7 @@ GOBUILDFLAGS=-v -trimpath
 LDFLAGS=-w -s -X main.Version=$(VERSION).$(REV)
 CGO := 0
 
-# IMG := paintface.jpg
-# IMG := colors2.jpg
-# IMG := whitney-norm.png
-# IMG := madonna01.png
-IMG := whitney.png
+IMG := paintface.jpg
 
 .PHONY: test
 test: $(SRC)
@@ -20,18 +16,21 @@ test: $(SRC)
 
 .PHONY: all
 all: \
-	retrospex_macos_arm64 \
-	retrospex_macos_amd64 \
-	retrospex_linux_arm64 \
-	retrospex_linux_amd64 \
-	retrospex_windows_arm64.exe \
-	retrospex_windows_amd64.exe \
-	retrospex_windows_x86.exe
+	retrospex_macos_arm64.zip \
+	retrospex_macos_amd64.zip \
+	retrospex_linux_arm64.zip \
+	retrospex_linux_amd64.zip \
+	retrospex_windows_arm64.exe.zip \
+	retrospex_windows_amd64.exe.zip \
+	retrospex_windows_x86.exe.zip
 
 .PHONY: clean
 clean:
 	rm *.png || true
-	rm retrospex_*
+	rm *.zip
+
+%.zip: %
+	zip -m -9 $@ $<
 
 retrospex_linux_amd64: $(SRC)
 	CGO_ENABLED=$(CGO) GOOS=linux GOARCH=amd64 go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS) -X main.Arch=linux.amd64" -o $@

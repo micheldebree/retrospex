@@ -17,13 +17,13 @@ Options:
  -o
   Output filename (default out.png)
  -m
-  Graphics mode. (default koala), One of mixedcharset,mccharset,sccharset,koala,hires
+  Graphics mode. (default koala), One of koala,hires,mixedcharset,mccharset,sccharset
  -p
-  Palette (default colodore). One of archmage,ste,perplex_1,colodore,vice,vice_old_lum,vice_371_internal,pantaloon,lenyn,pepto,electric,perplex_2
+  Palette (default colodore). One of vice_old_lum,vice_371_internal,pantaloon,ste,electric,perplex_1,perplex_2,lenyn,colodore,pepto,vice,archmage
  -dm
-  Dither matrix (default bayer2x2). One of none,bayer2x2,bayer4x4,bayer8x8
+  Dither matrix (default bayer4x4). One of none,bayer2x2,bayer4x4,bayer8x8
  -dd
-  Dither depth (default 20). 0-255
+  Dither depth (default 25). 0-255
 ```
 
 ## Example toolchain

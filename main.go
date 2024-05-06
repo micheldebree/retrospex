@@ -24,8 +24,8 @@ var Arch = "dev"
 const defaultOutput = "out.png"
 const defaultMode = "koala"
 const defaultPalette = "colodore"
-const defaultDitherMatrix = "bayer2x2"
-const defaultDitherDepth = 20
+const defaultDitherMatrix = "bayer4x4"
+const defaultDitherDepth = 25
 
 type Options struct {
 	OutFile      string
@@ -82,7 +82,7 @@ func main() {
 		printError(err.Error())
 		return
 	}
-	img = Resize(&img, spec.width, spec.height)
+	img = CropFill(&img, spec)
 
 	indexedImage := toIndexedImage(&img, spec, palette)
 	OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
