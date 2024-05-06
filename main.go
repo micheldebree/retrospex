@@ -18,14 +18,14 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-var Version = "0.0.1"
-var Arch = "-"
+var Version = "0.0"
+var Arch = "dev"
 
 const defaultOutput = "out.png"
 const defaultMode = "koala"
 const defaultPalette = "colodore"
-const defaultDitherMatrix = "bayer4x4"
-const defaultDitherDepth = 25
+const defaultDitherMatrix = "bayer2x2"
+const defaultDitherDepth = 20
 
 type Options struct {
 	OutFile      string
@@ -68,16 +68,18 @@ func main() {
 	ditherMatrix, isPresent := DitherMatrices[options.DitherMatrix]
 	if !isPresent {
 		printError(fmt.Sprintf("Unknown dither matrix: %s", options.DitherMatrix))
+		return
 	}
 
 	if options.DitherDepth < 0 || options.DitherDepth > 255 {
 		printError(fmt.Sprintf("Unsupported dither depth: %d, must be 0-100", options.DitherDepth))
+		return
 	}
 
 	infile := args[0]
 	img, err := ReadImageFile(infile)
 	if err != nil {
-		fmt.Print(err.Error())
+		printError(err.Error())
 		return
 	}
 	img = Resize(&img, spec.width, spec.height)

@@ -272,12 +272,3 @@ func createPalette(palette color.Palette) Palette {
 	return result
 }
 
-func (palette Palette) remove(index int) Palette {
-	result := make(Palette)
-	for k, v := range palette {
-		if k != index {
-			result[k] = v
-		}
-	}
-	return result
-}

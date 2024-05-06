@@ -50,7 +50,9 @@ func cluster(pixels *[]Pixel, nrClusters int) clusters.Clusters {
 	var d clusters.Observations
 
 	for _, p := range *pixels {
-		d = append(d, p)
+		if !p.hasBitPattern() {
+			d = append(d, p)
+		}
 	}
 
 	km, err := kmeans.NewWithOptions(0.01, nil)
@@ -67,6 +69,15 @@ func reducePaletteKmeans(img IndexedImage, layer Layer) ReducedPalette {
 	colorClusters := cluster(&img.pixels, len(layer.bitpatterns))
 	quantizedMeans := quantizeClusters(colorClusters, img.palette)
 
+	// TODO: make bitpattern map a type
+	// TODO: does this make any difference?
+	existingBitpatterns := make(map[int]int8)
+	for _, p := range img.pixels {
+		if p.hasBitPattern() {
+			existingBitpatterns[p.paletteIndex] = p.bitPattern
+		}
+	}
+
 	newPalette := make(Palette)
 	newBitpatterns := make(map[int]int8)
 	i := 0
@@ -74,6 +85,12 @@ func reducePaletteKmeans(img IndexedImage, layer Layer) ReducedPalette {
 		newPalette[quantizedMean] = img.palette[quantizedMean]
 		newBitpatterns[quantizedMean] = layer.bitpatterns[i]
 		i++
+	}
+	// Add existing bitpatterns to the palette so they also get a chance
+	// TODO: does this make any difference?
+	for key := range existingBitpatterns {
+		newPalette[key] = img.palette[key]
+		newBitpatterns[key] = existingBitpatterns[key]
 	}
 	return ReducedPalette{newPalette, newBitpatterns}
 }
