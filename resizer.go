@@ -11,10 +11,6 @@ func CropFill(img *image.Image, spec Retrospec) image.Image {
 	imgW := (*img).Bounds().Max.X - (*img).Bounds().Min.X
 	imgH := (*img).Bounds().Max.Y - (*img).Bounds().Min.Y
 
-	if (imgW == spec.width) && (imgH == spec.height) {
-		return *img
-	}
-
 	ratio := float64(imgW) / float64(imgH)
 	newRatio := float64(spec.displayWidth()) / float64(spec.displayHeight())
 
