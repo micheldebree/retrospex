@@ -20,7 +20,7 @@ type Pixel struct {
 	paletteIndex      int
 	quantizationError float64
 	// available when a bit pattern has been assigned
-	bitPattern int8
+	bitPattern int
 }
 
 func (pixel Pixel) getColor(palette Palette) colorful.Color {
