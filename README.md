@@ -14,16 +14,16 @@ Usage: retrospex [options] input.png
 
 Options:
 
- -o
-  Output filename (default out.png)
- -m
-  Graphics mode. (default koala), One of koala,hires,mixedcharset,mccharset,sccharset
- -p
-  Palette (default colodore). One of vice_old_lum,vice_371_internal,pantaloon,ste,electric,perplex_1,perplex_2,lenyn,colodore,pepto,vice,archmage
- -dm
-  Dither matrix (default bayer4x4). One of none,bayer2x2,bayer4x4,bayer8x8
- -dd
-  Dither depth (default 25). 0-255
+	-o
+		Output filename (default out.png)
+	-m
+		Graphics mode. (default koala), One of sccharset,mcibitmap,koala,hires,mixedcharset,mccharset
+	-p
+		Palette (default colodore). One of archmage,perplex_1,lenyn,colodore,vice_old_lum,vice_371_internal,electric,ste,perplex_2,pepto,vice,pantaloon
+	-dm
+		Dither matrix (default bayer4x4). One of bayer4x4,bayer8x8,none,bayer2x2
+	-dd
+		Dither depth (default 25). 0-255
 ```
 
 ## Example toolchain

@@ -16,7 +16,7 @@ type PaletteDistance map[int]float64
 // a specific Layer of a Retrospec
 type ReducedPalette struct {
 	palette     Palette
-	bitpatterns map[int]int8
+	bitpatterns map[int]int
 }
 
 func distance(color1, color2 colorful.Color) float64 {
@@ -112,7 +112,7 @@ func reducePalette(img IndexedImage, layer Layer) ReducedPalette {
 	indexToCount := make(map[int]int)
 
 	// TODO: does this make any difference?
-	existingBitpatterns := make(map[int]int8)
+	existingBitpatterns := make(map[int]int)
 
 	// count nr of pixels for each quantized color
 	for _, pixel := range img.pixels {
@@ -139,7 +139,7 @@ func reducePalette(img IndexedImage, layer Layer) ReducedPalette {
 	}
 
 	newPalette := make(Palette)
-	newBitpatterns := make(map[int]int8)
+	newBitpatterns := make(map[int]int)
 
 	// assign bitpatterns
 	i := 0

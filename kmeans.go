@@ -71,7 +71,7 @@ func reducePaletteKmeans(img IndexedImage, layer Layer) ReducedPalette {
 
 	// TODO: make bitpattern map a type
 	// TODO: does this make any difference?
-	existingBitpatterns := make(map[int]int8)
+	existingBitpatterns := make(map[int]int)
 	for _, p := range img.pixels {
 		if p.hasBitPattern() {
 			existingBitpatterns[p.paletteIndex] = p.bitPattern
@@ -79,7 +79,7 @@ func reducePaletteKmeans(img IndexedImage, layer Layer) ReducedPalette {
 	}
 
 	newPalette := make(Palette)
-	newBitpatterns := make(map[int]int8)
+	newBitpatterns := make(map[int]int)
 	i := 0
 	for _, quantizedMean := range quantizedMeans {
 		newPalette[quantizedMean] = img.palette[quantizedMean]
