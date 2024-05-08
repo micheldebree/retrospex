@@ -1,4 +1,4 @@
-VERSION := 0.0
+VERSION := 0.1
 REV := $(shell git rev-parse --short HEAD)
 SRC := $(filter-out $(wildcard *_test.go), $(wildcard *.go))
 
@@ -27,7 +27,8 @@ all: \
 .PHONY: clean
 clean:
 	rm *.png || true
-	rm *.zip
+	rm *.zip || true
+	rm retrospex_*
 
 %.zip: %
 	zip -m -9 $@ $<
