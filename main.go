@@ -21,12 +21,6 @@ import (
 var Version = "0.0"
 var Arch = "dev"
 
-const defaultOutput = "out.png"
-const defaultMode = "koala"
-const defaultPalette = "colodore"
-const defaultDitherMatrix = "bayer4x4"
-const defaultDitherDepth = 25
-
 type Options struct {
 	OutFile      string
 	Mode         string
@@ -35,15 +29,23 @@ type Options struct {
 	DitherDepth  int
 }
 
+var defaultOptions = Options{
+	OutFile:      "out.png",
+	Mode:         "koala",
+	Palette:      "colodore",
+	DitherMatrix: "bayer4x4",
+	DitherDepth:  25,
+}
+
 func main() {
 
 	var options Options
 
-	flag.StringVar(&options.OutFile, "o", defaultOutput, "output filename")
-	flag.StringVar(&options.Mode, "m", defaultMode, "graphics mode")
-	flag.StringVar(&options.Palette, "p", defaultPalette, "palette")
-	flag.StringVar(&options.DitherMatrix, "dm", defaultDitherMatrix, "dither matrix")
-	flag.IntVar(&options.DitherDepth, "dd", defaultDitherDepth, "dither depth")
+	flag.StringVar(&options.OutFile, "o", defaultOptions.OutFile, "output filename")
+	flag.StringVar(&options.Mode, "m", defaultOptions.Mode, "graphics mode")
+	flag.StringVar(&options.Palette, "p", defaultOptions.Palette, "palette")
+	flag.StringVar(&options.DitherMatrix, "dm", defaultOptions.DitherMatrix, "dither matrix")
+	flag.IntVar(&options.DitherDepth, "dd", defaultOptions.DitherDepth, "dither depth")
 	flag.Parse()
 
 	args := flag.Args()
@@ -102,9 +104,9 @@ func help() {
 	fmt.Printf("\nretrospex %s.%s by yth\n", Version, Arch)
 	fmt.Printf("\nUsage: retrospex [options] input.png\n\n")
 	fmt.Printf("Options:\n\n")
-	fmt.Printf("\t-o\n\t\tOutput filename (default %s)\n", defaultOutput)
-	fmt.Printf("\t-m\n\t\tGraphics mode. (default %s), One of %s\n", defaultMode, strings.Join(maps.Keys(C64Specs), ","))
-	fmt.Printf("\t-p\n\t\tPalette (default %s). One of %s\n", defaultPalette, strings.Join(maps.Keys(C64Palettes), ","))
-	fmt.Printf("\t-dm\n\t\tDither matrix (default %s). One of %s\n", defaultDitherMatrix, strings.Join(maps.Keys(DitherMatrices), ","))
-	fmt.Printf("\t-dd\n\t\tDither depth (default %d). 0-255\n", defaultDitherDepth)
+	fmt.Printf("\t-o\n\t\tOutput filename (default %s)\n", defaultOptions.OutFile)
+	fmt.Printf("\t-m\n\t\tGraphics mode. (default %s), One of %s\n", defaultOptions.Mode, strings.Join(maps.Keys(C64Specs), ","))
+	fmt.Printf("\t-p\n\t\tPalette (default %s). One of %s\n", defaultOptions.Palette, strings.Join(maps.Keys(C64Palettes), ","))
+	fmt.Printf("\t-dm\n\t\tDither matrix (default %s). One of %s\n", defaultOptions.DitherMatrix, strings.Join(maps.Keys(DitherMatrices), ","))
+	fmt.Printf("\t-dd\n\t\tDither depth (default %d). 0-255\n", defaultOptions.DitherDepth)
 }

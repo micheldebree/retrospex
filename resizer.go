@@ -26,8 +26,8 @@ func CropFill(img *image.Image, spec Retrospec) image.Image {
 	cropLeft := (imgW - newW) / 2
 	cropTop := (imgH - newH) / 2
 
-	topLeft := image.Point{cropLeft, cropTop}
-	bottomRight := image.Point{cropLeft + newW, cropTop + newH}
+	topLeft := image.Point{X: cropLeft, Y: cropTop}
+	bottomRight := image.Point{X: cropLeft + newW, Y: cropTop + newH}
 
 	srcRect := image.Rectangle{Min: topLeft, Max: bottomRight}
 	destRect := image.Rectangle{Min: image.Point{}, Max: image.Point{X: spec.width, Y: spec.height}}
