@@ -55,13 +55,6 @@ func main() {
 		return
 	}
 
-	//spec, isPresent := C64Specs[options.Mode]
-	// spec := makeKoalaSpec()
-	//if !isPresent {
-	//	printError(fmt.Sprintf("Unknown mode: %s", options.Mode))
-	//	return
-	//}
-
 	palette, isPresent := C64Palettes[options.Palette]
 	if !isPresent {
 		printError(fmt.Sprintf("Unknown palette: %s", options.Palette))
@@ -86,7 +79,7 @@ func main() {
 		return
 	}
 
-	spec := makeKoalaSpec(&img)
+	spec := makeSpec(options.Mode, &img)
 	indexedImage := toIndexedImage(&img, spec, palette)
 	OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
 	newImage := Quantize(indexedImage)
@@ -106,7 +99,7 @@ func help() {
 	fmt.Printf("\nUsage: retrospex [options] input.png\n\n")
 	fmt.Printf("Options:\n\n")
 	fmt.Printf("\t-o\n\t\tOutput filename (default %s)\n", defaultOptions.OutFile)
-	fmt.Printf("\t-m\n\t\tGraphics mode. (default %s), One of %s\n", defaultOptions.Mode, strings.Join(maps.Keys(C64Specs), ","))
+	fmt.Printf("\t-m\n\t\tGraphics mode. (default %s), One of %s\n", defaultOptions.Mode, strings.Join(maps.Keys(RetrospecFactories), ","))
 	fmt.Printf("\t-p\n\t\tPalette (default %s). One of %s\n", defaultOptions.Palette, strings.Join(maps.Keys(C64Palettes), ","))
 	fmt.Printf("\t-dm\n\t\tDither matrix (default %s). One of %s\n", defaultOptions.DitherMatrix, strings.Join(maps.Keys(DitherMatrices), ","))
 	fmt.Printf("\t-dd\n\t\tDither depth (default %d). 0-255\n", defaultOptions.DitherDepth)
