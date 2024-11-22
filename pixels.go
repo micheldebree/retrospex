@@ -77,9 +77,13 @@ func getPixel(image *image.Image, x, y int) Pixel {
 	return Pixel{x, y, convertedColor, -1, -1.0, -1}
 }
 
+func getDimensions(image *image.Image) (int, int) {
+	return (*image).Bounds().Max.X - (*image).Bounds().Min.X, (*image).Bounds().Max.Y - (*image).Bounds().Min.Y
+}
+
 func getPixels(image *image.Image) []Pixel {
 	startX, startY := (*image).Bounds().Min.X, (*image).Bounds().Min.Y
-	w, h := (*image).Bounds().Max.X-startX, (*image).Bounds().Max.Y-startY
+	w, h := getDimensions(image)
 	result := make([]Pixel, w*h)
 
 	for y := range h {
@@ -91,14 +95,15 @@ func getPixels(image *image.Image) []Pixel {
 	return result
 }
 
-// Cut up image into cells
-func getCells(img IndexedImage, layer Layer) []IndexedImage {
+// Cut up image into cells for a particular layer
+func getCells(img IndexedImage, layer Layer) TiledImage {
 
-	w, h := img.spec.width, img.spec.height
+	w, h := img.width, img.height
 
 	nrCols, nrRows := w/layer.cellWidth, h/layer.cellHeight
 
-	result := make([]IndexedImage, nrCols*nrRows)
+	tiles := make([]IndexedImage, nrCols*nrRows)
+
 	for cy := range nrRows {
 		for cx := range nrCols {
 			cell := make([]Pixel, layer.cellWidth*layer.cellHeight)
@@ -107,8 +112,14 @@ func getCells(img IndexedImage, layer Layer) []IndexedImage {
 					cell[py*layer.cellWidth+px] = img.PixelAt(cx*layer.cellWidth+px, cy*layer.cellHeight+py)
 				}
 			}
-			result[cy*nrCols+cx] = IndexedImage{img.spec, img.palette, cell}
+			tiles[cy*nrCols+cx] = IndexedImage{layer.cellWidth, layer.cellHeight, img.spec, img.palette, cell}
 		}
 	}
-	return result
+	return TiledImage{
+		nrRows,
+		nrCols,
+		layer.cellWidth,
+		layer.cellHeight,
+		tiles,
+	}
 }

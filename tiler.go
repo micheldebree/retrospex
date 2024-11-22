@@ -49,7 +49,7 @@ func cutIntoTiles(img image.Image, spec Retrospec, pal Palette) []IndexedImage {
 
 			iimg := toIndexedImage(&tile, spec, pal)
 
-			fmt.Printf("Tile bounds: %v\n", tile.Bounds())	
+			fmt.Printf("Tile bounds: %v\n", tile.Bounds())
 
 			qimage := Quantize(iimg)
 			result[i] = qimage
@@ -61,7 +61,7 @@ func cutIntoTiles(img image.Image, spec Retrospec, pal Palette) []IndexedImage {
 
 func hashTile(tile IndexedImage) string {
 
-	w, h := tile.spec.width, tile.spec.height
+	w, h := tile.width, tile.height
 
 	result := make([]byte, w*h)
 	i := 0

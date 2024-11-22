@@ -55,11 +55,12 @@ func main() {
 		return
 	}
 
-	spec, isPresent := C64Specs[options.Mode]
-	if !isPresent {
-		printError(fmt.Sprintf("Unknown mode: %s", options.Mode))
-		return
-	}
+	//spec, isPresent := C64Specs[options.Mode]
+	// spec := makeKoalaSpec()
+	//if !isPresent {
+	//	printError(fmt.Sprintf("Unknown mode: %s", options.Mode))
+	//	return
+	//}
 
 	palette, isPresent := C64Palettes[options.Palette]
 	if !isPresent {
@@ -84,8 +85,8 @@ func main() {
 		printError(err.Error())
 		return
 	}
-	img = CropFill(&img, spec)
 
+	spec := makeKoalaSpec(&img)
 	indexedImage := toIndexedImage(&img, spec, palette)
 	OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
 	newImage := Quantize(indexedImage)

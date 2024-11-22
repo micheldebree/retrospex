@@ -65,20 +65,32 @@ func QuantizeToIndex(aColor colorful.Color, palette Palette) (int, float64) {
 
 func Quantize(img IndexedImage) IndexedImage {
 	result := img
+
 	for _, layer := range img.spec.layers {
+		// cut the image up according to layer specs
 		cells := getCells(result, layer)
-		qCells := quantizeCells(cells, layer)
+
+		// quantize the cells
+		qCells := quantizeTiles(cells, layer)
+
+		// stitch the cells back together
 		result = combine(&qCells)
 	}
 	return result
 }
 
-func quantizeCells(cells []IndexedImage, layer Layer) []IndexedImage {
-	result := make([]IndexedImage, len(cells))
-	for ci, cell := range cells {
-		result[ci] = quantizeCell(cell, layer)
+func quantizeTiles(img TiledImage, layer Layer) TiledImage {
+	newTiles := make([]IndexedImage, len(img.tiles))
+	for ci, cell := range img.tiles {
+		newTiles[ci] = quantizeCell(cell, layer)
 	}
-	return result
+	return TiledImage{
+		img.nrRows,
+		img.nrCols,
+		img.tileWidth,
+		img.tileHeight,
+		newTiles,
+	}
 }
 
 func quantizeCell(img IndexedImage, layer Layer) IndexedImage {
