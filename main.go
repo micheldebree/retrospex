@@ -18,7 +18,7 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-var Version = "0.0"
+var Version = "0.2"
 var Arch = "dev"
 
 type Options struct {
@@ -80,6 +80,7 @@ func main() {
 	}
 
 	spec := makeSpec(options.Mode, &img)
+	fmt.Printf("Mode: %s\n", options.Mode)
 	indexedImage := toIndexedImage(&img, spec, palette)
 	OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
 	newImage := Quantize(indexedImage)

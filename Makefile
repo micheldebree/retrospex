@@ -6,13 +6,12 @@ GOBUILDFLAGS=-v -trimpath
 LDFLAGS=-w -s -X main.Version=$(VERSION).$(REV)
 CGO := 0
 
-IMG := paintface.jpg
-
 .PHONY: test
-test: $(SRC)
-	go run $^ -o $@-$(REV).png $(IMG) && open $@-$(REV).png
-	png2prg -v -d $@-$(REV).png
-	open $@-$(REV).prg
+test: paintface.prg
+	open $<
+
+retrospex:
+	go build $(SRC)
 
 .PHONY: all
 all: \
@@ -28,7 +27,12 @@ all: \
 clean:
 	rm *.png || true
 	rm *.zip || true
+	rm *.prg || true
 	rm retrospex_*
+
+.PHONY: install
+install: $(SRC)
+	go build -o "${HOME}/bin/retrospex"
 
 %.zip: %
 	zip -m -9 $@ $<
@@ -54,3 +58,4 @@ retrospex_windows_arm64.exe: $(SRC)
 retrospex_windows_x86.exe: $(SRC) 
 	CGO_ENABLED=$(CGO) GOOS=windows GOARCH=386 go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS) -X main.Arch=windows.x86" -o $@
 
+include koala.mk

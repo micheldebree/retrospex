@@ -13,7 +13,7 @@ type IndexedImage struct {
 	pixels  []Pixel
 }
 
-// Multiple IndexedImage tiles (all of the same size)
+// TiledImage Multiple IndexedImage tiles (all of the same size)
 type TiledImage struct {
 	nrRows     int
 	nrCols     int

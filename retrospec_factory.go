@@ -9,6 +9,8 @@ var RetrospecFactories = map[string]func(*image.Image) Retrospec{
 	"mccharset":    makeMCCharsetSpecSpec,
 	"scccharset":   makeSCCCharsetSpecSpec,
 	"mcibitmap":    makeMciBitmapSpec,
+	"scsprites":    makeScSpritesSpec,
+	"mcsprites":    makeMcSpritesSpec,
 }
 
 func makeSpec(specName string, img *image.Image) Retrospec {
@@ -75,4 +77,27 @@ func makeMciBitmapSpec(img *image.Image) Retrospec {
 			{8, 8, []int{0x01, 0x10, 0x11}, true}, // 0400,x (upper nibble), 0400,x (lower nibble), d800,x
 		},
 	}
+}
+
+func makeScSpritesSpec(img *image.Image) Retrospec {
+	w, h := getDimensions(img)
+	return Retrospec{
+		[]Layer{
+			{w, h, []int{0}, false},  // d021
+			{24, 21, []int{1}, true}, // sprite color
+		},
+	}
+}
+
+func makeMcSpritesSpec(img *image.Image) Retrospec {
+	w, h := getDimensions(img)
+	return Retrospec{
+		[]Layer{
+			{w, h, []int{0x00}, false},   // d021
+			{12, 21, []int{0x01}, false}, // d025
+			{12, 21, []int{0x10}, false}, // d027,x
+			{12, 21, []int{0x11}, true},  // d026
+		},
+	}
+
 }
