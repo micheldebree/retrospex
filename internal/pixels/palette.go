@@ -1,4 +1,4 @@
-package indexedimage
+package pixels
 
 import (
 	"image/color"

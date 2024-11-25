@@ -1,6 +1,7 @@
 package indexedimage
 
 import (
+	"github.com/micheldebree/retrospex/internal/pixels"
 	"image"
 )
 
@@ -9,8 +10,8 @@ type IndexedImage struct {
 	width   int
 	height  int
 	spec    Retrospec
-	palette Palette
-	pixels  []Pixel
+	palette pixels.Palette
+	pixels  []pixels.Pixel
 }
 
 // TiledImage Multiple IndexedImage tiles (all of the same size)
@@ -22,23 +23,23 @@ type TiledImage struct {
 	tiles      []IndexedImage
 }
 
-func newIndexedImage(w int, h int, spec Retrospec, pal Palette) IndexedImage {
-	pixels := make([]Pixel, w*h)
-	return IndexedImage{w, h, spec, pal, pixels}
+func newIndexedImage(w int, h int, spec Retrospec, pal pixels.Palette) IndexedImage {
+	thePixels := make([]pixels.Pixel, w*h)
+	return IndexedImage{w, h, spec, pal, thePixels}
 }
 
-func ToIndexedImage(img *image.Image, spec Retrospec, pal Palette) IndexedImage {
-	pixels := getPixels(img)
-	w, h := getDimensions(img)
-	return IndexedImage{w, h, spec, pal, pixels}
+func ToIndexedImage(img *image.Image, spec Retrospec, pal pixels.Palette) IndexedImage {
+	thePixels := pixels.GetPixels(img)
+	w, h := pixels.GetDimensions(img)
+	return IndexedImage{w, h, spec, pal, thePixels}
 }
 
-func (img *IndexedImage) PixelAt(x, y int) Pixel {
+func (img *IndexedImage) PixelAt(x, y int) pixels.Pixel {
 	return img.pixels[y*img.width+x]
 }
 
-func (img *IndexedImage) SetPixel(pixel Pixel) {
-	img.pixels[pixel.y*img.width+pixel.x] = pixel
+func (img *IndexedImage) SetPixel(pixel pixels.Pixel) {
+	img.pixels[pixel.Y*img.width+pixel.X] = pixel
 }
 
 func (img *TiledImage) GetDimensions() (int, int) {
@@ -68,8 +69,37 @@ func (img *IndexedImage) Render() image.Image {
 	for y := range img.height {
 		for x := range img.width {
 			pixel := img.PixelAt(x, y)
-			result.SetRGBA(x, y, toColor(pixel.getColor(img.palette)))
+			result.SetRGBA(x, y, pixels.ToColor(pixel.GetColor(img.palette)))
 		}
 	}
 	return result
+}
+
+// Cut up image into cells for a particular layer
+func getCells(img IndexedImage, layer Layer) TiledImage {
+
+	w, h := img.width, img.height
+
+	nrCols, nrRows := w/layer.cellWidth, h/layer.cellHeight
+
+	tiles := make([]IndexedImage, nrCols*nrRows)
+
+	for cy := range nrRows {
+		for cx := range nrCols {
+			cell := make([]pixels.Pixel, layer.cellWidth*layer.cellHeight)
+			for py := range layer.cellHeight {
+				for px := range layer.cellWidth {
+					cell[py*layer.cellWidth+px] = img.PixelAt(cx*layer.cellWidth+px, cy*layer.cellHeight+py)
+				}
+			}
+			tiles[cy*nrCols+cx] = IndexedImage{layer.cellWidth, layer.cellHeight, img.spec, img.palette, cell}
+		}
+	}
+	return TiledImage{
+		nrRows,
+		nrCols,
+		layer.cellWidth,
+		layer.cellHeight,
+		tiles,
+	}
 }

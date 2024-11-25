@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"image"
 
+	"github.com/micheldebree/retrospex/internal/pixels"
 	"golang.org/x/exp/maps"
 )
 
-func countUniqueTiles(img image.Image, spec Retrospec, pal Palette) {
+func countUniqueTiles(img image.Image, spec Retrospec, pal pixels.Palette) {
 
 	tiles := cutIntoTiles(img, spec, pal)
 
@@ -27,7 +28,7 @@ func countUniqueTiles(img image.Image, spec Retrospec, pal Palette) {
 
 }
 
-func cutIntoTiles(img image.Image, spec Retrospec, pal Palette) []IndexedImage {
+func cutIntoTiles(img image.Image, spec Retrospec, pal pixels.Palette) []IndexedImage {
 
 	tileW, tileH := 8, 8
 	w, h := img.Bounds().Max.X, img.Bounds().Max.Y
@@ -69,11 +70,11 @@ func hashTile(tile IndexedImage) string {
 		for x := range w {
 			pixel := tile.PixelAt(x, y)
 
-			if !pixel.hasBitPattern() {
+			if !pixel.HasBitPattern() {
 				panic("Pixel has no bit pattern!")
 			}
 
-			result[i] = byte(pixel.bitPattern)
+			result[i] = byte(pixel.BitPattern)
 		}
 	}
 	hash := sha256.New()

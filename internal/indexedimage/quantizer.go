@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/lucasb-eyer/go-colorful"
+	"github.com/micheldebree/retrospex/internal/pixels"
 	"golang.org/x/exp/maps"
 )
 
@@ -15,7 +16,7 @@ type PaletteDistance map[int]float64
 // ReducedPalette Palette that has been reduced to the number of bitpatterns supported in
 // a specific Layer of a Retrospec
 type ReducedPalette struct {
-	palette     Palette
+	palette     pixels.Palette
 	bitpatterns map[int]int
 }
 
@@ -25,7 +26,7 @@ func distance(color1, color2 colorful.Color) float64 {
 }
 
 // distances Distance from a pixel to each color in a palette
-func distances(aColor colorful.Color, palette Palette) PaletteDistance {
+func distances(aColor colorful.Color, palette pixels.Palette) PaletteDistance {
 	result := make(PaletteDistance, len(palette))
 	for palIndex, c := range palette {
 		result[palIndex] = distance(aColor, c)
@@ -53,13 +54,13 @@ func bestPixelIndex(distances PaletteDistance) (index int, qerror float64) {
 	return bestIndex, smallestDistance
 }
 
-func quantizePixel(p *Pixel, pal Palette) {
-	i, qerror := QuantizeToIndex(p.color, pal)
-	p.paletteIndex = i
-	p.quantizationError = qerror
+func quantizePixel(p *pixels.Pixel, pal pixels.Palette) {
+	i, qerror := QuantizeToIndex(p.Color, pal)
+	p.PaletteIndex = i
+	p.QuantizationError = qerror
 }
 
-func QuantizeToIndex(aColor colorful.Color, palette Palette) (int, float64) {
+func QuantizeToIndex(aColor colorful.Color, palette pixels.Palette) (int, float64) {
 	return bestPixelIndex(distances(aColor, palette))
 }
 
@@ -100,15 +101,15 @@ func quantizeCell(img IndexedImage, layer Layer) IndexedImage {
 	for pi := range img.pixels {
 		// pixels that are already assigned a bitpattern should not
 		// be quantized as their color will not be in the reduced palette
-		if !img.pixels[pi].hasBitPattern() { // has already been processed
+		if !img.pixels[pi].HasBitPattern() { // has already been processed
 			if layer.isLast { // last layer, all remaining pixels should be quantized against new palette
 				quantizePixel(&(img.pixels[pi]), newPalette.palette)
-				img.pixels[pi].bitPattern = newPalette.bitpatterns[img.pixels[pi].paletteIndex]
+				img.pixels[pi].BitPattern = newPalette.bitpatterns[img.pixels[pi].PaletteIndex]
 			} else { // not the last layer, only process pixels that quantize to a bitpattern in the new palette
 				quantizePixel(&(img.pixels[pi]), img.palette)
-				bitpattern, present := newPalette.bitpatterns[img.pixels[pi].paletteIndex]
+				bitpattern, present := newPalette.bitpatterns[img.pixels[pi].PaletteIndex]
 				if present {
-					img.pixels[pi].bitPattern = bitpattern
+					img.pixels[pi].BitPattern = bitpattern
 				}
 			}
 		}
@@ -130,11 +131,11 @@ func reducePalette(img IndexedImage, layer Layer) ReducedPalette {
 	for _, pixel := range img.pixels {
 
 		// pixels that are already assigned a bitpattern don't count
-		if !pixel.hasBitPattern() {
+		if !pixel.HasBitPattern() {
 			quantizePixel(&pixel, img.palette)
-			indexToCount[pixel.paletteIndex]++
+			indexToCount[pixel.PaletteIndex]++
 		} else {
-			existingBitpatterns[pixel.paletteIndex] = pixel.bitPattern
+			existingBitpatterns[pixel.PaletteIndex] = pixel.BitPattern
 		}
 	}
 
@@ -150,7 +151,7 @@ func reducePalette(img IndexedImage, layer Layer) ReducedPalette {
 		keys = keys[0:maxColors]
 	}
 
-	newPalette := make(Palette)
+	newPalette := make(pixels.Palette)
 	newBitpatterns := make(map[int]int)
 
 	// assign bitpatterns

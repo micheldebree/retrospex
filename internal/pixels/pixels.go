@@ -1,4 +1,4 @@
-package indexedimage
+package pixels
 
 import (
 	"fmt"
@@ -14,22 +14,22 @@ import (
 
 // Pixel One pixel in the image
 type Pixel struct {
-	x, y  int
-	color colorful.Color
+	X, Y  int
+	Color colorful.Color
 	// available after quantizing
-	paletteIndex      int
-	quantizationError float64
+	PaletteIndex      int
+	QuantizationError float64
 	// available when a bit pattern has been assigned
-	bitPattern int
+	BitPattern int
 }
 
-func (pixel Pixel) getColor(palette Palette) colorful.Color {
+func (pixel Pixel) GetColor(palette Palette) colorful.Color {
 	pixel.assertQuantized()
-	return palette[pixel.paletteIndex]
+	return palette[pixel.PaletteIndex]
 }
 
 func (pixel Pixel) isQuantized() bool {
-	return pixel.paletteIndex >= 0
+	return pixel.PaletteIndex >= 0
 }
 
 func (pixel Pixel) assertQuantized() {
@@ -38,12 +38,12 @@ func (pixel Pixel) assertQuantized() {
 	}
 }
 
-func (pixel Pixel) hasBitPattern() bool {
-	return pixel.bitPattern >= 0
+func (pixel Pixel) HasBitPattern() bool {
+	return pixel.BitPattern >= 0
 }
 
 func (pixel Pixel) assertHasBitPattern() {
-	if !pixel.hasBitPattern() {
+	if !pixel.HasBitPattern() {
 		panic(fmt.Sprintf("Pixel %v does not have a bit pattern", pixel))
 	}
 }
@@ -53,7 +53,7 @@ func ToRGBA(aColor color.Color) color.RGBA {
 	return color.RGBA{R: (uint8)(rr >> 8), G: (uint8)(gg >> 8), B: (uint8)(bb >> 8), A: (uint8)(aa >> 8)}
 }
 
-func toColor(colorful colorful.Color) color.RGBA {
+func ToColor(colorful colorful.Color) color.RGBA {
 	return color.RGBA{
 		R: uint8(colorful.R * 256.0),
 		G: uint8(colorful.G * 256.0),
@@ -77,13 +77,13 @@ func getPixel(image *image.Image, x, y int) Pixel {
 	return Pixel{x, y, convertedColor, -1, -1.0, -1}
 }
 
-func getDimensions(image *image.Image) (int, int) {
+func GetDimensions(image *image.Image) (int, int) {
 	return (*image).Bounds().Max.X - (*image).Bounds().Min.X, (*image).Bounds().Max.Y - (*image).Bounds().Min.Y
 }
 
-func getPixels(image *image.Image) []Pixel {
+func GetPixels(image *image.Image) []Pixel {
 	startX, startY := (*image).Bounds().Min.X, (*image).Bounds().Min.Y
-	w, h := getDimensions(image)
+	w, h := GetDimensions(image)
 	result := make([]Pixel, w*h)
 
 	for y := range h {
@@ -93,33 +93,4 @@ func getPixels(image *image.Image) []Pixel {
 		}
 	}
 	return result
-}
-
-// Cut up image into cells for a particular layer
-func getCells(img IndexedImage, layer Layer) TiledImage {
-
-	w, h := img.width, img.height
-
-	nrCols, nrRows := w/layer.cellWidth, h/layer.cellHeight
-
-	tiles := make([]IndexedImage, nrCols*nrRows)
-
-	for cy := range nrRows {
-		for cx := range nrCols {
-			cell := make([]Pixel, layer.cellWidth*layer.cellHeight)
-			for py := range layer.cellHeight {
-				for px := range layer.cellWidth {
-					cell[py*layer.cellWidth+px] = img.PixelAt(cx*layer.cellWidth+px, cy*layer.cellHeight+py)
-				}
-			}
-			tiles[cy*nrCols+cx] = IndexedImage{layer.cellWidth, layer.cellHeight, img.spec, img.palette, cell}
-		}
-	}
-	return TiledImage{
-		nrRows,
-		nrCols,
-		layer.cellWidth,
-		layer.cellHeight,
-		tiles,
-	}
 }

@@ -58,4 +58,4 @@ retrospex_windows_arm64.exe: $(SRC)
 retrospex_windows_x86.exe: $(SRC) 
 	CGO_ENABLED=$(CGO) GOOS=windows GOARCH=386 go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS) -X main.Arch=windows.x86" -o $@
 
-include koala.mk
+include scripts/koala.mk

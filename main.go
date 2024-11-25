@@ -15,7 +15,9 @@ import (
 	_ "image/png"
 	"strings"
 
+	"github.com/micheldebree/retrospex/internal/imageio"
 	"github.com/micheldebree/retrospex/internal/indexedimage"
+	"github.com/micheldebree/retrospex/internal/pixels"
 
 	"golang.org/x/exp/maps"
 )
@@ -57,7 +59,7 @@ func main() {
 		return
 	}
 
-	palette, isPresent := indexedimage.C64Palettes[options.Palette]
+	palette, isPresent := pixels.C64Palettes[options.Palette]
 	if !isPresent {
 		printError(fmt.Sprintf("Unknown palette: %s", options.Palette))
 		return
@@ -75,7 +77,7 @@ func main() {
 	}
 
 	infile := args[0]
-	img, err := indexedimage.ReadImageFile(infile)
+	img, err := imageio.ReadImageFile(infile)
 	if err != nil {
 		printError(err.Error())
 		return
@@ -88,7 +90,7 @@ func main() {
 	newImage := indexedimage.Quantize(indexedImage)
 
 	result := newImage.Render()
-	indexedimage.WriteImage(options.OutFile, result)
+	imageio.WriteImage(options.OutFile, result)
 	fmt.Print(options.OutFile)
 }
 
@@ -103,7 +105,7 @@ func help() {
 	fmt.Printf("Options:\n\n")
 	fmt.Printf("\t-o\n\t\tOutput filename (default %s)\n", defaultOptions.OutFile)
 	fmt.Printf("\t-m\n\t\tGraphics mode. (default %s), One of %s\n", defaultOptions.Mode, strings.Join(maps.Keys(indexedimage.RetrospecFactories), ","))
-	fmt.Printf("\t-p\n\t\tPalette (default %s). One of %s\n", defaultOptions.Palette, strings.Join(maps.Keys(indexedimage.C64Palettes), ","))
+	fmt.Printf("\t-p\n\t\tPalette (default %s). One of %s\n", defaultOptions.Palette, strings.Join(maps.Keys(pixels.C64Palettes), ","))
 	fmt.Printf("\t-dm\n\t\tDither matrix (default %s). One of %s\n", defaultOptions.DitherMatrix, strings.Join(maps.Keys(indexedimage.DitherMatrices), ","))
 	fmt.Printf("\t-dd\n\t\tDither depth (default %d). 0-255\n", defaultOptions.DitherDepth)
 }

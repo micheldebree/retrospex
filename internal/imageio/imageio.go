@@ -1,4 +1,4 @@
-package indexedimage
+package imageio
 
 import (
 	"image"

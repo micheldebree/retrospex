@@ -1,6 +1,10 @@
 package indexedimage
 
-import "image"
+import (
+	"image"
+
+	"github.com/micheldebree/retrospex/internal/pixels"
+)
 
 var RetrospecFactories = map[string]func(*image.Image) Retrospec{
 	"koala":        makeKoalaSpec,
@@ -23,7 +27,7 @@ func MakeSpec(specName string, img *image.Image) Retrospec {
 }
 
 func makeKoalaSpec(img *image.Image) Retrospec {
-	w, h := getDimensions(img)
+	w, h := pixels.GetDimensions(img)
 	return Retrospec{
 		[]Layer{
 			{w, h, []int{0x00}, false},            // d021
@@ -41,7 +45,7 @@ func makeHiresSpec(img *image.Image) Retrospec {
 }
 
 func makeMixedCharsetSpecSpec(img *image.Image) Retrospec {
-	w, h := getDimensions(img)
+	w, h := pixels.GetDimensions(img)
 	return Retrospec{
 		[]Layer{
 			{w, h, []int{0x00, 0x01, 0x10}, false}, // d021, d022, d023
@@ -51,7 +55,7 @@ func makeMixedCharsetSpecSpec(img *image.Image) Retrospec {
 }
 
 func makeMCCharsetSpecSpec(img *image.Image) Retrospec {
-	w, h := getDimensions(img)
+	w, h := pixels.GetDimensions(img)
 	return Retrospec{
 		[]Layer{
 			{w, h, []int{0x00, 0x01, 0x10, 0x11}, true}, // d021, d022, d023, d800...
@@ -60,7 +64,7 @@ func makeMCCharsetSpecSpec(img *image.Image) Retrospec {
 }
 
 func makeSCCCharsetSpecSpec(img *image.Image) Retrospec {
-	w, h := getDimensions(img)
+	w, h := pixels.GetDimensions(img)
 	return Retrospec{
 		[]Layer{
 			{w, h, []int{0}, false}, // d021
@@ -70,7 +74,7 @@ func makeSCCCharsetSpecSpec(img *image.Image) Retrospec {
 }
 
 func makeMciBitmapSpec(img *image.Image) Retrospec {
-	w, h := getDimensions(img)
+	w, h := pixels.GetDimensions(img)
 	return Retrospec{
 		[]Layer{
 			{w, h, []int{0x00}, false},            // d021
@@ -80,7 +84,7 @@ func makeMciBitmapSpec(img *image.Image) Retrospec {
 }
 
 func makeScSpritesSpec(img *image.Image) Retrospec {
-	w, h := getDimensions(img)
+	w, h := pixels.GetDimensions(img)
 	return Retrospec{
 		[]Layer{
 			{w, h, []int{0}, false},  // d021
@@ -90,7 +94,7 @@ func makeScSpritesSpec(img *image.Image) Retrospec {
 }
 
 func makeMcSpritesSpec(img *image.Image) Retrospec {
-	w, h := getDimensions(img)
+	w, h := pixels.GetDimensions(img)
 	return Retrospec{
 		[]Layer{
 			{w, h, []int{0x00}, false},   // d021
