@@ -1,4 +1,4 @@
-package main
+package indexedimage
 
 import "image"
 
@@ -13,7 +13,7 @@ var RetrospecFactories = map[string]func(*image.Image) Retrospec{
 	"mcsprites":    makeMcSpritesSpec,
 }
 
-func makeSpec(specName string, img *image.Image) Retrospec {
+func MakeSpec(specName string, img *image.Image) Retrospec {
 
 	factory, isPresent := RetrospecFactories[specName]
 	if !isPresent {

@@ -1,4 +1,4 @@
-package main
+package indexedimage
 
 import (
 	"image"
@@ -27,7 +27,7 @@ func newIndexedImage(w int, h int, spec Retrospec, pal Palette) IndexedImage {
 	return IndexedImage{w, h, spec, pal, pixels}
 }
 
-func toIndexedImage(img *image.Image, spec Retrospec, pal Palette) IndexedImage {
+func ToIndexedImage(img *image.Image, spec Retrospec, pal Palette) IndexedImage {
 	pixels := getPixels(img)
 	w, h := getDimensions(img)
 	return IndexedImage{w, h, spec, pal, pixels}

@@ -1,4 +1,4 @@
-package main
+package indexedimage
 
 import "github.com/lucasb-eyer/go-colorful"
 

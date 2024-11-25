@@ -1,4 +1,4 @@
-package main
+package indexedimage
 
 type Layer struct {
 	cellWidth, cellHeight int

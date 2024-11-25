@@ -11,7 +11,7 @@ test: paintface.prg
 	open $<
 
 retrospex:
-	go build $(SRC)
+	go build
 
 .PHONY: all
 all: \

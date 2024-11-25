@@ -15,10 +15,12 @@ import (
 	_ "image/png"
 	"strings"
 
+	"github.com/micheldebree/retrospex/internal/indexedimage"
+
 	"golang.org/x/exp/maps"
 )
 
-var Version = "0.2"
+var Version = "0.1"
 var Arch = "dev"
 
 type Options struct {
@@ -55,13 +57,13 @@ func main() {
 		return
 	}
 
-	palette, isPresent := C64Palettes[options.Palette]
+	palette, isPresent := indexedimage.C64Palettes[options.Palette]
 	if !isPresent {
 		printError(fmt.Sprintf("Unknown palette: %s", options.Palette))
 		return
 	}
 
-	ditherMatrix, isPresent := DitherMatrices[options.DitherMatrix]
+	ditherMatrix, isPresent := indexedimage.DitherMatrices[options.DitherMatrix]
 	if !isPresent {
 		printError(fmt.Sprintf("Unknown dither matrix: %s", options.DitherMatrix))
 		return
@@ -73,20 +75,20 @@ func main() {
 	}
 
 	infile := args[0]
-	img, err := ReadImageFile(infile)
+	img, err := indexedimage.ReadImageFile(infile)
 	if err != nil {
 		printError(err.Error())
 		return
 	}
 
-	spec := makeSpec(options.Mode, &img)
+	spec := indexedimage.MakeSpec(options.Mode, &img)
 	fmt.Printf("Mode: %s\n", options.Mode)
-	indexedImage := toIndexedImage(&img, spec, palette)
-	OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
-	newImage := Quantize(indexedImage)
+	indexedImage := indexedimage.ToIndexedImage(&img, spec, palette)
+	indexedimage.OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
+	newImage := indexedimage.Quantize(indexedImage)
 
 	result := newImage.Render()
-	WriteImage(options.OutFile, result)
+	indexedimage.WriteImage(options.OutFile, result)
 	fmt.Print(options.OutFile)
 }
 
@@ -100,8 +102,8 @@ func help() {
 	fmt.Printf("\nUsage: retrospex [options] input.png\n\n")
 	fmt.Printf("Options:\n\n")
 	fmt.Printf("\t-o\n\t\tOutput filename (default %s)\n", defaultOptions.OutFile)
-	fmt.Printf("\t-m\n\t\tGraphics mode. (default %s), One of %s\n", defaultOptions.Mode, strings.Join(maps.Keys(RetrospecFactories), ","))
-	fmt.Printf("\t-p\n\t\tPalette (default %s). One of %s\n", defaultOptions.Palette, strings.Join(maps.Keys(C64Palettes), ","))
-	fmt.Printf("\t-dm\n\t\tDither matrix (default %s). One of %s\n", defaultOptions.DitherMatrix, strings.Join(maps.Keys(DitherMatrices), ","))
+	fmt.Printf("\t-m\n\t\tGraphics mode. (default %s), One of %s\n", defaultOptions.Mode, strings.Join(maps.Keys(indexedimage.RetrospecFactories), ","))
+	fmt.Printf("\t-p\n\t\tPalette (default %s). One of %s\n", defaultOptions.Palette, strings.Join(maps.Keys(indexedimage.C64Palettes), ","))
+	fmt.Printf("\t-dm\n\t\tDither matrix (default %s). One of %s\n", defaultOptions.DitherMatrix, strings.Join(maps.Keys(indexedimage.DitherMatrices), ","))
 	fmt.Printf("\t-dd\n\t\tDither depth (default %d). 0-255\n", defaultOptions.DitherDepth)
 }

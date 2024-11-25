@@ -1,4 +1,4 @@
-package main
+package indexedimage
 
 import (
 	"crypto/sha256"
@@ -47,7 +47,7 @@ func cutIntoTiles(img image.Image, spec Retrospec, pal Palette) []IndexedImage {
 				SubImage(r image.Rectangle) image.Image
 			}).SubImage(image.Rect(x*tileW, y*tileH, x*tileW+tileW, y*tileH+tileH))
 
-			iimg := toIndexedImage(&tile, spec, pal)
+			iimg := ToIndexedImage(&tile, spec, pal)
 
 			fmt.Printf("Tile bounds: %v\n", tile.Bounds())
 
