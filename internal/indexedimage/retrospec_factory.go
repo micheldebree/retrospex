@@ -9,16 +9,15 @@ import (
 var RetrospecFactories = map[string]func(*image.Image) Retrospec{
 	"koala":        makeKoalaSpec,
 	"hires":        makeHiresSpec,
-	"mixedcharset": makeMixedCharsetSpecSpec,
-	"mccharset":    makeMCCharsetSpecSpec,
+	"mixedcharset": makeMixedCharsetSpec,
+	"mccharset":    makeMCCharsetSpec,
 	"scccharset":   makeSCCCharsetSpecSpec,
-	"mcibitmap":    makeMciBitmapSpec,
-	"scsprites":    makeScSpritesSpec,
-	"mcsprites":    makeMcSpritesSpec,
+	"mcibitmap":    makeMCiBitmapSpec,
+	"scsprites":    makeSCSpritesSpec,
+	"mcsprites":    makeMCSpritesSpec,
 }
 
 func MakeSpec(specName string, img *image.Image) Retrospec {
-
 	factory, isPresent := RetrospecFactories[specName]
 	if !isPresent {
 		panic("Unknown mode")
@@ -44,7 +43,7 @@ func makeHiresSpec(img *image.Image) Retrospec {
 	}
 }
 
-func makeMixedCharsetSpecSpec(img *image.Image) Retrospec {
+func makeMixedCharsetSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
 	return Retrospec{
 		[]Layer{
@@ -54,7 +53,7 @@ func makeMixedCharsetSpecSpec(img *image.Image) Retrospec {
 	}
 }
 
-func makeMCCharsetSpecSpec(img *image.Image) Retrospec {
+func makeMCCharsetSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
 	return Retrospec{
 		[]Layer{
@@ -73,7 +72,7 @@ func makeSCCCharsetSpecSpec(img *image.Image) Retrospec {
 	}
 }
 
-func makeMciBitmapSpec(img *image.Image) Retrospec {
+func makeMCiBitmapSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
 	return Retrospec{
 		[]Layer{
@@ -83,25 +82,26 @@ func makeMciBitmapSpec(img *image.Image) Retrospec {
 	}
 }
 
-func makeScSpritesSpec(img *image.Image) Retrospec {
+// TODO: does png2prg only support one color?
+func makeSCSpritesSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
 	return Retrospec{
 		[]Layer{
-			{w, h, []int{0}, false},  // d021
-			{24, 21, []int{1}, true}, // sprite color
+			{w, h, []int{0}, false}, // d021
+			{w, h, []int{1}, true},  // sprite color
 		},
 	}
 }
 
-func makeMcSpritesSpec(img *image.Image) Retrospec {
+// TODO: does png2prg only support 4 colors?
+func makeMCSpritesSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
 	return Retrospec{
 		[]Layer{
-			{w, h, []int{0x00}, false},   // d021
-			{12, 21, []int{0x01}, false}, // d025
-			{12, 21, []int{0x10}, false}, // d027,x
-			{12, 21, []int{0x11}, true},  // d026
+			{w, h, []int{0x00}, false}, // d021
+			{w, h, []int{0x01}, false}, // d025
+			{w, h, []int{0x10}, false}, // d027,x
+			{w, h, []int{0x11}, true},  // d026
 		},
 	}
-
 }

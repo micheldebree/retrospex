@@ -10,8 +10,8 @@ CGO := 0
 test: paintface.prg
 	open $<
 
-retrospex:
-	go build
+retrospex: $(SRC)
+	go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS)" -o "$@"
 
 .PHONY: all
 all: \
@@ -58,4 +58,4 @@ retrospex_windows_arm64.exe: $(SRC)
 retrospex_windows_x86.exe: $(SRC) 
 	CGO_ENABLED=$(CGO) GOOS=windows GOARCH=386 go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS) -X main.Arch=windows.x86" -o $@
 
-include scripts/koala.mk
+include scripts/scsprites.mk

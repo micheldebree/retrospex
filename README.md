@@ -17,9 +17,9 @@ Options:
 	-o
 		Output filename (default out.png)
 	-m
-		Graphics mode. (default koala), One of sccharset,mcibitmap,koala,hires,mixedcharset,mccharset
+		Graphics mode. (default koala), One of hires,mixedcharset,mccharset,scccharset,mcibitmap,scsprites,mcsprites,koala
 	-p
-		Palette (default colodore). One of archmage,perplex_1,lenyn,colodore,vice_old_lum,vice_371_internal,electric,ste,perplex_2,pepto,vice,pantaloon
+		Palette (default colodore). One of archmage,electric,colodore,pepto,vice,vice_old_lum,vice_371_internal,pantaloon,ste,perplex_1,lenyn,perplex_2
 	-dm
 		Dither matrix (default bayer4x4). One of bayer4x4,bayer8x8,none,bayer2x2
 	-dd
@@ -37,6 +37,13 @@ c64image((C64 executable))
 png2prg -- koala --> c64image
 music((music)) -- SID --> png2prg
 ```
+
+## Scripts
+
+The `/scripts` folder contains examples on how to script a build from
+source image to c64 file. Some example makefiles are included aswell.
+
+## Example
 
 Create a c64 executable from `madonna.png` with music `Whos_That_Girl.sid`:
 

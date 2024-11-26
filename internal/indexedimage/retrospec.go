@@ -10,9 +10,3 @@ type Layer struct {
 type Retrospec struct {
 	layers []Layer
 }
-
-var Hires2Colors = Retrospec{
-	[]Layer{
-		{320, 200, []int{0, 1}, true}, // 0400,x (lower), 0400,x (higher)
-	},
-}
