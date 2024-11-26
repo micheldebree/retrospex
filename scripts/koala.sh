@@ -1,6 +1,4 @@
 #!/bin/bash
-# dependencies: imagemagick, retrospex, png2prg
-
 MODE=koala
 
 # resize source to koala proportions

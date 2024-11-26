@@ -12,10 +12,10 @@ import (
 
 func countUniqueTiles(img image.Image, spec Retrospec, pal pixels.Palette) {
 
-	tiles := cutIntoTiles(img, spec, pal)
+	tiledImage := cutIntoTiles(img, spec, pal)
 
 	theMap := make(map[string]int)
-	for _, tile := range tiles {
+	for _, tile := range tiledImage.tiles {
 		hash := hashTile(tile)
 		count, isPresent := theMap[hash]
 		if !isPresent {
@@ -24,11 +24,11 @@ func countUniqueTiles(img image.Image, spec Retrospec, pal pixels.Palette) {
 		theMap[hash] = count + 1
 	}
 	fmt.Printf("%v\n", theMap)
-	fmt.Printf("%d unique tiles found\n", len(maps.Keys(theMap)))
+	fmt.Printf("%d unique tiledImage found\n", len(maps.Keys(theMap)))
 
 }
 
-func cutIntoTiles(img image.Image, spec Retrospec, pal pixels.Palette) []IndexedImage {
+func cutIntoTiles(img image.Image, spec Retrospec, pal pixels.Palette) TiledImage {
 
 	tileW, tileH := 8, 8
 	w, h := img.Bounds().Max.X, img.Bounds().Max.Y
@@ -57,7 +57,13 @@ func cutIntoTiles(img image.Image, spec Retrospec, pal pixels.Palette) []Indexed
 			i++
 		}
 	}
-	return result
+	return TiledImage{
+		nrRows:     nrRows,
+		nrCols:     nrCols,
+		tileWidth:  tileW,
+		tileHeight: tileH,
+		tiles:      result,
+	}
 }
 
 func hashTile(tile IndexedImage) string {

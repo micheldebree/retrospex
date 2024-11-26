@@ -2,6 +2,8 @@
 # - name the source image <name>.src.png
 # - use <name>.prg as a dependency in other targets
 
+MODE=hires
+
 # resize and apply b/w threshold
 %.1.png: %.src.png
 	magick "$<" \
@@ -13,15 +15,9 @@
 		"$@"
 
 # apply c64 specs
-%.2.png: %.1.png ./retrospex
-	./retrospex -m "hires" -o "$@" "$<"
-
-# rescale back to double-width pixel proportions
-.PRECIOUS: %.hires.png
-%.hires.png: %.2.png
-	magick "$<" -sample 320x200\! "$@"
+%.$(MODE).png: %.1.png
+	retrospex -m $(MODE) -o "$@" "$<"
 
 # convert to prg
-%.prg: %.hires.png
-	png2prg -display -o "$@" "$<"
-
+%.prg: %.$(MODE).png
+	png2prg -mode $(MODE) -display -o "$@" "$<"

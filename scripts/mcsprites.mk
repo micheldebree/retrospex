@@ -5,7 +5,6 @@
 MODE=mcsprites
 
 # resize to 8x12 pixels and apply threshold
-.PRECIOUS: %.1.png
 %.1.png: %.src.png
 	magick "$<" \
 		-normalize \
@@ -14,16 +13,13 @@ MODE=mcsprites
 		"$@"
 
 # apply c64 specs
-.PRECIOUS: %.2.png
 %.2.png: %.1.png retrospex
 	./retrospex -m $(MODE) -o "$@" "$<"
 
 # rescale back to double-width pixel proportions
-.PRECIOUS: %.$(MODE).png
 %.$(MODE).png: %.2.png
 	magick "$<" -sample 200%x100% "$@"
-	
+
 # convert to prg
 %.prg: %.$(MODE).png
 	png2prg -mode $(MODE) -display -o "$@" "$<"
-

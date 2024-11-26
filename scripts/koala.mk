@@ -15,15 +15,13 @@ MODE=koala
 		"$@"
 
 # apply c64 specs
-%.2.png: %.1.png ./retrospex
+%.2.png: %.1.png
 	./retrospex -m $(MODE) -o "$@" "$<"
 
 # rescale back to double-width pixel proportions
-.PRECIOUS: %.$(MODE).png
 %.$(MODE).png: %.2.png
 	magick "$<" -sample 320x200\! "$@"
 
 # convert to prg
 %.prg: %.$(MODE).png
 	png2prg --mode $(MODE) -display -o "$@" "$<"
-

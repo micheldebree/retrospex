@@ -1,11 +1,19 @@
 # retrospex
 
 Converts an image to match Commodore 64 graphic modes specifications.
-Designed to be used as part of a development toolchain, for example together with other tools like:
 
-- [ImageMagick](https://imagemagick.org/index.php)
-- [png2prg](https://github.com/staD020/png2prg). retrospex is specifically designed for compatibility with `png2prg`
-- [spot](https://github.com/spartaomg/spot_cpp)
+Retrospex only does two things:
+
+- Quantize the image colors to the 16-color Commodore 64 palette
+- Apply restrictions that various graphic modes impose on the number of unique colors
+  used in a specific area
+
+Designed to be used as part of a development toolchain, for example:
+
+- [ImageMagick](https://imagemagick.org/index.php) (process an image, like resizing and cropping)
+- [png2prg](https://github.com/staD020/png2prg). (convert to a Commodore 64 compatible format) retrospex is specifically
+  designed for compatibility with `png2prg`
+- [spot](https://github.com/spartaomg/spot_cpp) (convert and optimize to Commodore 64 compatible format )
 
 ## Usage
 
