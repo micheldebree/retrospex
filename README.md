@@ -8,12 +8,18 @@ Retrospex only does two things:
 - Apply restrictions that various graphic modes impose on the number of unique colors
   used in a specific area
 
+Things like cropping/scaling to the right size, or making sure multicolor
+pixels are two pixels wide is not part of this tool and can be done with other
+tools in a pre-processing step.
+
 Designed to be used as part of a development toolchain, for example:
 
-- [ImageMagick](https://imagemagick.org/index.php) (process an image, like resizing and cropping)
-- [png2prg](https://github.com/staD020/png2prg). (convert to a Commodore 64 compatible format) retrospex is specifically
-  designed for compatibility with `png2prg`
-- [spot](https://github.com/spartaomg/spot_cpp) (convert and optimize to Commodore 64 compatible format )
+- [ImageMagick](https://imagemagick.org/index.php) (process an image, like
+  resizing and cropping)
+- [png2prg](https://github.com/staD020/png2prg). (convert to a Commodore 64
+  compatible format) retrospex is specifically designed for compatibility with `png2prg`
+- [spot](https://github.com/spartaomg/spot_cpp) (convert and optimize to
+  Commodore 64 compatible format)
 
 ## Usage
 
@@ -34,40 +40,7 @@ Options:
 		Dither depth (default 25). 0-255
 ```
 
-## Example toolchain
-
-```mermaid
-graph TD
-image((image)) -- PNG --> ImageMagick
-ImageMagick -- color adjusted, resized, cropped PNG --> retrospex
-retrospex -- quantized PNG --> png2prg
-c64image((C64 executable))
-png2prg -- koala --> c64image
-music((music)) -- SID --> png2prg
-```
-
 ## Scripts
 
 The `/scripts` folder contains examples on how to script a build from
-source image to c64 file. Some example makefiles are included aswell.
-
-## Example
-
-Create a c64 executable from `madonna.png` with music `Whos_That_Girl.sid`:
-
-```bash
-#!/bin/bash
-INPUT=madonna
-
-# use https://imagemagick.org to resize and normalize source image
-convert ${INPUT}.png -normalize -resize 320x200^ -gravity center -extent 320x200 ${INPUT}01.png
-
-# use retrospex to convert to c64 specs
-retrospex -m koala -o ${INPUT}02.png ${INPUT}01.png
-
-# use https://github.com/staD020/png2prg to convert to c64 executable with music
-png2prg -v -d -sid Whos_That_Girl.sid ${INPUT}02.png
-
-# open the result in https://vice-emu.sourceforge.io/
-x64sc ${INPUT}02.prg
-```
+source image to Commodore 64 file. Example makefiles are included aswell.

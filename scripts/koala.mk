@@ -1,11 +1,5 @@
-# USAGE:
-# - name the source image <name>.src.png
-# - use <name>.prg as a dependency in other targets
-
-MODE=koala
-
 # resize source to koala proportions
-%.1.png: %.src.png
+%.koala.1.png: %.src.png
 	magick "$<" \
 		-normalize \
 		-resize 320x200^ \
@@ -15,13 +9,13 @@ MODE=koala
 		"$@"
 
 # apply c64 specs
-%.2.png: %.1.png
-	./retrospex -m $(MODE) -o "$@" "$<"
+%.koala.2.png: %.koala.1.png
+	retrospex -m koala -o "$@" "$<"
 
 # rescale back to double-width pixel proportions
-%.$(MODE).png: %.2.png
+%.koala.png: %.koala.2.png
 	magick "$<" -sample 320x200\! "$@"
 
 # convert to prg
-%.prg: %.$(MODE).png
-	png2prg --mode $(MODE) -display -o "$@" "$<"
+%.koala.prg: %.koala.png
+	png2prg --mode koala -display -o "$@" "$<"

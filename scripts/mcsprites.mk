@@ -1,11 +1,5 @@
-# USAGE:
-# - name the source image <name>.src.png
-# - use <name>.prg as a dependency in other targets
-
-MODE=mcsprites
-
 # resize to 8x12 pixels and apply threshold
-%.1.png: %.src.png
+%.tmp1.png: %.src.png
 	magick "$<" \
 		-normalize \
 		-resize 192x \
@@ -13,13 +7,13 @@ MODE=mcsprites
 		"$@"
 
 # apply c64 specs
-%.2.png: %.1.png retrospex
-	./retrospex -m $(MODE) -o "$@" "$<"
+%.tmp2.png: %.tmp1.png retrospex
+	./retrospex -m mcsprites -o "$@" "$<"
 
 # rescale back to double-width pixel proportions
-%.$(MODE).png: %.2.png
+%.mcsprites.png: %.tmp2.png
 	magick "$<" -sample 200%x100% "$@"
 
 # convert to prg
-%.prg: %.$(MODE).png
-	png2prg -mode $(MODE) -display -o "$@" "$<"
+%.mcsprites.prg: %.mcsprites.png
+	png2prg -mode mcsprites -display -o "$@" "$<"

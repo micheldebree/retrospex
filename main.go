@@ -22,7 +22,7 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-var Version = "0.1"
+var Version = "0.0"
 var Arch = "dev"
 
 type Options struct {
