@@ -26,3 +26,4 @@ go.work
 retrospex_*
 .DS_Store
 scripts/*.prg
+./retrospex
