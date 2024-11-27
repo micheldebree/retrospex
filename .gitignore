@@ -24,3 +24,5 @@ go.work
 .idea
 
 retrospex_*
+.DS_Store
+scripts/*.prg

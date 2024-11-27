@@ -1,4 +1,4 @@
-package main
+package imageio
 
 import (
 	"image"
@@ -20,8 +20,7 @@ func ReadImageFile(filename string) (image.Image, error) {
 		return nil, err
 	}
 	defer func(f *os.File) {
-		err := f.Close()
-		abortOnError(err)
+		abortOnError(f.Close())
 	}(f)
 
 	img, _, err := image.Decode(f)

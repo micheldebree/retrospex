@@ -1,4 +1,4 @@
-package main
+package pixels
 
 import (
 	"image/color"
@@ -271,4 +271,3 @@ func createPalette(palette color.Palette) Palette {
 	}
 	return result
 }
-

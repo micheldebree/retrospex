@@ -1,18 +1,21 @@
-VERSION := 0.1
+VERSION := 1.0
 REV := $(shell git rev-parse --short HEAD)
 SRC := $(filter-out $(wildcard *_test.go), $(wildcard *.go))
 
-GOBUILDFLAGS=-v -trimpath
-LDFLAGS=-w -s -X main.Version=$(VERSION).$(REV)
+GOBUILDFLAGS := -v -trimpath
+LDFLAGS :=-w -s -X main.Version=$(VERSION).$(REV)
 CGO := 0
-
-IMG := paintface.jpg
+BUILDCMD := go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS)"
 
 .PHONY: test
-test: $(SRC)
-	go run $^ -o $@-$(REV).png $(IMG) && open $@-$(REV).png
-	png2prg -v -d $@-$(REV).png
-	open $@-$(REV).prg
+test: \
+	scripts/paintface.koala.prg \
+	scripts/paintface.hires.prg \
+	scripts/paintface.scsprites.prg \
+	scripts/paintface.mcsprites.prg
+
+retrospex: $(SRC)
+	$(BUILDCMD) -o "$@"
 
 .PHONY: all
 all: \
@@ -26,9 +29,13 @@ all: \
 
 .PHONY: clean
 clean:
-	rm *.png || true
-	rm *.zip || true
-	rm retrospex_*
+	rm scripts/*.prg || true
+	rm scripts/*.tmp1.png || true
+	rm retrospex*
+
+.PHONY: install
+install: $(SRC)
+	$(BUILDCMD) -o "${HOME}/bin/retrospex"
 
 %.zip: %
 	zip -m -9 $@ $<
@@ -54,3 +61,7 @@ retrospex_windows_arm64.exe: $(SRC)
 retrospex_windows_x86.exe: $(SRC) 
 	CGO_ENABLED=$(CGO) GOOS=windows GOARCH=386 go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS) -X main.Arch=windows.x86" -o $@
 
+include scripts/koala.mk
+include scripts/hires.mk
+include scripts/scsprites.mk
+include scripts/mcsprites.mk

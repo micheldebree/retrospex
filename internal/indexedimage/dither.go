@@ -1,4 +1,4 @@
-package main
+package indexedimage
 
 import "github.com/lucasb-eyer/go-colorful"
 
@@ -40,16 +40,16 @@ func OrderedDither(img *IndexedImage, matrix IntMatrix, depth int) {
 	for i := range (*img).pixels {
 		// change pixels in place
 		pixel := &(*img).pixels[i]
-		matrixX := pixel.x % matrixW
-		matrixY := pixel.y % matrixH
+		matrixX := pixel.X % matrixW
+		matrixY := pixel.Y % matrixH
 		matrixV := normalizedMatrix[matrixY][matrixX]
 
 		color := colorful.Color{
-			R: max(pixel.color.R+matrixV, 0.0),
-			G: max(pixel.color.G+matrixV, 0.0),
-			B: max(pixel.color.B+matrixV, 0.0),
+			R: max(pixel.Color.R+matrixV, 0.0),
+			G: max(pixel.Color.G+matrixV, 0.0),
+			B: max(pixel.Color.B+matrixV, 0.0),
 		}
-		pixel.color = color
+		pixel.Color = color
 	}
 }
 
