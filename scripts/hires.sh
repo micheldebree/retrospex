@@ -1,5 +1,4 @@
 #!/bin/sh
-
 MODE=hires
 
 # resize and apply b/w threshold

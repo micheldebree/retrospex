@@ -13,4 +13,3 @@
 # convert to prg
 %.scsprites.prg: %.scsprites.png
 	png2prg -mode scsprites -display -o "$@" "$<"
-

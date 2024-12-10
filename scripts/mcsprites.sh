@@ -1,5 +1,4 @@
 #!/bin/bash
-
 MODE=mcsprites
 
 # resize to 96 (8x12) pixels width

@@ -1,5 +1,4 @@
 #!/bin/bash
-
 MODE=scsprites
 
 # resize to 8x24 pixels and apply threshold
