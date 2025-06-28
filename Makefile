@@ -9,6 +9,7 @@ BUILDCMD := go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS)"
 
 .PHONY: test
 test: \
+	go test ./...
 	scripts/paintface.koala.prg \
 	scripts/paintface.hires.prg \
 	scripts/paintface.scsprites.prg \
