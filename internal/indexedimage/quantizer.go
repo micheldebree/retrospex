@@ -64,57 +64,78 @@ func QuantizeToIndex(aColor colorful.Color, palette pixels.Palette) (int, float6
 	return bestPixelIndex(distances(aColor, palette))
 }
 
+// Tile represents a region of an IndexedImage
+type Tile struct {
+	img       *IndexedImage
+	x, y      int
+	width, height int
+}
+
+// Cut up image into tiles for a particular layer
+func getTiles(img IndexedImage, layer Layer) []Tile {
+	w, h := img.width, img.height
+
+	nrCols, nrRows := w/layer.cellWidth, h/layer.cellHeight
+
+	tiles := make([]Tile, nrCols*nrRows)
+
+	for cy := range nrRows {
+		for cx := range nrCols {
+			tiles[cy*nrCols+cx] = Tile{
+				&img,
+				cx * layer.cellWidth,
+				cy * layer.cellHeight,
+				layer.cellWidth,
+				layer.cellHeight,
+			}
+		}
+	}
+	return tiles
+}
+
+func quantizeTiles(img IndexedImage, layer Layer) {
+	tiles := getTiles(img, layer)
+	for _, tile := range tiles {
+		quantizeTile(tile, layer)
+	}
+}
+
+func quantizeTile(tile Tile, layer Layer) {
+	newPalette := reducePalette(*tile.img, layer)
+
+	for y := 0; y < tile.height; y++ {
+		for x := 0; x < tile.width; x++ {
+			pixelIndex := (tile.y + y) * tile.img.width + (tile.x + x)
+			pixel := &tile.img.pixels[pixelIndex]
+			if !pixel.HasBitPattern() { // has already been processed
+				if layer.isLast { // last layer, all remaining pixels should be quantized against new palette
+					quantizePixel(pixel, newPalette.palette)
+					pixel.BitPattern = newPalette.bitpatterns[pixel.PaletteIndex]
+				} else { // not the last layer, only process pixels that quantize to a bitpattern in the new palette
+					quantizePixel(pixel, tile.img.palette)
+					bitpattern, present := newPalette.bitpatterns[pixel.PaletteIndex]
+					if present {
+						pixel.BitPattern = bitpattern
+					}
+				}
+			}
+		}
+	}
+}
+
 func Quantize(img IndexedImage) IndexedImage {
 	result := img
 
 	for _, layer := range img.spec.layers {
 		// cut the image up according to layer specs
-		cells := getCells(result, layer)
+		tiles := getTiles(result, layer)
 
-		// quantize the cells
-		qCells := quantizeTiles(cells, layer)
-
-		// stitch the cells back together
-		result = combine(&qCells)
-	}
-	return result
-}
-
-func quantizeTiles(img TiledImage, layer Layer) TiledImage {
-	newTiles := make([]IndexedImage, len(img.tiles))
-	for ci, cell := range img.tiles {
-		newTiles[ci] = quantizeCell(cell, layer)
-	}
-	return TiledImage{
-		img.nrRows,
-		img.nrCols,
-		img.tileWidth,
-		img.tileHeight,
-		newTiles,
-	}
-}
-
-func quantizeCell(img IndexedImage, layer Layer) IndexedImage {
-	// newPalette := reducePaletteKmeans(img, layer)
-	newPalette := reducePalette(img, layer)
-
-	for pi := range img.pixels {
-		// pixels that are already assigned a bitpattern should not
-		// be quantized as their color will not be in the reduced palette
-		if !img.pixels[pi].HasBitPattern() { // has already been processed
-			if layer.isLast { // last layer, all remaining pixels should be quantized against new palette
-				quantizePixel(&(img.pixels[pi]), newPalette.palette)
-				img.pixels[pi].BitPattern = newPalette.bitpatterns[img.pixels[pi].PaletteIndex]
-			} else { // not the last layer, only process pixels that quantize to a bitpattern in the new palette
-				quantizePixel(&(img.pixels[pi]), img.palette)
-				bitpattern, present := newPalette.bitpatterns[img.pixels[pi].PaletteIndex]
-				if present {
-					img.pixels[pi].BitPattern = bitpattern
-				}
-			}
+		// quantize the tiles
+		for _, tile := range tiles {
+			quantizeTile(tile, layer)
 		}
 	}
-	return img
+	return result
 }
 
 // reduce a palette to maximum number of colors according to their
