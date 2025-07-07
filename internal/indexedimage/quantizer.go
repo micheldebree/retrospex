@@ -66,8 +66,8 @@ func QuantizeToIndex(aColor colorful.Color, palette pixels.Palette) (int, float6
 
 // Tile represents a region of an IndexedImage
 type Tile struct {
-	img       *IndexedImage
-	x, y      int
+	img           *IndexedImage
+	x, y          int
 	width, height int
 }
 
@@ -93,19 +93,12 @@ func getTiles(img IndexedImage, layer Layer) []Tile {
 	return tiles
 }
 
-func quantizeTiles(img IndexedImage, layer Layer) {
-	tiles := getTiles(img, layer)
-	for _, tile := range tiles {
-		quantizeTile(tile, layer)
-	}
-}
-
 func quantizeTile(tile Tile, layer Layer) {
 	newPalette := reducePalette(*tile.img, layer)
 
 	for y := 0; y < tile.height; y++ {
 		for x := 0; x < tile.width; x++ {
-			pixelIndex := (tile.y + y) * tile.img.width + (tile.x + x)
+			pixelIndex := (tile.y+y)*tile.img.width + (tile.x + x)
 			pixel := &tile.img.pixels[pixelIndex]
 			if !pixel.HasBitPattern() { // has already been processed
 				if layer.isLast { // last layer, all remaining pixels should be quantized against new palette

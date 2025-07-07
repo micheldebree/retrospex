@@ -1,8 +1,9 @@
 package indexedimage
 
 import (
-	"github.com/micheldebree/retrospex/internal/pixels"
 	"image"
+
+	"github.com/micheldebree/retrospex/internal/pixels"
 )
 
 // IndexedImage an image with pixels in left to right, top to bottom order
@@ -12,11 +13,6 @@ type IndexedImage struct {
 	spec    Retrospec
 	palette pixels.Palette
 	pixels  []pixels.Pixel
-}
-
-func newIndexedImage(w int, h int, spec Retrospec, pal pixels.Palette) IndexedImage {
-	thePixels := make([]pixels.Pixel, w*h)
-	return IndexedImage{w, h, spec, pal, thePixels}
 }
 
 func ToIndexedImage(img *image.Image, spec Retrospec, pal pixels.Palette) IndexedImage {
