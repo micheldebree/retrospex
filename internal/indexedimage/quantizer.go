@@ -94,7 +94,7 @@ func getTiles(img IndexedImage, layer Layer) []Tile {
 }
 
 func quantizeTile(tile Tile, layer Layer) {
-	newPalette := reducePalette(*tile.img, layer)
+	newPalette := reducePalette(tile, layer)
 
 	for y := 0; y < tile.height; y++ {
 		for x := 0; x < tile.width; x++ {
@@ -134,17 +134,21 @@ func Quantize(img IndexedImage) IndexedImage {
 // reduce a palette to maximum number of colors according to their
 // quantized occurence in pixels. assign a bitpattern to each palette entry
 // only considers pixels that don't have a bitpattern assigned yet
-func reducePalette(img IndexedImage, layer Layer) ReducedPalette {
+func reducePalette(tile Tile, layer Layer) ReducedPalette {
 
 	indexToCount := make(map[int]int)
 
 	// count nr of pixels for each quantized color
-	for _, pixel := range img.pixels {
+	for y := 0; y < tile.height; y++ {
+		for x := 0; x < tile.width; x++ {
+			pixelIndex := (tile.y+y)*tile.img.width + (tile.x + x)
+			pixel := &tile.img.pixels[pixelIndex]
 
-		// pixels that are already assigned a bitpattern don't count
-		if !pixel.HasBitPattern() {
-			quantizePixel(&pixel, img.palette)
-			indexToCount[pixel.PaletteIndex]++
+			// pixels that are already assigned a bitpattern don't count
+			if !pixel.HasBitPattern() {
+				quantizePixel(pixel, tile.img.palette)
+				indexToCount[pixel.PaletteIndex]++
+			}
 		}
 	}
 
@@ -166,7 +170,7 @@ func reducePalette(img IndexedImage, layer Layer) ReducedPalette {
 	// assign bitpatterns
 	i := 0
 	for _, key := range keys {
-		newPalette[key] = img.palette[key]
+		newPalette[key] = tile.img.palette[key]
 		newBitpatterns[key] = layer.bitpatterns[i]
 		i++
 	}
