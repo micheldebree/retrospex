@@ -138,9 +138,6 @@ func reducePalette(img IndexedImage, layer Layer) ReducedPalette {
 
 	indexToCount := make(map[int]int)
 
-	// TODO: does this make any difference?
-	existingBitpatterns := make(map[int]int)
-
 	// count nr of pixels for each quantized color
 	for _, pixel := range img.pixels {
 
@@ -148,8 +145,6 @@ func reducePalette(img IndexedImage, layer Layer) ReducedPalette {
 		if !pixel.HasBitPattern() {
 			quantizePixel(&pixel, img.palette)
 			indexToCount[pixel.PaletteIndex]++
-		} else {
-			existingBitpatterns[pixel.PaletteIndex] = pixel.BitPattern
 		}
 	}
 
@@ -174,13 +169,6 @@ func reducePalette(img IndexedImage, layer Layer) ReducedPalette {
 		newPalette[key] = img.palette[key]
 		newBitpatterns[key] = layer.bitpatterns[i]
 		i++
-	}
-
-	// Add existing bitpatterns to the palette so they also get a chance
-	// TODO: does this make any difference?
-	for key := range existingBitpatterns {
-		newPalette[key] = img.palette[key]
-		newBitpatterns[key] = existingBitpatterns[key]
 	}
 
 	return ReducedPalette{newPalette, newBitpatterns}
