@@ -55,13 +55,10 @@ func bestPixelIndex(distances PaletteDistance) (index int, qerror float64) {
 }
 
 func quantizePixel(p *pixels.Pixel, pal pixels.Palette) {
-	i, qerror := QuantizeToIndex(p.Color, pal)
-	p.PaletteIndex = i
-	p.QuantizationError = qerror
-}
-
-func QuantizeToIndex(aColor colorful.Color, palette pixels.Palette) (int, float64) {
-	return bestPixelIndex(distances(aColor, palette))
+	distances := distances(p.Color, pal)
+	bestIndex, smallestDistance := bestPixelIndex(distances)
+	p.PaletteIndex = bestIndex
+	p.QuantizationError = smallestDistance
 }
 
 // Tile represents a region of an IndexedImage
