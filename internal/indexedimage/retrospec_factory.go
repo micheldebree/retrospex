@@ -35,7 +35,7 @@ func makeKoalaSpec(img *image.Image) Retrospec {
 	}
 }
 
-func makeHiresSpec(img *image.Image) Retrospec {
+func makeHiresSpec(_ *image.Image) Retrospec {
 	return Retrospec{
 		[]Layer{
 			{8, 8, []int{0, 1}, true}, // 0400,x (lower nibble), 0400,x (upper nibble)

@@ -10,7 +10,7 @@
 
 # apply c64 specs
 %.koala.2.png: %.koala.1.png
-	retrospex -m koala -o "$@" "$<"
+	time retrospex -m koala -o "$@" "$<"
 
 # rescale back to double-width pixel proportions
 %.koala.png: %.koala.2.png

@@ -7,6 +7,9 @@ LDFLAGS :=-w -s -X main.Version=$(VERSION).$(REV)
 CGO := 0
 BUILDCMD := go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS)"
 
+run: test
+	open scripts/paintface.koala.prg
+
 .PHONY: test
 test: \
 	scripts/paintface.koala.prg \

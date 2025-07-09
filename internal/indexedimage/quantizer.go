@@ -65,6 +65,10 @@ type LayerRegion struct {
 	bitpatterns   map[int]int    // maps each palette index to a bit pattern
 }
 
+func (region *LayerRegion) coordsToIndex(x, y int) int {
+	return (region.y+y)*region.img.width + (region.x + x)
+}
+
 // Cut up image into regions for a particular layer
 func getLayerRegions(img IndexedImage, layer Layer) []LayerRegion {
 	w, h := img.width, img.height
@@ -95,7 +99,7 @@ func quantizeLayerRegion(region LayerRegion) {
 
 	for y := 0; y < region.height; y++ {
 		for x := 0; x < region.width; x++ {
-			pixelIndex := (region.y+y)*region.img.width + (region.x + x)
+			pixelIndex := region.coordsToIndex(x, y)
 			pixel := &region.img.pixels[pixelIndex]
 			if !pixel.HasBitPattern() { // has already been processed
 				if region.layer.isLast { // last layer, all remaining pixels should be quantized against the region's palette
@@ -138,7 +142,7 @@ func createPaletteForBitpatterns(region LayerRegion) {
 	// count nr of pixels for each quantized color
 	for y := 0; y < region.height; y++ {
 		for x := 0; x < region.width; x++ {
-			pixelIndex := (region.y+y)*region.img.width + (region.x + x)
+			pixelIndex := region.coordsToIndex(x, y)
 			pixel := &region.img.pixels[pixelIndex]
 
 			// pixels that are already assigned a bitpattern don't count
