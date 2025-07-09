@@ -13,13 +13,6 @@ import (
 // In the order of the palette
 type PaletteDistance map[int]float64
 
-// ReducedPalette Palette that has been reduced to the number of bitpatterns supported in
-// a specific Layer of a Retrospec
-type ReducedPalette struct {
-	palette     pixels.Palette
-	bitpatterns map[int]int
-}
-
 func distance(color1, color2 colorful.Color) float64 {
 	// TODO: make an option
 	return color1.DistanceLinearRGB(color2)
@@ -61,49 +54,56 @@ func quantizePixel(p *pixels.Pixel, pal pixels.Palette) {
 	p.QuantizationError = smallestDistance
 }
 
-// Tile represents a region of an IndexedImage
-type Tile struct {
+// LayerRegion represents a region of an IndexedImage with its reduced palette of colors
+// It belongs to a layer and maps the bitpatterns in that layer to this palette
+type LayerRegion struct {
 	img           *IndexedImage
+	layer         *Layer
 	x, y          int
 	width, height int
+	palette       pixels.Palette // a 'sparse' palette, meaning not all palette indexes from the original palette are present
+	bitpatterns   map[int]int    // maps each palette index to a bit pattern
 }
 
-// Cut up image into tiles for a particular layer
-func getTiles(img IndexedImage, layer Layer) []Tile {
+// Cut up image into regions for a particular layer
+func getLayerRegions(img IndexedImage, layer Layer) []LayerRegion {
 	w, h := img.width, img.height
 
 	nrCols, nrRows := w/layer.cellWidth, h/layer.cellHeight
 
-	tiles := make([]Tile, nrCols*nrRows)
+	regions := make([]LayerRegion, nrCols*nrRows)
 
 	for cy := range nrRows {
 		for cx := range nrCols {
-			tiles[cy*nrCols+cx] = Tile{
+			regions[cy*nrCols+cx] = LayerRegion{
 				&img,
+				&layer,
 				cx * layer.cellWidth,
 				cy * layer.cellHeight,
 				layer.cellWidth,
 				layer.cellHeight,
+				pixels.Palette{},
+				make(map[int]int),
 			}
 		}
 	}
-	return tiles
+	return regions
 }
 
-func quantizeTile(tile Tile, layer Layer) {
-	newPalette := reducePalette(tile, layer)
+func quantizeLayerRegion(region LayerRegion) {
+	createPaletteForBitpatterns(region)
 
-	for y := 0; y < tile.height; y++ {
-		for x := 0; x < tile.width; x++ {
-			pixelIndex := (tile.y+y)*tile.img.width + (tile.x + x)
-			pixel := &tile.img.pixels[pixelIndex]
+	for y := 0; y < region.height; y++ {
+		for x := 0; x < region.width; x++ {
+			pixelIndex := (region.y+y)*region.img.width + (region.x + x)
+			pixel := &region.img.pixels[pixelIndex]
 			if !pixel.HasBitPattern() { // has already been processed
-				if layer.isLast { // last layer, all remaining pixels should be quantized against new palette
-					quantizePixel(pixel, newPalette.palette)
-					pixel.BitPattern = newPalette.bitpatterns[pixel.PaletteIndex]
+				if region.layer.isLast { // last layer, all remaining pixels should be quantized against the region's palette
+					quantizePixel(pixel, region.palette)
+					pixel.BitPattern = region.bitpatterns[pixel.PaletteIndex]
 				} else { // not the last layer, only process pixels that quantize to a bitpattern in the new palette
-					quantizePixel(pixel, tile.img.palette)
-					bitpattern, present := newPalette.bitpatterns[pixel.PaletteIndex]
+					quantizePixel(pixel, region.img.palette)
+					bitpattern, present := region.bitpatterns[pixel.PaletteIndex]
 					if present {
 						pixel.BitPattern = bitpattern
 					}
@@ -118,11 +118,11 @@ func Quantize(img IndexedImage) IndexedImage {
 
 	for _, layer := range img.spec.layers {
 		// cut the image up according to layer specs
-		tiles := getTiles(result, layer)
+		regions := getLayerRegions(result, layer)
 
-		// quantize the tiles
-		for _, tile := range tiles {
-			quantizeTile(tile, layer)
+		// quantize the regions
+		for _, region := range regions {
+			quantizeLayerRegion(region)
 		}
 	}
 	return result
@@ -131,19 +131,19 @@ func Quantize(img IndexedImage) IndexedImage {
 // reduce a palette to maximum number of colors according to their
 // quantized occurence in pixels. assign a bitpattern to each palette entry
 // only considers pixels that don't have a bitpattern assigned yet
-func reducePalette(tile Tile, layer Layer) ReducedPalette {
+func createPaletteForBitpatterns(region LayerRegion) {
 
 	indexToCount := make(map[int]int)
 
 	// count nr of pixels for each quantized color
-	for y := 0; y < tile.height; y++ {
-		for x := 0; x < tile.width; x++ {
-			pixelIndex := (tile.y+y)*tile.img.width + (tile.x + x)
-			pixel := &tile.img.pixels[pixelIndex]
+	for y := 0; y < region.height; y++ {
+		for x := 0; x < region.width; x++ {
+			pixelIndex := (region.y+y)*region.img.width + (region.x + x)
+			pixel := &region.img.pixels[pixelIndex]
 
 			// pixels that are already assigned a bitpattern don't count
 			if !pixel.HasBitPattern() {
-				quantizePixel(pixel, tile.img.palette)
+				quantizePixel(pixel, region.img.palette)
 				indexToCount[pixel.PaletteIndex]++
 			}
 		}
@@ -156,21 +156,17 @@ func reducePalette(tile Tile, layer Layer) ReducedPalette {
 	})
 
 	// only keep top n
-	maxColors := len(layer.bitpatterns)
+	maxColors := len(region.layer.bitpatterns)
 	if maxColors < len(keys) {
 		keys = keys[0:maxColors]
 	}
 
-	newPalette := make(pixels.Palette)
-	newBitpatterns := make(map[int]int)
-
 	// assign bitpatterns
 	i := 0
 	for _, key := range keys {
-		newPalette[key] = tile.img.palette[key]
-		newBitpatterns[key] = layer.bitpatterns[i]
+		region.palette[key] = region.img.palette[key]
+		region.bitpatterns[key] = region.layer.bitpatterns[i]
 		i++
 	}
 
-	return ReducedPalette{newPalette, newBitpatterns}
 }
