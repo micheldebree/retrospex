@@ -57,16 +57,43 @@ func quantizePixel(p *pixels.Pixel, pal pixels.Palette) {
 // LayerRegion represents a region of an IndexedImage with its reduced palette of colors
 // It belongs to a layer and maps the bitpatterns in that layer to this palette
 type LayerRegion struct {
-	img           *IndexedImage
-	layer         *Layer
-	x, y          int
-	width, height int
-	palette       pixels.Palette // a 'sparse' palette, meaning not all palette indexes from the original palette are present
-	bitpatterns   map[int]int    // maps each palette index to a bit pattern
+	img               *IndexedImage
+	x, y              int
+	width, height     int
+	bitpatternToColor map[int]int // maps each bit pattern to a palette index
+	colorToBitpattern map[int]int // reverse
+	isLastLayer       bool
+}
+
+func (region *LayerRegion) addMapping(bitPattern, paletteIndex int) {
+	region.bitpatternToColor[bitPattern] = paletteIndex
+	region.colorToBitpattern[paletteIndex] = bitPattern
 }
 
 func (region *LayerRegion) coordsToIndex(x, y int) int {
 	return (region.y+y)*region.img.width + (region.x + x)
+}
+
+// get the first bitpattern that is not mapped to a pallette index
+func (region *LayerRegion) getUnmappedBitPattern() int {
+	for bitpattern, paletteIndex := range region.bitpatternToColor {
+		if paletteIndex < 0 {
+			return bitpattern
+		}
+	}
+	panic("No more bitpatterns to assign")
+}
+
+// create a pallete containing only the colors assigned to a bitpattern
+func (region *LayerRegion) getPalette() pixels.Palette {
+
+	result := make(pixels.Palette)
+	for _, paletteIndex := range region.bitpatternToColor {
+		if paletteIndex >= 0 {
+			result[paletteIndex] = region.img.palette[paletteIndex]
+		}
+	}
+	return result
 }
 
 // Cut up image into regions for a particular layer
@@ -81,33 +108,40 @@ func getLayerRegions(img IndexedImage, layer Layer) []LayerRegion {
 		for cx := range nrCols {
 			regions[cy*nrCols+cx] = LayerRegion{
 				&img,
-				&layer,
 				cx * layer.cellWidth,
 				cy * layer.cellHeight,
 				layer.cellWidth,
 				layer.cellHeight,
-				pixels.Palette{},
 				make(map[int]int),
+				make(map[int]int),
+				layer.isLast,
 			}
+
+			// initialize bitpatterns, unmapped
+			for _, bitpattern := range layer.bitpatterns {
+				regions[cy*nrCols+cx].addMapping(bitpattern, -1)
+			}
+
 		}
 	}
 	return regions
 }
 
 func quantizeLayerRegion(region LayerRegion) {
-	createPaletteForBitpatterns(region)
+	assignBitPatterns(region)
+	localPalette := region.getPalette()
 
 	for y := 0; y < region.height; y++ {
 		for x := 0; x < region.width; x++ {
 			pixelIndex := region.coordsToIndex(x, y)
 			pixel := &region.img.pixels[pixelIndex]
 			if !pixel.HasBitPattern() { // has already been processed
-				if region.layer.isLast { // last layer, all remaining pixels should be quantized against the region's palette
-					quantizePixel(pixel, region.palette)
-					pixel.BitPattern = region.bitpatterns[pixel.PaletteIndex]
+				if region.isLastLayer { // last layer, all remaining pixels should be quantized against the region's palette
+					quantizePixel(pixel, localPalette)
+					pixel.BitPattern = region.colorToBitpattern[pixel.PaletteIndex]
 				} else { // not the last layer, only process pixels that quantize to a bitpattern in the new palette
 					quantizePixel(pixel, region.img.palette)
-					bitpattern, present := region.bitpatterns[pixel.PaletteIndex]
+					bitpattern, present := region.colorToBitpattern[pixel.PaletteIndex]
 					if present {
 						pixel.BitPattern = bitpattern
 					}
@@ -135,8 +169,9 @@ func Quantize(img IndexedImage) IndexedImage {
 // reduce a palette to maximum number of colors according to their
 // quantized occurence in pixels. assign a bitpattern to each palette entry
 // only considers pixels that don't have a bitpattern assigned yet
-func createPaletteForBitpatterns(region LayerRegion) {
+func assignBitPatterns(region LayerRegion) {
 
+	// maps color index to occurence count
 	indexToCount := make(map[int]int)
 
 	// count nr of pixels for each quantized color
@@ -160,17 +195,15 @@ func createPaletteForBitpatterns(region LayerRegion) {
 	})
 
 	// only keep top n
-	maxColors := len(region.layer.bitpatterns)
+	maxColors := len(region.bitpatternToColor)
 	if maxColors < len(keys) {
 		keys = keys[0:maxColors]
 	}
 
 	// assign bitpatterns
-	i := 0
 	for _, key := range keys {
-		region.palette[key] = region.img.palette[key]
-		region.bitpatterns[key] = region.layer.bitpatterns[i]
-		i++
+		bitPattern := region.getUnmappedBitPattern()
+		region.addMapping(bitPattern, key)
 	}
 
 }

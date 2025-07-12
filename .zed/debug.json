@@ -1,0 +1,39 @@
+// Project-local debug tasks
+//
+// For more documentation on how to configure debug tasks,
+// see: https://zed.dev/docs/debugger
+[
+  {
+    "label": "hires",
+    "adapter": "Delve",
+    "request": "launch",
+    "mode": "debug",
+    // For Delve, the program can be a package name
+    "program": ".",
+    "args": [
+      "-m",
+      "hires",
+      "-o",
+      "scripts/paintface.hires.png",
+      "scripts/paintface.hires.1.png"
+    ]
+    // "buildFlags": [],
+  },
+
+  {
+    "label": "scsprites",
+    "adapter": "Delve",
+    "request": "launch",
+    "mode": "debug",
+    // For Delve, the program can be a package name
+    "program": ".",
+    "args": [
+      "-m",
+      "scsprites",
+      "-o",
+      "scripts/paintface.scsprites.png",
+      "scripts/paintface.tmp1.png"
+    ]
+    // "buildFlags": [],
+  }
+]
