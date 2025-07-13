@@ -54,59 +54,17 @@ func quantizePixel(p *pixels.Pixel, pal pixels.Palette) {
 	p.QuantizationError = smallestDistance
 }
 
-// LayerRegion represents a region of an IndexedImage with its reduced palette of colors
-// It belongs to a layer and maps the bitpatterns in that layer to this palette
-type LayerRegion struct {
-	img               *IndexedImage
-	x, y              int
-	width, height     int
-	bitpatternToColor map[int]int // maps each bit pattern to a palette index
-	colorToBitpattern map[int]int // reverse
-	isLastLayer       bool
-}
-
-func (region *LayerRegion) addMapping(bitPattern, paletteIndex int) {
-	region.bitpatternToColor[bitPattern] = paletteIndex
-	region.colorToBitpattern[paletteIndex] = bitPattern
-}
-
-func (region *LayerRegion) coordsToIndex(x, y int) int {
-	return (region.y+y)*region.img.width + (region.x + x)
-}
-
-// get the first bitpattern that is not mapped to a pallette index
-func (region *LayerRegion) getUnmappedBitPattern() int {
-	for bitpattern, paletteIndex := range region.bitpatternToColor {
-		if paletteIndex < 0 {
-			return bitpattern
-		}
-	}
-	panic("No more bitpatterns to assign")
-}
-
-// create a pallete containing only the colors assigned to a bitpattern
-func (region *LayerRegion) getPalette() pixels.Palette {
-
-	result := make(pixels.Palette)
-	for _, paletteIndex := range region.bitpatternToColor {
-		if paletteIndex >= 0 {
-			result[paletteIndex] = region.img.palette[paletteIndex]
-		}
-	}
-	return result
-}
-
 // Cut up image into regions for a particular layer
-func getLayerRegions(img IndexedImage, layer Layer) []LayerRegion {
+func getRegions(img IndexedImage, layer Layer) []Region {
 	w, h := img.width, img.height
 
 	nrCols, nrRows := w/layer.cellWidth, h/layer.cellHeight
 
-	regions := make([]LayerRegion, nrCols*nrRows)
+	regions := make([]Region, nrCols*nrRows)
 
 	for cy := range nrRows {
 		for cx := range nrCols {
-			regions[cy*nrCols+cx] = LayerRegion{
+			regions[cy*nrCols+cx] = Region{
 				&img,
 				cx * layer.cellWidth,
 				cy * layer.cellHeight,
@@ -127,7 +85,7 @@ func getLayerRegions(img IndexedImage, layer Layer) []LayerRegion {
 	return regions
 }
 
-func quantizeLayerRegion(region LayerRegion) {
+func quantizeRegion(region Region) {
 	assignBitPatterns(region)
 	localPalette := region.getPalette()
 
@@ -156,11 +114,11 @@ func Quantize(img IndexedImage) IndexedImage {
 
 	for _, layer := range img.spec.layers {
 		// cut the image up according to layer specs
-		regions := getLayerRegions(result, layer)
+		regions := getRegions(result, layer)
 
 		// quantize the regions
 		for _, region := range regions {
-			quantizeLayerRegion(region)
+			quantizeRegion(region)
 		}
 	}
 	return result
@@ -169,7 +127,7 @@ func Quantize(img IndexedImage) IndexedImage {
 // reduce a palette to maximum number of colors according to their
 // quantized occurence in pixels. assign a bitpattern to each palette entry
 // only considers pixels that don't have a bitpattern assigned yet
-func assignBitPatterns(region LayerRegion) {
+func assignBitPatterns(region Region) {
 
 	// maps color index to occurence count
 	indexToCount := make(map[int]int)
