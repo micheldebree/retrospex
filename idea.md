@@ -9,7 +9,7 @@ doing pre-processing or actually creating a binary for use on a real Commodore 6
 It simply outputs an image that adheres to the limitations.
 
 Pre-processing like scaling or cropping can be done with another tool and is
-not in scope for retrospex.
+not in scope for Retrospex.
 
 Creating a Commodore 64 binary format can be done with another tool like
 png2prg and is not in scope. Retrospex is tuned to be used as a pre-processing
@@ -22,4 +22,3 @@ Popular image formats for input are supported. Output is a PNG image. There is
 no limit to input image dimensions. If the user wants to make sure the image
 fits on the Commodore 64 screen, they have to do the pre-processing required
 themselves.
-
