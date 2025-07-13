@@ -1,0 +1,141 @@
+
+## Future Enhancements
+- Add support for more graphic modes and variants.
+- Improve palette options based on user feedback.
+
+## Development Guidelines
+- Follow Go coding standards and best practices.
+- Ensure thorough testing of all supported graphic modes and palettes.
+- Document code and provide clear usage instructions.
+
+## Contributing
+- Fork the repository and create a new branch for your feature or bug fix.
+- Write tests to cover your changes.
+- Submit a pull request with a detailed description of your changes.
+
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+---
+
+# Detailed Implementation Specification
+
+## Core Features
+
+### 1. **Graphic Modes**
+- **Modes**: Bitmap, character mode, sprites.
+- **Constraints**: Define specific limitations and constraints for each mode.
+
+### 2. **Multicolor and Hires Variants**
+- **Handling**: Implement rules for applying multicolor and high-resolution variants to an image.
+- **Algorithms**: Use specific algorithms or techniques for these variants.
+
+### 3. **Palette Options**
+- **Palettes**: Define a set of palettes (e.g., C64 standard palettes) that the tool will use for quantization.
+- **Selection**: Allow users to specify which palette to use via command-line arguments or configuration files.
+
+### 4. **Input/Output Formats**
+- **Supported Formats**: PNG, JPEG.
+- **Handling**: Specific handling for different input formats if necessary.
+
+### 5. **Pre-processing and Post-processing**
+- **Pre-processing**: Document the kind of pre-processing users should perform before using Retrospex.
+- **Post-processing**: Document any post-processing steps that need to be performed after using Retrospex.
+
+## Detailed Implementation Questions
+
+### 1. **Graphic Modes**
+- **Description**: Provide a detailed description of each graphic mode, including resolution, color limitations, and any other constraints.
+- **Handling**: How should the tool handle images that do not fit within these constraints? (e.g., scaling, cropping)
+
+### 2. **Multicolor and Hires Variants**
+- **Rules**: What are the specific rules for applying multicolor and high-resolution variants to an image?
+- **Algorithms**: Are there any algorithms or techniques that need to be implemented to achieve this?
+
+### 3. **Palette Options**
+- **List**: Provide a list of all available palettes, including their color values.
+- **Selection**: How should the tool handle palette selection? (e.g., command-line argument)
+
+### 4. **Input/Output Formats**
+- **Supported Formats**: Which image formats will Retrospex support as input?
+- **Handling**: Will there be any specific handling for different input formats?
+
+### 5. **Pre-processing and Post-processing**
+- **Pre-processing**: What kind of pre-processing should the user perform before using Retrospex?
+- **Post-processing**: Are there any post-processing steps that need to be documented or automated?
+
+## Example Usage
+
+### Command-line Interface
+- **Example Commands**: Provide example command-line usage for each graphic mode and variant.
+- **Error Handling**: How should the tool handle errors and edge cases? (e.g., invalid input format, unsupported graphic mode)
+
+### Documentation
+- **Sections**: What kind of documentation will be provided to users? (e.g., README file, man pages)
+- **Topics**: Are there any specific sections or topics that need to be covered in the documentation?
+
+## Future Enhancements
+
+### Additional Features
+- **Features**: Are there any additional features or enhancements that you would like to include in future versions of Retrospex?
+- **Prioritization**: How should these features be prioritized and implemented?
+
+### Testing and Quality Assurance
+- **Testing**: What kind of testing will be performed to ensure the tool works correctly? (e.g., unit tests, integration tests)
+- **Quality Assurance**: Are there any specific quality assurance processes that need to be followed?
+
+---
+
+# Color Quantization Specification
+
+## 1. **Quantization Process**
+- **Euclidean Distance Calculation**: Calculate the Euclidean distance between each pixel's color and the colors in the selected palette.
+- **Best Match Selection**: For each pixel, select the palette color with the smallest Euclidean distance as the best match.
+
+## 2. **Palette Definition**
+- **Palette Colors**: Define a set of palettes (e.g., C64 standard palettes) that the tool will use for quantization.
+- **Palette Selection**: Allow users to specify which palette to use via command-line arguments or configuration files.
+
+## 3. **Quantization Algorithm**
+- **Input Image**: Read the input image and extract its pixel colors.
+- **Distance Calculation**: For each pixel, calculate the Euclidean distance to all colors in the selected palette.
+- **Color Mapping**: Map each pixel to the closest color in the palette based on the smallest Euclidean distance.
+
+## 4. **Implementation Details**
+- **Euclidean Distance Formula**:
+  ```go
+  func euclideanDistance(c1, c2 colorful.Color) float64 {
+      return math.Sqrt(
+          math.Pow(c1.R-c2.R, 2) +
+          math.Pow(c1.G-c2.G, 2) +
+          math.Pow(c1.B-c2.B, 2))
+  }
+  ```
+- **Quantization Function**:
+  ```go
+  func quantizePixel(pixel colorful.Color, palette pixels.Palette) (int, float64) {
+      var bestIndex int
+      var smallestDistance float64 = math.MaxFloat64
+
+      for index, color := range palette {
+          distance := euclideanDistance(pixel, color)
+          if distance < smallestDistance {
+              smallestDistance = distance
+              bestIndex = index
+          }
+      }
+
+      return bestIndex, smallestDistance
+  }
+  ```
+
+## 5. **Integration with Graphic Modes**
+- **Mode-Specific Quantization**: Ensure that the quantization process adheres to the constraints of each graphic mode (e.g., bitmap, character mode, sprites).
+- **Multicolor and Hires Variants**: Implement specific rules for applying multicolor and high-resolution variants during quantization.
+
+## 6. **Error Handling**
+- **Invalid Palette Selection**: Handle cases where an invalid palette is selected.
+- **Unsupported Image Formats**: Provide error messages for unsupported image formats.
+
+## Example Usage
+
