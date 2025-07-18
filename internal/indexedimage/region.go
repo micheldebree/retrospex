@@ -20,7 +20,7 @@ func (region *Region) addMapping(bitPattern, paletteIndex int) {
 }
 
 func (region *Region) coordsToIndex(x, y int) int {
-	return (region.y+y)*region.img.width + (region.x + x)
+	return (region.y+y)*region.img.Width + (region.x + x)
 }
 
 // get the first bitpattern that is not mapped to a pallette index

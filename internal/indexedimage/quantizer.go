@@ -56,7 +56,7 @@ func quantizePixel(p *pixels.Pixel, pal pixels.Palette) {
 
 // Cut up image into regions for a particular layer
 func getRegions(img IndexedImage, layer Layer) []Region {
-	w, h := img.width, img.height
+	w, h := img.Width, img.Height
 
 	nrCols, nrRows := w/layer.cellWidth, h/layer.cellHeight
 
@@ -112,7 +112,7 @@ func quantizeRegion(region Region) {
 func Quantize(img IndexedImage) IndexedImage {
 	result := img
 
-	for _, layer := range img.spec.layers {
+	for _, layer := range img.Spec.layers {
 		// cut the image up according to layer specs
 		regions := getRegions(result, layer)
 
