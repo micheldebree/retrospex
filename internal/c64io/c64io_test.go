@@ -48,4 +48,18 @@ func TestReOrderToC64BitmapOrder(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("Input height not multiple of 8", func(t *testing.T) {
+		input := []byte{
+			0x01, 0x02, 0x03, 0x04,
+			0x11, 0x12, 0x13, 0x14,
+		}
+		bytesPerInputRow := 8
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("expected panic")
+			}
+		}()
+		reOrderToC64BitmapOrder(input, bytesPerInputRow)
+	})
 }
