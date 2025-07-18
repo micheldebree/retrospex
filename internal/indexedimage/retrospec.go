@@ -8,5 +8,6 @@ type Layer struct {
 }
 
 type Retrospec struct {
-	layers []Layer
+	layers         []Layer
+	BitPatternSize int
 }

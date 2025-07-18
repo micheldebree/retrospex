@@ -42,7 +42,7 @@ func (pixel Pixel) HasBitPattern() bool {
 	return pixel.BitPattern >= 0
 }
 
-func (pixel Pixel) assertHasBitPattern() {
+func (pixel Pixel) AssertHasBitPattern() {
 	if !pixel.HasBitPattern() {
 		panic(fmt.Sprintf("Pixel %v does not have a bit pattern", pixel))
 	}
