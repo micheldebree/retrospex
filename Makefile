@@ -11,7 +11,7 @@ run: test
 	open scripts/paintface.koala.prg
 
 .PHONY: test
-test: \
+test: install \
 	scripts/paintface.koala.prg \
 	scripts/paintface.hires.prg \
 	scripts/paintface.scsprites.prg \
