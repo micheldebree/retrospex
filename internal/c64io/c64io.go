@@ -16,7 +16,8 @@ func getBitmapData(img *indexedimage.IndexedImage) []byte {
 
     // Calculate the number of bytes needed
     numBitPatterns := width * height
-    numBytes := (numBitPatterns + 7) / 8 // Ceiling division
+    bitsPerByte := 8 / bitPatternSize
+    numBytes := (numBitPatterns * bitPatternSize + bitsPerByte - 1) / bitsPerByte // Ceiling division
 
     result := make([]byte, numBytes)
     byteIndex := 0
@@ -29,22 +30,12 @@ func getBitmapData(img *indexedimage.IndexedImage) []byte {
             pixel.assertHasBitPattern() // Ensure the pixel has a bit pattern
 
             bitPattern := pixel.BitPattern
-            if bitPatternSize == 1 {
-                result[byteIndex] |= byte(bitPattern) << (7 - bitPosition)
-                bitPosition++
-                if bitPosition == 8 {
-                    bitPosition = 0
-                    byteIndex++
-                }
-            } else if bitPatternSize == 2 {
-                result[byteIndex] |= byte(bitPattern) << (6 - bitPosition)
-                bitPosition += 2
-                if bitPosition == 8 {
-                    bitPosition = 0
-                    byteIndex++
-                }
-            } else {
-                panic("Unsupported bit pattern size")
+            shift := bitsPerByte - bitPosition - 1
+            result[byteIndex] |= byte(bitPattern) << shift
+            bitPosition += bitPatternSize
+            if bitPosition == bitsPerByte {
+                bitPosition = 0
+                byteIndex++
             }
         }
     }
