@@ -3,6 +3,8 @@ package c64io
 import (
 	"testing"
 
+	"image/color"
+
 	"github.com/micheldebree/retrospex/internal/indexedimage"
 	"github.com/micheldebree/retrospex/internal/pixels"
 )
@@ -21,16 +23,16 @@ func TestGetBitmapData(t *testing.T) {
 				Spec: indexedimage.Retrospec{
 					BitPatternSize: 1,
 				},
-				pixels: []pixels.Pixel{
+				Pixels: []pixels.Pixel{
 					{
-						X:         0,
-						Y:         0,
-						Color:     pixels.ToColorful(color.RGBA{0xff, 0x00, 0x00, 0xff}),
+						X:          0,
+						Y:          0,
+						Color:      pixels.ToColorful(color.RGBA{0xff, 0x00, 0x00, 0xff}),
 						BitPattern: 1,
 					},
 				},
 			},
-			expected: []byte{0x80}, // 1 bit pattern (1) in the most significant position
+			expected: []byte{0b10000000}, // 1 bit pattern (1) in the most significant position
 		},
 		{
 			name: "Multiple pixels",
@@ -38,16 +40,16 @@ func TestGetBitmapData(t *testing.T) {
 				Width:  2,
 				Height: 2,
 				Spec: indexedimage.Retrospec{
-					BitPatternSize: 1,
+					BitPatternSize: 2,
 				},
-				pixels: []pixels.Pixel{
-					{X: 0, Y: 0, Color: pixels.ToColorful(color.RGBA{0xff, 0x00, 0x00, 0xff}), BitPattern: 1},
-					{X: 1, Y: 0, Color: pixels.ToColorful(color.RGBA{0x00, 0xff, 0x00, 0xff}), BitPattern: 2},
-					{X: 0, Y: 1, Color: pixels.ToColorful(color.RGBA{0x00, 0x00, 0xff, 0xff}), BitPattern: 3},
-					{X: 1, Y: 1, Color: pixels.ToColorful(color.RGBA{0xff, 0xff, 0x00, 0xff}), BitPattern: 4},
+				Pixels: []pixels.Pixel{
+					{X: 0, Y: 0, Color: pixels.ToColorful(color.RGBA{0xff, 0x00, 0x00, 0xff}), BitPattern: 0x01},
+					{X: 1, Y: 0, Color: pixels.ToColorful(color.RGBA{0x00, 0xff, 0x00, 0xff}), BitPattern: 0x10},
+					{X: 0, Y: 1, Color: pixels.ToColorful(color.RGBA{0x00, 0x00, 0xff, 0xff}), BitPattern: 0x11},
+					{X: 1, Y: 1, Color: pixels.ToColorful(color.RGBA{0xff, 0xff, 0x00, 0xff}), BitPattern: 0x10},
 				},
 			},
-			expected: []byte{0xc0, 0xf0}, // 0b11000000, 0b11110000
+			expected: []byte{0b01100000, 0b11100000},
 		},
 	}
 
@@ -72,7 +74,7 @@ func TestGetBitmapData(t *testing.T) {
 			Spec: indexedimage.Retrospec{
 				BitPatternSize: 1,
 			},
-			pixels: []pixels.Pixel{
+			Pixels: []pixels.Pixel{
 				{X: 0, Y: 0, Color: pixels.ToColorful(color.RGBA{0xff, 0x00, 0x00, 0xff}), BitPattern: -1}, // No bit pattern
 			},
 		}
