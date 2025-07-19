@@ -78,7 +78,7 @@ func fileExists(filename string) bool {
 	return !info.IsDir()
 }
 
-func saveBinary(img *indexedimage.IndexedImage, filename string, overwrite bool) {
+func SaveBinary(filename string, img *indexedimage.IndexedImage, overwrite bool) {
 	bitmapData := getBitmapData(img)
 
 	var properlyOrderedBytes []byte

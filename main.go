@@ -10,12 +10,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/micheldebree/retrospex/internal/conversion"
-	"github.com/micheldebree/retrospex/internal/dithering"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
 	"strings"
+
+	"github.com/micheldebree/retrospex/internal/c64io"
+	"github.com/micheldebree/retrospex/internal/conversion"
+	"github.com/micheldebree/retrospex/internal/dithering"
 
 	"github.com/micheldebree/retrospex/internal/imageio"
 	"github.com/micheldebree/retrospex/internal/indexedimage"
@@ -33,6 +35,7 @@ type Options struct {
 	Palette      string
 	DitherMatrix string
 	DitherDepth  int
+	Format       string // Added Format field
 }
 
 var defaultOptions = Options{
@@ -41,6 +44,7 @@ var defaultOptions = Options{
 	Palette:      "colodore",
 	DitherMatrix: "bayer4x4",
 	DitherDepth:  25,
+	Format:       "png", // Default format is png
 }
 
 func main() {
@@ -52,6 +56,7 @@ func main() {
 	flag.StringVar(&options.Palette, "p", defaultOptions.Palette, "palette")
 	flag.StringVar(&options.DitherMatrix, "dm", defaultOptions.DitherMatrix, "dither matrix")
 	flag.IntVar(&options.DitherDepth, "dd", defaultOptions.DitherDepth, "dither depth")
+	flag.StringVar(&options.Format, "f", defaultOptions.Format, "output format (png or binary)") // Added Format flag
 	flag.Parse()
 
 	args := flag.Args()
@@ -91,8 +96,13 @@ func main() {
 	dithering.OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
 	newImage := conversion.Quantize(indexedImage)
 
-	result := newImage.Render()
-	imageio.WriteImage(options.OutFile, result)
+	switch options.Format {
+	case "png":
+		result := newImage.Render()
+		imageio.WriteImage(options.OutFile, result)
+	case "binary":
+		c64io.SaveBinary(options.OutFile, &newImage, true)
+	}
 	fmt.Print(options.OutFile)
 }
 
@@ -110,4 +120,5 @@ func help() {
 	fmt.Printf("\t-p\n\t\tPalette (default %s). One of %s\n", defaultOptions.Palette, strings.Join(maps.Keys(pixels.C64Palettes), ","))
 	fmt.Printf("\t-dm\n\t\tDither matrix (default %s). One of %s\n", defaultOptions.DitherMatrix, strings.Join(maps.Keys(dithering.DitherMatrices), ","))
 	fmt.Printf("\t-dd\n\t\tDither depth (default %d). 0-255\n", defaultOptions.DitherDepth)
+	fmt.Printf("\t-f\n\t\tOutput format (default %s). One of png, binary\n", defaultOptions.Format) // Added Format option to help
 }
