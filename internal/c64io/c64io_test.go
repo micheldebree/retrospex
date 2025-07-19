@@ -192,7 +192,7 @@ func TestReOrderToC64BitmapOrder(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := reOrderToC64BitmapOrder(tt.input, tt.bytesPerInputRow)
+			result := reOrderToVicBitmapOrder(tt.input, tt.bytesPerInputRow)
 			if len(result) != len(tt.expected) {
 				t.Errorf("expected length %d, got %d", len(tt.expected), len(result))
 			}
@@ -215,6 +215,6 @@ func TestReOrderToC64BitmapOrder(t *testing.T) {
 				t.Errorf("expected panic")
 			}
 		}()
-		reOrderToC64BitmapOrder(input, bytesPerInputRow)
+		reOrderToVicBitmapOrder(input, bytesPerInputRow)
 	})
 }
