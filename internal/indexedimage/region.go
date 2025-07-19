@@ -39,7 +39,7 @@ func (region *Region) getPalette() pixels.Palette {
 	result := make(pixels.Palette)
 	for _, paletteIndex := range region.bitpatternToColor {
 		if paletteIndex >= 0 {
-			result[paletteIndex] = region.img.palette[paletteIndex]
+			result[paletteIndex] = region.img.Palette[paletteIndex]
 		}
 	}
 	return result

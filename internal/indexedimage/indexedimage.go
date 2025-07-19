@@ -11,8 +11,8 @@ type IndexedImage struct {
 	Width   int
 	Height  int
 	Spec    Retrospec
-	palette pixels.Palette
-	pixels  []pixels.Pixel
+	Palette pixels.Palette
+	Pixels  []pixels.Pixel
 }
 
 func ToIndexedImage(img *image.Image, spec Retrospec, pal pixels.Palette) IndexedImage {
@@ -22,11 +22,11 @@ func ToIndexedImage(img *image.Image, spec Retrospec, pal pixels.Palette) Indexe
 }
 
 func (img *IndexedImage) PixelAt(x, y int) pixels.Pixel {
-	return img.pixels[y*img.Width+x]
+	return img.Pixels[y*img.Width+x]
 }
 
 func (img *IndexedImage) SetPixel(pixel pixels.Pixel) {
-	img.pixels[pixel.Y*img.Width+pixel.X] = pixel
+	img.Pixels[pixel.Y*img.Width+pixel.X] = pixel
 }
 
 // Render to a 'normal' RGBA image
@@ -38,7 +38,7 @@ func (img *IndexedImage) Render() image.Image {
 	for y := range img.Height {
 		for x := range img.Width {
 			pixel := img.PixelAt(x, y)
-			result.SetRGBA(x, y, pixels.ToColor(pixel.GetColor(img.palette)))
+			result.SetRGBA(x, y, pixels.ToColor(pixel.GetColor(img.Palette)))
 		}
 	}
 	return result

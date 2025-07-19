@@ -92,13 +92,13 @@ func quantizeRegion(region Region) {
 	for y := 0; y < region.height; y++ {
 		for x := 0; x < region.width; x++ {
 			pixelIndex := region.coordsToIndex(x, y)
-			pixel := &region.img.pixels[pixelIndex]
+			pixel := &region.img.Pixels[pixelIndex]
 			if !pixel.HasBitPattern() { // has already been processed
 				if region.isLastLayer { // last layer, all remaining pixels should be quantized against the region's palette
 					quantizePixel(pixel, localPalette)
 					pixel.BitPattern = region.colorToBitpattern[pixel.PaletteIndex]
 				} else { // not the last layer, only process pixels that quantize to a bitpattern in the new palette
-					quantizePixel(pixel, region.img.palette)
+					quantizePixel(pixel, region.img.Palette)
 					bitpattern, present := region.colorToBitpattern[pixel.PaletteIndex]
 					if present {
 						pixel.BitPattern = bitpattern
@@ -136,11 +136,11 @@ func assignBitPatterns(region Region) {
 	for y := 0; y < region.height; y++ {
 		for x := 0; x < region.width; x++ {
 			pixelIndex := region.coordsToIndex(x, y)
-			pixel := &region.img.pixels[pixelIndex]
+			pixel := &region.img.Pixels[pixelIndex]
 
 			// pixels that are already assigned a bitpattern don't count
 			if !pixel.HasBitPattern() {
-				quantizePixel(pixel, region.img.palette)
+				quantizePixel(pixel, region.img.Palette)
 				indexToCount[pixel.PaletteIndex]++
 			}
 		}

@@ -1,6 +1,7 @@
 package c64io
 
 import (
+	"fmt"
 	"github.com/micheldebree/retrospex/internal/indexedimage"
 )
 
@@ -12,29 +13,30 @@ import (
 func getBitmapData(img *indexedimage.IndexedImage) []byte {
 	width, height := img.Width, img.Height
 	bitPatternSize := img.Spec.BitPatternSize
+	pixelsPerByte := 8 / bitPatternSize
+
+	if width%pixelsPerByte != 0 {
+		panic(fmt.Sprintf("Image width should be a multiple of %d", pixelsPerByte))
+	}
 
 	// Calculate the number of bytes needed
-	numBitPatterns := width * height
-	bitsPerByte := 8 / bitPatternSize
-	numBytes := (numBitPatterns*bitPatternSize + bitsPerByte - 1) / bitsPerByte // Ceiling division
+	numPixels := width * height
+	numBytes := (numPixels + pixelsPerByte - 1) / pixelsPerByte // Ceiling division
 
 	result := make([]byte, numBytes)
 	byteIndex := 0
-	bitPosition := 0
 
 	for y := range height {
 		for x := range width {
 			pixel := img.PixelAt(x, y)
 			pixel.AssertHasBitPattern() // Ensure the pixel has a bit pattern
 
-			bitPattern := pixel.BitPattern
-			shift := bitsPerByte - bitPosition - 1
-			result[byteIndex] |= byte(bitPattern) << shift
-			bitPosition += bitPatternSize
-			if bitPosition == bitsPerByte {
-				bitPosition = 0
-				byteIndex++
-			}
+			outIndex := byteIndex / pixelsPerByte
+
+			shiftLeft := bitPatternSize * (pixelsPerByte - 1 - byteIndex%pixelsPerByte)
+
+			result[outIndex] |= byte(pixel.BitPattern) << shiftLeft
+			byteIndex++
 		}
 	}
 
@@ -64,8 +66,8 @@ func reOrderToC64BitmapOrder(input []byte, bytesPerInputRow int) []byte {
 		for col := range bytesPerInputRow {
 			colIndex := rowIndex + col // start index of this column
 			for byteInCol := range 8 {
-				byteIndex := colIndex + byteInCol*bytesPerInputRow
-				result[dstIndex] = input[byteIndex]
+				srcIndex := colIndex + byteInCol*bytesPerInputRow
+				result[dstIndex] = input[srcIndex]
 				dstIndex++
 			}
 		}

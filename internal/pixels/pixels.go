@@ -15,7 +15,7 @@ import (
 // Pixel One pixel in the image
 type Pixel struct {
 	X, Y  int
-	Color colorful.Color
+	Color colorful.Color // the color in the original image
 	// available after quantizing
 	PaletteIndex      int
 	QuantizationError float64
@@ -62,7 +62,7 @@ func ToColor(colorful colorful.Color) color.RGBA {
 	}
 }
 
-func toColorful(aColor color.RGBA) colorful.Color {
+func ToColorful(aColor color.RGBA) colorful.Color {
 	return colorful.Color{
 		R: float64(aColor.R) / 256.0,
 		G: float64(aColor.G) / 256.0,

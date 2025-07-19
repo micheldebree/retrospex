@@ -267,7 +267,7 @@ var Lenyn = createPalette(
 func createPalette(palette color.Palette) Palette {
 	result := make(Palette)
 	for i, c := range palette {
-		result[i] = toColorful(ToRGBA(c))
+		result[i] = ToColorful(ToRGBA(c))
 	}
 	return result
 }

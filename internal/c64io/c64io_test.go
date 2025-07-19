@@ -10,46 +10,36 @@ import (
 )
 
 func TestGetBitmapData(t *testing.T) {
+
+	irrelevantColor := pixels.ToColorful(color.RGBA{0xff, 0x00, 0x00, 0x00})
+
 	tests := []struct {
 		name     string
 		image    *indexedimage.IndexedImage
 		expected []byte
 	}{
 		{
-			name: "Single pixel",
-			image: &indexedimage.IndexedImage{
-				Width:  1,
-				Height: 1,
-				Spec: indexedimage.Retrospec{
-					BitPatternSize: 1,
-				},
-				Pixels: []pixels.Pixel{
-					{
-						X:          0,
-						Y:          0,
-						Color:      pixels.ToColorful(color.RGBA{0xff, 0x00, 0x00, 0xff}),
-						BitPattern: 1,
-					},
-				},
-			},
-			expected: []byte{0b10000000}, // 1 bit pattern (1) in the most significant position
-		},
-		{
 			name: "Multiple pixels",
 			image: &indexedimage.IndexedImage{
-				Width:  2,
+				Width:  4,
 				Height: 2,
 				Spec: indexedimage.Retrospec{
 					BitPatternSize: 2,
 				},
 				Pixels: []pixels.Pixel{
-					{X: 0, Y: 0, Color: pixels.ToColorful(color.RGBA{0xff, 0x00, 0x00, 0xff}), BitPattern: 0x01},
-					{X: 1, Y: 0, Color: pixels.ToColorful(color.RGBA{0x00, 0xff, 0x00, 0xff}), BitPattern: 0x10},
-					{X: 0, Y: 1, Color: pixels.ToColorful(color.RGBA{0x00, 0x00, 0xff, 0xff}), BitPattern: 0x11},
-					{X: 1, Y: 1, Color: pixels.ToColorful(color.RGBA{0xff, 0xff, 0x00, 0xff}), BitPattern: 0x10},
+					{X: 0, Y: 0, Color: irrelevantColor, BitPattern: 0b01},
+					{X: 1, Y: 0, Color: irrelevantColor, BitPattern: 0b10},
+					{X: 2, Y: 0, Color: irrelevantColor, BitPattern: 0b11},
+					{X: 3, Y: 0, Color: irrelevantColor, BitPattern: 0b10},
+					{X: 0, Y: 1, Color: irrelevantColor, BitPattern: 0b00},
+					{X: 1, Y: 1, Color: irrelevantColor, BitPattern: 0b11},
+					{X: 2, Y: 1, Color: irrelevantColor, BitPattern: 0b11},
+					{X: 3, Y: 1, Color: irrelevantColor, BitPattern: 0b01},
 				},
 			},
-			expected: []byte{0b01100000, 0b11100000},
+			expected: []byte{
+				0b01101110, 0b00111101,
+			},
 		},
 	}
 
@@ -61,7 +51,7 @@ func TestGetBitmapData(t *testing.T) {
 			}
 			for i, v := range result {
 				if v != tt.expected[i] {
-					t.Errorf("at index %d: expected %v, got %v", i, tt.expected[i], v)
+					t.Errorf("at index %d: expected %08b, got %08b", i, tt.expected[i], v)
 				}
 			}
 		})
@@ -69,8 +59,8 @@ func TestGetBitmapData(t *testing.T) {
 
 	t.Run("Pixel without bit pattern", func(t *testing.T) {
 		image := &indexedimage.IndexedImage{
-			Width:  1,
-			Height: 1,
+			Width:  8,
+			Height: 8,
 			Spec: indexedimage.Retrospec{
 				BitPatternSize: 1,
 			},
@@ -150,7 +140,7 @@ func TestReOrderToC64BitmapOrder(t *testing.T) {
 			}
 			for i, v := range result {
 				if v != tt.expected[i] {
-					t.Errorf("at index %d: expected %v, got %v", i, tt.expected[i], v)
+					t.Errorf("at index %d: expected %08b, got %08b", i, tt.expected[i], v)
 				}
 			}
 		})

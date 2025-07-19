@@ -12,7 +12,6 @@ func abortOnError(err error) {
 	}
 }
 
-// ReadImageFile read an image from a file
 func ReadImageFile(filename string) (image.Image, error) {
 
 	f, err := os.Open(filename)
