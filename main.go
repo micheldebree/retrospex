@@ -10,6 +10,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/micheldebree/retrospex/internal/conversion"
+	"github.com/micheldebree/retrospex/internal/dithering"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
@@ -65,7 +67,7 @@ func main() {
 		return
 	}
 
-	ditherMatrix, isPresent := indexedimage.DitherMatrices[options.DitherMatrix]
+	ditherMatrix, isPresent := dithering.DitherMatrices[options.DitherMatrix]
 	if !isPresent {
 		printError(fmt.Sprintf("Unknown dither matrix: %s", options.DitherMatrix))
 		return
@@ -86,8 +88,8 @@ func main() {
 	spec := indexedimage.MakeSpec(options.Mode, &img)
 	fmt.Printf("Mode: %s\n", options.Mode)
 	indexedImage := indexedimage.ToIndexedImage(&img, spec, palette)
-	indexedimage.OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
-	newImage := indexedimage.Quantize(indexedImage)
+	dithering.OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
+	newImage := conversion.Quantize(indexedImage)
 
 	result := newImage.Render()
 	imageio.WriteImage(options.OutFile, result)
@@ -106,6 +108,6 @@ func help() {
 	fmt.Printf("\t-o\n\t\tOutput filename (default %s)\n", defaultOptions.OutFile)
 	fmt.Printf("\t-m\n\t\tGraphics mode. (default %s), One of %s\n", defaultOptions.Mode, strings.Join(maps.Keys(indexedimage.RetrospecFactories), ","))
 	fmt.Printf("\t-p\n\t\tPalette (default %s). One of %s\n", defaultOptions.Palette, strings.Join(maps.Keys(pixels.C64Palettes), ","))
-	fmt.Printf("\t-dm\n\t\tDither matrix (default %s). One of %s\n", defaultOptions.DitherMatrix, strings.Join(maps.Keys(indexedimage.DitherMatrices), ","))
+	fmt.Printf("\t-dm\n\t\tDither matrix (default %s). One of %s\n", defaultOptions.DitherMatrix, strings.Join(maps.Keys(dithering.DitherMatrices), ","))
 	fmt.Printf("\t-dd\n\t\tDither depth (default %d). 0-255\n", defaultOptions.DitherDepth)
 }

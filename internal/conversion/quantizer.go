@@ -1,6 +1,7 @@
-package indexedimage
+package conversion
 
 import (
+	"github.com/micheldebree/retrospex/internal/indexedimage"
 	"math"
 	"sort"
 
@@ -55,10 +56,10 @@ func quantizePixel(p *pixels.Pixel, pal pixels.Palette) {
 }
 
 // Cut up image into regions for a particular layer
-func getRegions(img IndexedImage, layer Layer) []Region {
+func getRegions(img indexedimage.IndexedImage, layer indexedimage.Layer) []Region {
 	w, h := img.Width, img.Height
 
-	nrCols, nrRows := w/layer.cellWidth, h/layer.cellHeight
+	nrCols, nrRows := w/layer.CellWidth, h/layer.CellHeight
 
 	regions := make([]Region, nrCols*nrRows)
 
@@ -66,17 +67,17 @@ func getRegions(img IndexedImage, layer Layer) []Region {
 		for cx := range nrCols {
 			regions[cy*nrCols+cx] = Region{
 				&img,
-				cx * layer.cellWidth,
-				cy * layer.cellHeight,
-				layer.cellWidth,
-				layer.cellHeight,
+				cx * layer.CellWidth,
+				cy * layer.CellHeight,
+				layer.CellWidth,
+				layer.CellHeight,
 				make(map[int]int),
 				make(map[int]int),
-				layer.isLast,
+				layer.IsLast,
 			}
 
 			// initialize bitpatterns, unmapped
-			for _, bitpattern := range layer.bitpatterns {
+			for _, bitpattern := range layer.Bitpatterns {
 				regions[cy*nrCols+cx].addMapping(bitpattern, -1)
 			}
 
@@ -109,10 +110,10 @@ func quantizeRegion(region Region) {
 	}
 }
 
-func Quantize(img IndexedImage) IndexedImage {
+func Quantize(img indexedimage.IndexedImage) indexedimage.IndexedImage {
 	result := img
 
-	for _, layer := range img.Spec.layers {
+	for _, layer := range img.Spec.Layers {
 		// cut the image up according to layer specs
 		regions := getRegions(result, layer)
 

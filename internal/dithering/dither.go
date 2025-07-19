@@ -1,6 +1,9 @@
-package indexedimage
+package dithering
 
-import "github.com/lucasb-eyer/go-colorful"
+import (
+	"github.com/lucasb-eyer/go-colorful"
+	"github.com/micheldebree/retrospex/internal/indexedimage"
+)
 
 type IntMatrix [][]int
 type FloatMatrix [][]float64
@@ -31,7 +34,7 @@ var DitherMatrices = map[string]IntMatrix{
 
 // OrderedDither Apply ordered dithering by offsetting color channels with
 // a matrix. N.B. the image itself is adjusted
-func OrderedDither(img *IndexedImage, matrix IntMatrix, depth int) {
+func OrderedDither(img *indexedimage.IndexedImage, matrix IntMatrix, depth int) {
 
 	normalizedMatrix := normalize(matrix, float64(depth)/255.)
 	matrixH := len(matrix)

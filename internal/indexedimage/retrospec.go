@@ -1,13 +1,13 @@
 package indexedimage
 
 type Layer struct {
-	cellWidth, cellHeight int
-	bitpatterns           []int
+	CellWidth, CellHeight int
+	Bitpatterns           []int
 	// TODO: this can be determined while processing
-	isLast bool // the last layer should quantize all remaining pixels
+	IsLast bool // the last layer should quantize all remaining pixels
 }
 
 type Retrospec struct {
-	layers         []Layer
+	Layers         []Layer
 	BitPatternSize int
 }

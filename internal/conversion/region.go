@@ -1,12 +1,15 @@
-package indexedimage
+package conversion
 
-import "github.com/micheldebree/retrospex/internal/pixels"
+import (
+	"github.com/micheldebree/retrospex/internal/indexedimage"
+	"github.com/micheldebree/retrospex/internal/pixels"
+)
 
 // Region represents a region of an IndexedImage
 // Regions can overlap
 // Within one region, there is a limited palette, assigned to the bitpatterns in that region
 type Region struct {
-	img               *IndexedImage
+	img               *indexedimage.IndexedImage
 	x, y              int
 	width, height     int
 	bitpatternToColor map[int]int // maps each bit pattern to a palette index
