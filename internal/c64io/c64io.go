@@ -13,7 +13,7 @@ import (
 func getBitmapData(img *indexedimage.IndexedImage) []byte {
 	width, height := img.Width, img.Height
 	bitPatternSize := img.Spec.BitPatternSize
-	pixelsPerByte := 8 / bitPatternSize
+	pixelsPerByte := img.Spec.PixelsPerByte()
 
 	if width%pixelsPerByte != 0 {
 		panic(fmt.Sprintf("Image width should be a multiple of %d", pixelsPerByte))
@@ -49,10 +49,6 @@ func reOrderToVicBitmapOrder(input []byte, bytesPerInputRow int) []byte {
 	bytesPerOutputRow := bytesPerInputRow * 8
 	numRows := len(input) / bytesPerOutputRow
 
-	if (len(input) % bytesPerOutputRow) != 0 {
-		panic("Input height should be a multiple of 8")
-	}
-
 	dstIndex := 0
 
 	for row := range numRows {
@@ -83,7 +79,7 @@ func SaveBinary(filename string, img *indexedimage.IndexedImage, overwrite bool)
 
 	var properlyOrderedBytes []byte
 	if img.Spec.BitmapByteOrder == indexedimage.VicByteOrder {
-		properlyOrderedBytes = reOrderToVicBitmapOrder(bitmapData, img.Width)
+		properlyOrderedBytes = reOrderToVicBitmapOrder(bitmapData, img.BytesPerRow())
 	} else {
 		properlyOrderedBytes = bitmapData
 	}

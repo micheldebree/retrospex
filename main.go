@@ -35,8 +35,15 @@ type Options struct {
 	Palette      string
 	DitherMatrix string
 	DitherDepth  int
-	Format       string // Added Format field
+	Format       FormatType // Changed to use enum type
 }
+
+type FormatType string
+
+const (
+	PNG    FormatType = "png"
+	BINARY FormatType = "binary"
+)
 
 var defaultOptions = Options{
 	OutFile:      "out.png",
@@ -44,7 +51,7 @@ var defaultOptions = Options{
 	Palette:      "colodore",
 	DitherMatrix: "bayer4x4",
 	DitherDepth:  25,
-	Format:       "png", // Default format is png
+	Format:       PNG, // Default format is png
 }
 
 func main() {
@@ -56,8 +63,12 @@ func main() {
 	flag.StringVar(&options.Palette, "p", defaultOptions.Palette, "palette")
 	flag.StringVar(&options.DitherMatrix, "dm", defaultOptions.DitherMatrix, "dither matrix")
 	flag.IntVar(&options.DitherDepth, "dd", defaultOptions.DitherDepth, "dither depth")
-	flag.StringVar(&options.Format, "f", defaultOptions.Format, "output format (png or binary)") // Added Format flag
+
+	var formatString string
+	flag.StringVar(&formatString, "f", string(defaultOptions.Format), "output format (png or binary)")
 	flag.Parse()
+
+	options.Format = FormatType(formatString)
 
 	args := flag.Args()
 
@@ -97,10 +108,9 @@ func main() {
 	newImage := conversion.Quantize(indexedImage)
 
 	switch options.Format {
-	case "png":
-		result := newImage.Render()
-		imageio.WriteImage(options.OutFile, result)
-	case "binary":
+	case PNG:
+		imageio.WriteImage(options.OutFile, newImage.Render())
+	case BINARY:
 		c64io.SaveBinary(options.OutFile, &newImage, true)
 	}
 	fmt.Print(options.OutFile)

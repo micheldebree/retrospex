@@ -43,3 +43,7 @@ func (img *IndexedImage) Render() image.Image {
 	}
 	return result
 }
+
+func (img *IndexedImage) BytesPerRow() int {
+	return img.Width / img.Spec.PixelsPerByte()
+}

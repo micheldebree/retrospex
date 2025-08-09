@@ -19,3 +19,7 @@ type Retrospec struct {
 	BitPatternSize  int
 	BitmapByteOrder ByteOrder
 }
+
+func (spec Retrospec) PixelsPerByte() int {
+	return 8 / spec.BitPatternSize
+}
