@@ -7,6 +7,7 @@ LDFLAGS :=-w -s -X main.Version=$(VERSION).$(REV)
 CGO := 0
 BUILDCMD := go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS)"
 
+.PHONY: test
 test:
 	go test ./...
 
