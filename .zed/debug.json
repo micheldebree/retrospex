@@ -4,6 +4,22 @@
 // see: https://zed.dev/docs/debugger
 [
   {
+    "label": "koala",
+    "adapter": "Delve",
+    "request": "launch",
+    "mode": "debug",
+    // For Delve, the program can be a package name
+    "program": ".",
+    "args": [
+      "-m",
+      "koala",
+      "-o",
+      "scripts/paintface.koala.png",
+      "scripts/paintface.src.png"
+    ]
+    // "buildFlags": [],
+  },
+  {
     "label": "hires",
     "adapter": "Delve",
     "request": "launch",
@@ -19,7 +35,6 @@
     ]
     // "buildFlags": [],
   },
-
   {
     "label": "scsprites",
     "adapter": "Delve",

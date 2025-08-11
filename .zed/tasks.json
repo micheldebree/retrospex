@@ -3,6 +3,17 @@
 // Example:
 [
   {
+    "label": "koala",
+    "command": "./scripts/koala.sh",
+    "args": ["./scripts/paintface.src.png"],
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "reveal_target": "dock",
+    "hide": "never",
+    "shell": "system"
+  },
+  {
     "label": "scsprites",
     "command": "./scripts/scsprites.sh",
     "args": ["./scripts/paintface.src.png"],

@@ -1,11 +1,12 @@
 package conversion
 
 import (
-	"github.com/micheldebree/retrospex/internal/indexedimage"
+	"image/color"
 	"math"
 	"sort"
 
-	"github.com/lucasb-eyer/go-colorful"
+	"github.com/micheldebree/retrospex/internal/indexedimage"
+
 	"github.com/micheldebree/retrospex/internal/pixels"
 	"golang.org/x/exp/maps"
 )
@@ -14,13 +15,19 @@ import (
 // In the order of the palette
 type PaletteDistance map[int]float64
 
-func distance(color1, color2 colorful.Color) float64 {
-	// TODO: make an option
-	return color1.DistanceLinearRGB(color2)
+func distance(color1, color2 color.Color) float64 {
+	r1, g1, b1, _ := color1.RGBA()
+	r2, g2, b2, _ := color2.RGBA()
+
+	dr := float64(r1 - r2)
+	dg := float64(g1 - g2)
+	db := float64(b1 - b2)
+
+	return math.Sqrt(dr*dr + dg*dg + db*db)
 }
 
 // distances Distance from a pixel to each color in a palette
-func distances(aColor colorful.Color, palette pixels.Palette) PaletteDistance {
+func distances(aColor color.Color, palette pixels.Palette) PaletteDistance {
 	result := make(PaletteDistance, len(palette))
 	for palIndex, c := range palette {
 		result[palIndex] = distance(aColor, c)

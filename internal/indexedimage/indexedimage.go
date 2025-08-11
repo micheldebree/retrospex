@@ -38,7 +38,7 @@ func (img *IndexedImage) Render() image.Image {
 	for y := range img.Height {
 		for x := range img.Width {
 			pixel := img.PixelAt(x, y)
-			result.SetRGBA(x, y, pixels.ToColor(pixel.GetColor(img.Palette)))
+			result.Set(x, y, pixel.GetIndexedColor(img.Palette))
 		}
 	}
 	return result

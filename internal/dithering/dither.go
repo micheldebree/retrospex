@@ -1,7 +1,8 @@
 package dithering
 
 import (
-	"github.com/lucasb-eyer/go-colorful"
+	"image/color"
+
 	"github.com/micheldebree/retrospex/internal/indexedimage"
 )
 
@@ -47,11 +48,13 @@ func OrderedDither(img *indexedimage.IndexedImage, matrix IntMatrix, depth int) 
 		matrixY := pixel.Y % matrixH
 		matrixV := normalizedMatrix[matrixY][matrixX]
 
-		color := colorful.Color{
-			R: max(pixel.Color.R+matrixV, 0.0),
-			G: max(pixel.Color.G+matrixV, 0.0),
-			B: max(pixel.Color.B+matrixV, 0.0),
-		}
+		r, g, b, _ := pixel.Color.RGBA()
+
+		rOffset := float64(r) + matrixV
+		gOffset := float64(g) + matrixV
+		bOffset := float64(b) + matrixV
+
+		color := color.RGBA{uint8(rOffset), uint8(gOffset), uint8(bOffset), 0xff}
 		pixel.Color = color
 	}
 }

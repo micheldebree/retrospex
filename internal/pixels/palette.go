@@ -2,11 +2,9 @@ package pixels
 
 import (
 	"image/color"
-
-	"github.com/lucasb-eyer/go-colorful"
 )
 
-type Palette map[int]colorful.Color
+type Palette map[int]color.Color
 
 var C64Palettes = map[string]Palette{
 	"colodore":          Colodore,
@@ -267,7 +265,7 @@ var Lenyn = createPalette(
 func createPalette(palette color.Palette) Palette {
 	result := make(Palette)
 	for i, c := range palette {
-		result[i] = ToColorful(ToRGBA(c))
+		result[i] = c
 	}
 	return result
 }

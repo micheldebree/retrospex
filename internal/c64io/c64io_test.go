@@ -11,7 +11,7 @@ import (
 
 func TestGetBitmapData(t *testing.T) {
 
-	irrelevantColor := pixels.ToColorful(color.RGBA{0, 0, 0, 0})
+	irrelevantColor := color.RGBA{0, 0, 0, 0}
 
 	tests := []struct {
 		name     string
@@ -123,7 +123,7 @@ func TestGetBitmapData(t *testing.T) {
 				BitPatternSize: 1,
 			},
 			Pixels: []pixels.Pixel{
-				{X: 0, Y: 0, Color: pixels.ToColorful(color.RGBA{0xff, 0x00, 0x00, 0xff}), BitPattern: -1}, // No bit pattern
+				{X: 0, Y: 0, Color: color.RGBA{0xff, 0x00, 0x00, 0xff}, BitPattern: -1}, // No bit pattern
 			},
 		}
 		defer func() {

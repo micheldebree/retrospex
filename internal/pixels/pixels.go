@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-
-	"github.com/lucasb-eyer/go-colorful"
 )
 
 // Two types of color are used:
@@ -15,7 +13,7 @@ import (
 // Pixel One pixel in the image
 type Pixel struct {
 	X, Y  int
-	Color colorful.Color // the color in the original image
+	Color color.Color // the color in the original image
 	// available after quantizing
 	PaletteIndex      int
 	QuantizationError float64
@@ -23,7 +21,7 @@ type Pixel struct {
 	BitPattern int
 }
 
-func (pixel Pixel) GetColor(palette Palette) colorful.Color {
+func (pixel Pixel) GetIndexedColor(palette Palette) color.Color {
 	pixel.assertQuantized()
 	return palette[pixel.PaletteIndex]
 }
@@ -48,33 +46,9 @@ func (pixel Pixel) AssertHasBitPattern() {
 	}
 }
 
-func ToRGBA(aColor color.Color) color.RGBA {
-	rr, gg, bb, aa := aColor.RGBA()
-	return color.RGBA{R: (uint8)(rr >> 8), G: (uint8)(gg >> 8), B: (uint8)(bb >> 8), A: (uint8)(aa >> 8)}
-}
-
-func ToColor(colorful colorful.Color) color.RGBA {
-	return color.RGBA{
-		R: uint8(colorful.R * 256.0),
-		G: uint8(colorful.G * 256.0),
-		B: uint8(colorful.B * 256.0),
-		A: 0xff,
-	}
-}
-
-func ToColorful(aColor color.RGBA) colorful.Color {
-	return colorful.Color{
-		R: float64(aColor.R) / 256.0,
-		G: float64(aColor.G) / 256.0,
-		B: float64(aColor.B) / 256.0,
-	}
-}
-
 func getPixel(image *image.Image, x, y int) Pixel {
-	r, g, b, a := (*image).At(x, y).RGBA()
-	scale := float64(a)
-	convertedColor := colorful.Color{R: float64(r) / scale, G: float64(g) / scale, B: float64(b) / scale}
-	return Pixel{x, y, convertedColor, -1, -1.0, -1}
+	color := (*image).At(x, y)
+	return Pixel{x, y, color, -1, -1.0, -1}
 }
 
 func GetDimensions(image *image.Image) (int, int) {

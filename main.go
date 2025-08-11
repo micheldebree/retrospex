@@ -83,7 +83,7 @@ func main() {
 		return
 	}
 
-	ditherMatrix, isPresent := dithering.DitherMatrices[options.DitherMatrix]
+	// ditherMatrix, isPresent := dithering.DitherMatrices[options.DitherMatrix]
 	if !isPresent {
 		printError(fmt.Sprintf("Unknown dither matrix: %s", options.DitherMatrix))
 		return
@@ -104,7 +104,7 @@ func main() {
 	spec := indexedimage.MakeSpec(options.Mode, &img)
 	fmt.Printf("Mode: %s\n", options.Mode)
 	indexedImage := indexedimage.ToIndexedImage(&img, spec, palette)
-	dithering.OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
+	// dithering.OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
 	newImage := conversion.Quantize(indexedImage)
 
 	switch options.Format {

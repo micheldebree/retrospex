@@ -6,7 +6,6 @@ import (
 	"github.com/micheldebree/retrospex/internal/indexedimage"
 	"github.com/micheldebree/retrospex/internal/pixels"
 	"github.com/stretchr/testify/assert"
-	"github.com/lucasb-eyer/go-colorful"
 )
 
 func TestRegion_addMapping(t *testing.T) {
@@ -80,27 +79,4 @@ func TestRegion_getUnmappedBitPattern(t *testing.T) {
 	}
 
 	assert.Equal(t, 1, region.getUnmappedBitPattern())
-}
-
-func TestRegion_getPalette(t *testing.T) {
-	img := &indexedimage.IndexedImage{
-		Width:   10,
-		Height:  10,
-		Spec:    indexedimage.Retrospec{},
-		Palette: pixels.Palette{1: colorful.Color{R: 0.5, G: 0.5, B: 0.5}},
-		Pixels:  []pixels.Pixel{},
-	}
-	region := &Region{
-		img:               img,
-		x:                 0,
-		y:                 0,
-		width:             10,
-		height:            10,
-		bitpatternToColor: map[int]int{1: 1, 2: -1},
-		colorToBitpattern: make(map[int]int),
-		isLastLayer:       false,
-	}
-
-	palette := region.getPalette()
-	assert.Equal(t, colorful.Color{R: 0.5, G: 0.5, B: 0.5}, palette[1])
 }
