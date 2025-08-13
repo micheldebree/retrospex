@@ -52,21 +52,22 @@ func getRegions(img indexedimage.IndexedImage, layer indexedimage.Layer) []Regio
 
 	for cy := range nrRows {
 		for cx := range nrCols {
-			regions[cy*nrCols+cx] = Region{
+
+			regionIndex := cy*nrCols + cx
+
+			regions[regionIndex] = Region{
 				&img,
 				cx * layer.CellWidth,
 				cy * layer.CellHeight,
 				layer.CellWidth,
 				layer.CellHeight,
+				// TODO: these are made twice
 				make(map[int]int),
 				make(map[int]int),
 				layer.IsLast,
 			}
 
-			// initialize bitpatterns, unmapped
-			for _, bitpattern := range layer.Bitpatterns {
-				regions[cy*nrCols+cx].addMapping(bitpattern, -1)
-			}
+			regions[regionIndex].initBitPatterns(layer)
 		}
 	}
 	return regions
@@ -148,7 +149,7 @@ func assignBitPatterns(region Region) {
 	// assign bitpatterns
 	for _, key := range keys {
 		bitPattern := region.getUnmappedBitPattern()
-		region.addMapping(bitPattern, key)
+		region.assignColorToBitPattern(bitPattern, key)
 	}
 
 }

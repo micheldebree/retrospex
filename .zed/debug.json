@@ -50,5 +50,25 @@
       "scripts/paintface.tmp1.png"
     ]
     // "buildFlags": [],
+  },
+  {
+    "label": "background",
+    "adapter": "Delve",
+    "request": "launch",
+    "mode": "debug",
+    // For Delve, the program can be a package name
+    "program": ".",
+    "args": [
+      "-m",
+      "mccharset",
+      "-dm",
+      "none",
+      "-p",
+      "pepto",
+      "-o",
+      "background.mchars.png",
+      "background.png"
+    ]
+    // "buildFlags": [],
   }
 ]

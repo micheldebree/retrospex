@@ -13,11 +13,24 @@ type Region struct {
 	x, y              int
 	width, height     int
 	bitpatternToColor map[int]int // maps each bit pattern to a palette index
-	colorToBitpattern map[int]int // reverse
+	colorToBitpattern map[int]int // maps each bit pattern to a palette index
 	isLastLayer       bool        // is this region in the last layer?
 }
 
-func (region *Region) addMapping(bitPattern, paletteIndex int) {
+func (region *Region) initBitPatterns(layer indexedimage.Layer) {
+	for _, bitPattern := range layer.Bitpatterns {
+		region.bitpatternToColor[bitPattern] = -1
+	}
+}
+
+func (region *Region) bitPatternIsAssigned(bitPattern int) bool {
+	return region.bitpatternToColor[bitPattern] != -1
+}
+
+func (region *Region) assignColorToBitPattern(bitPattern int, paletteIndex int) {
+	if region.bitPatternIsAssigned(bitPattern) {
+		panic("cannot assign color to bit pattern, a color is already assigned")
+	}
 	region.bitpatternToColor[bitPattern] = paletteIndex
 	region.colorToBitpattern[paletteIndex] = bitPattern
 }
@@ -27,6 +40,7 @@ func (region *Region) coordsToIndex(x, y int) int {
 }
 
 // get the first bitpattern that is not mapped to a pallette index
+// TODO: the map is unordered so unpredictable
 func (region *Region) getUnmappedBitPattern() int {
 	for bitpattern, paletteIndex := range region.bitpatternToColor {
 		if paletteIndex < 0 {

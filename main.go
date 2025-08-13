@@ -89,7 +89,7 @@ func main() {
 		return
 	}
 
-	if options.DitherDepth < 0 || options.DitherDepth > 255 {
+	if options.DitherDepth < 0 || options.DitherDepth > 100 {
 		printError(fmt.Sprintf("Unsupported dither depth: %d, must be 0-100", options.DitherDepth))
 		return
 	}
