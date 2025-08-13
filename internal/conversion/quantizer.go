@@ -1,8 +1,6 @@
 package conversion
 
 import (
-	"image/color"
-	"math"
 	"sort"
 
 	"github.com/micheldebree/retrospex/internal/indexedimage"
@@ -15,51 +13,33 @@ import (
 // In the order of the palette
 type PaletteDistance map[int]float64
 
-func distance(color1, color2 color.Color) float64 {
-	r1, g1, b1, _ := color1.RGBA()
-	r2, g2, b2, _ := color2.RGBA()
-
-	dr := float64(r1 - r2)
-	dg := float64(g1 - g2)
-	db := float64(b1 - b2)
-
-	return math.Sqrt(dr*dr + dg*dg + db*db)
+// QuantizePixel quantizes a pixel to the nearest color in the palette
+func QuantizePixel(p *pixels.Pixel, pal pixels.Palette) {
+	p.PaletteIndex = bestIndex(p, pal)
+	p.QuantizationError = 0
 }
 
-// distances Distance from a pixel to each color in a palette
-func distances(aColor color.Color, palette pixels.Palette) PaletteDistance {
-	result := make(PaletteDistance, len(palette))
-	for palIndex, c := range palette {
-		result[palIndex] = distance(aColor, c)
-	}
-	return result
-}
-
-// bestPixelIndex The palette index with the smallest distance
-// also returns the distance itself, meaning the quantization error
-// which is useful for error diffusion dithering
-func bestPixelIndex(distances PaletteDistance) (index int, qerror float64) {
-	bestIndex := -1
-	smallestDistance := math.MaxFloat64
-	for i, distance := range distances {
-		if distance < smallestDistance {
-			smallestDistance = distance
-			bestIndex = i
+// borrowed from golang color package
+func bestIndex(p *pixels.Pixel, pal pixels.Palette) int {
+	cr, cg, cb, ca := p.Color.RGBA()
+	ret, bestSum := 0, uint32(1<<32-1)
+	for i, v := range pal {
+		vr, vg, vb, va := v.RGBA()
+		sum := sqDiff(cr, vr) + sqDiff(cg, vg) + sqDiff(cb, vb) + sqDiff(ca, va)
+		if sum < bestSum {
+			if sum == 0 {
+				return i
+			}
+			ret, bestSum = i, sum
 		}
 	}
-
-	if bestIndex < 0 {
-		panic("Could not determine best index")
-	}
-
-	return bestIndex, smallestDistance
+	return ret
 }
 
-func quantizePixel(p *pixels.Pixel, pal pixels.Palette) {
-	distances := distances(p.Color, pal)
-	bestIndex, smallestDistance := bestPixelIndex(distances)
-	p.PaletteIndex = bestIndex
-	p.QuantizationError = smallestDistance
+// borrowed from golang color package
+func sqDiff(x, y uint32) uint32 {
+	d := x - y
+	return (d * d) >> 2
 }
 
 // Cut up image into regions for a particular layer
@@ -87,7 +67,6 @@ func getRegions(img indexedimage.IndexedImage, layer indexedimage.Layer) []Regio
 			for _, bitpattern := range layer.Bitpatterns {
 				regions[cy*nrCols+cx].addMapping(bitpattern, -1)
 			}
-
 		}
 	}
 	return regions
@@ -103,10 +82,10 @@ func quantizeRegion(region Region) {
 			pixel := &region.img.Pixels[pixelIndex]
 			if !pixel.HasBitPattern() { // has already been processed
 				if region.isLastLayer { // last layer, all remaining pixels should be quantized against the region's palette
-					quantizePixel(pixel, localPalette)
+					QuantizePixel(pixel, localPalette)
 					pixel.BitPattern = region.colorToBitpattern[pixel.PaletteIndex]
 				} else { // not the last layer, only process pixels that quantize to a bitpattern in the new palette
-					quantizePixel(pixel, region.img.Palette)
+					QuantizePixel(pixel, region.img.Palette)
 					bitpattern, present := region.colorToBitpattern[pixel.PaletteIndex]
 					if present {
 						pixel.BitPattern = bitpattern
@@ -148,7 +127,7 @@ func assignBitPatterns(region Region) {
 
 			// pixels that are already assigned a bitpattern don't count
 			if !pixel.HasBitPattern() {
-				quantizePixel(pixel, region.img.Palette)
+				QuantizePixel(pixel, region.img.Palette)
 				indexToCount[pixel.PaletteIndex]++
 			}
 		}

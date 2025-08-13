@@ -7,7 +7,6 @@ import (
 )
 
 type IntMatrix [][]int
-type FloatMatrix [][]float64
 
 var DitherMatrices = map[string]IntMatrix{
 	"none": {{0}},
@@ -37,7 +36,7 @@ var DitherMatrices = map[string]IntMatrix{
 // a matrix. N.B. the image itself is adjusted
 func OrderedDither(img *indexedimage.IndexedImage, matrix IntMatrix, depth int) {
 
-	normalizedMatrix := normalize(matrix, float64(depth)/255.)
+	normalizedMatrix := normalize(matrix, depth)
 	matrixH := len(matrix)
 	matrixW := len(matrix[0])
 
@@ -50,30 +49,45 @@ func OrderedDither(img *indexedimage.IndexedImage, matrix IntMatrix, depth int) 
 
 		r, g, b, _ := pixel.Color.RGBA()
 
-		rOffset := float64(r) + matrixV
-		gOffset := float64(g) + matrixV
-		bOffset := float64(b) + matrixV
+		rOffset := toByteWithOverflow(r) + matrixV
+		gOffset := toByteWithOverflow(g) + matrixV
+		bOffset := toByteWithOverflow(b) + matrixV
 
-		color := color.RGBA{uint8(rOffset), uint8(gOffset), uint8(bOffset), 0xff}
-		pixel.Color = color
+		pixel.Color = color.RGBA{capToByte(rOffset), capToByte(gOffset), capToByte(bOffset), 0xff}
 	}
 }
 
-func normalize(matrix IntMatrix, depth float64) FloatMatrix {
+// Scale back to the range of a byte, but leave room for underflow and overflow by using int
+func toByteWithOverflow(colorChannel uint32) int {
+	return int(colorChannel >> 8)
+}
+
+// Convert to byte, capping underflow and overflow resulting from adding the matrix
+func capToByte(value int) uint8 {
+	if value > 255 {
+		return 255
+	}
+	if value < 0 {
+		return 0
+	}
+	return uint8(value)
+}
+
+func normalize(matrix IntMatrix, depth int) IntMatrix {
 
 	height := len(matrix)
 	width := len(matrix[0])
 
 	// initialize float matrix
-	result := make(FloatMatrix, height)
+	result := make(IntMatrix, height)
 	for i := range result {
-		result[i] = make([]float64, width)
+		result[i] = make([]int, width)
 	}
 
-	factor := 1.0 / float64(width*height)
+	factor := float64(depth) / float64(width*height)
 	for rowIndex, row := range matrix {
 		for colIndex, col := range row {
-			result[rowIndex][colIndex] = depth * (factor*float64(col) - 0.5)
+			result[rowIndex][colIndex] = int(factor*float64(col) - 0.5)
 		}
 	}
 	return result

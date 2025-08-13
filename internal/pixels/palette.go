@@ -269,3 +269,11 @@ func createPalette(palette color.Palette) Palette {
 	}
 	return result
 }
+
+func ToColorPalette(p Palette) color.Palette {
+	result := make(color.Palette, len(p))
+	for i, c := range p {
+		result[i] = c
+	}
+	return result
+}

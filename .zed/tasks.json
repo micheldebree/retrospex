@@ -4,7 +4,7 @@
 [
   {
     "label": "koala",
-    "command": "./scripts/koala.sh",
+    "command": "make install && ./scripts/koala.sh",
     "args": ["./scripts/paintface.src.png"],
     "use_new_terminal": false,
     "allow_concurrent_runs": false,
