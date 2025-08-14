@@ -61,12 +61,10 @@ func getRegions(img indexedimage.IndexedImage, layer indexedimage.Layer) []Regio
 				cy * layer.CellHeight,
 				layer.CellWidth,
 				layer.CellHeight,
-				// TODO: these are made twice
 				make(map[int]int),
 				make(map[int]int),
 				layer.IsLast,
 			}
-
 			regions[regionIndex].initBitPatterns(layer)
 		}
 	}
@@ -97,6 +95,7 @@ func quantizeRegion(region Region) {
 	}
 }
 
+// quantize all the pixels in the image according to the image specs
 func Quantize(img indexedimage.IndexedImage) indexedimage.IndexedImage {
 	result := img
 
@@ -135,21 +134,24 @@ func assignBitPatterns(region Region) {
 	}
 
 	// sort in reverse order of count values
-	keys := maps.Keys(indexToCount)
-	sort.SliceStable(keys, func(i, j int) bool {
-		return indexToCount[keys[i]] > indexToCount[keys[j]]
+	unassignedColors := maps.Keys(indexToCount)
+	sort.SliceStable(unassignedColors, func(i, j int) bool {
+		return indexToCount[unassignedColors[i]] > indexToCount[unassignedColors[j]]
 	})
 
-	// only keep top n
-	maxColors := len(region.bitpatternToColor)
-	if maxColors < len(keys) {
-		keys = keys[0:maxColors]
-	}
+	// assign bitpatterns until there are no more colors or no more bitpatterns
+	// to map to
 
-	// assign bitpatterns
-	for _, key := range keys {
-		bitPattern := region.getUnmappedBitPattern()
-		region.assignColorToBitPattern(bitPattern, key)
+	nrOfUnassignedColors := len(unassignedColors)
+	colorIndex := 0
+	bitpatternFound, bitPattern := region.getUnmappedBitPattern()
+	done := nrOfUnassignedColors <= 0 || !bitpatternFound
+
+	for !done {
+		region.assignColorToBitPattern(bitPattern, unassignedColors[colorIndex])
+		colorIndex++
+		bitpatternFound, bitPattern = region.getUnmappedBitPattern()
+		done = (colorIndex >= nrOfUnassignedColors) || !bitpatternFound
 	}
 
 }

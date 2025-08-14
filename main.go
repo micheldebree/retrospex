@@ -89,8 +89,8 @@ func main() {
 		return
 	}
 
-	if options.DitherDepth < 0 || options.DitherDepth > 100 {
-		printError(fmt.Sprintf("Unsupported dither depth: %d, must be 0-100", options.DitherDepth))
+	if options.DitherDepth < 0 || options.DitherDepth > 255 {
+		printError(fmt.Sprintf("Unsupported dither depth: %d, must be 0-255", options.DitherDepth))
 		return
 	}
 
@@ -109,6 +109,7 @@ func main() {
 
 	switch options.Format {
 	case PNG:
+		// TODO: add overwrite flag
 		imageio.WriteImage(options.OutFile, newImage.Render())
 	case BINARY:
 		c64io.SaveBinary(options.OutFile, &newImage, true)
