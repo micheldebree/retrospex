@@ -16,6 +16,8 @@ type PaletteDistance map[int]float64
 // QuantizePixel quantizes a pixel to the nearest color in the palette
 func QuantizePixel(p *pixels.Pixel, pal pixels.Palette) {
 	p.PaletteIndex = bestIndex(p, pal)
+	// TODO: store quantization error for when we want to do error diffusion
+	// dithering later
 	p.QuantizationError = 0
 }
 
@@ -79,14 +81,18 @@ func quantizeRegion(region Region) {
 		for x := 0; x < region.width; x++ {
 			pixelIndex := region.coordsToIndex(x, y)
 			pixel := &region.img.Pixels[pixelIndex]
-			if !pixel.HasBitPattern() { // has already been processed
-				if region.isLastLayer { // last layer, all remaining pixels should be quantized against the region's palette
+			// only process pixels that don't have a bitpattern assigned yet
+			if !pixel.HasBitPattern() {
+				if region.isLastLayer {
+					// last layer, all remaining pixels should be re-quantized
+					// against the local palette
 					QuantizePixel(pixel, localPalette)
 					pixel.BitPattern = region.colorToBitpattern[pixel.PaletteIndex]
-				} else { // not the last layer, only process pixels that quantize to a bitpattern in the new palette
-					QuantizePixel(pixel, region.img.Palette)
-					bitpattern, present := region.colorToBitpattern[pixel.PaletteIndex]
-					if present {
+				} else {
+					// The pixel should have already been quantized when
+					// assigning bitpatterns
+					pixel.AssertQuantized()
+					if bitpattern, present := region.colorToBitpattern[pixel.PaletteIndex]; present {
 						pixel.BitPattern = bitpattern
 					}
 				}
@@ -116,6 +122,32 @@ func Quantize(img indexedimage.IndexedImage) indexedimage.IndexedImage {
 // only considers pixels that don't have a bitpattern assigned yet
 func assignBitPatterns(region Region) {
 
+	if found, _ := region.getUnmappedBitPattern(); !found {
+		panic("All bit patterns have been assigned a color already.")
+	}
+
+	unassignedColors := getUnassignedColors(region)
+
+	// assign bitpatterns until there are no more colors or no more bitpatterns
+	// to map to
+
+	nrOfUnassignedColors := len(unassignedColors)
+	colorIndex := 0
+	bitpatternFound, bitPattern := region.getUnmappedBitPattern()
+	done := nrOfUnassignedColors <= 0 || !bitpatternFound
+
+	for !done {
+		region.assignColorToBitPattern(bitPattern, unassignedColors[colorIndex])
+		colorIndex++
+		bitpatternFound, bitPattern = region.getUnmappedBitPattern()
+		done = (colorIndex >= nrOfUnassignedColors) || !bitpatternFound
+	}
+
+}
+
+// Get colors that don't have a bitpattern assigned
+// Sorted most occuring color first
+func getUnassignedColors(region Region) []int {
 	// maps color index to occurence count
 	indexToCount := make(map[int]int)
 
@@ -138,20 +170,5 @@ func assignBitPatterns(region Region) {
 	sort.SliceStable(unassignedColors, func(i, j int) bool {
 		return indexToCount[unassignedColors[i]] > indexToCount[unassignedColors[j]]
 	})
-
-	// assign bitpatterns until there are no more colors or no more bitpatterns
-	// to map to
-
-	nrOfUnassignedColors := len(unassignedColors)
-	colorIndex := 0
-	bitpatternFound, bitPattern := region.getUnmappedBitPattern()
-	done := nrOfUnassignedColors <= 0 || !bitpatternFound
-
-	for !done {
-		region.assignColorToBitPattern(bitPattern, unassignedColors[colorIndex])
-		colorIndex++
-		bitpatternFound, bitPattern = region.getUnmappedBitPattern()
-		done = (colorIndex >= nrOfUnassignedColors) || !bitpatternFound
-	}
-
+	return unassignedColors
 }

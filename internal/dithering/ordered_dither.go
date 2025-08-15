@@ -57,12 +57,14 @@ func OrderedDither(img *indexedimage.IndexedImage, matrix IntMatrix, depth int) 
 	}
 }
 
-// Scale back to the range of a byte, but leave room for underflow and overflow by using int
+// Scale back to the range of a byte, but leave room for underflow and overflow
+// by using int
 func toByteWithOverflow(colorChannel uint32) int {
 	return int(colorChannel >> 8)
 }
 
-// Convert to byte, capping underflow and overflow resulting from adding the matrix
+// Convert to byte, capping underflow and overflow resulting from adding the
+// matrix
 func capToByte(value int) uint8 {
 	if value > 255 {
 		return 255

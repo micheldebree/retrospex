@@ -44,6 +44,7 @@ func (region *Region) coordsToIndex(x, y int) int {
 
 // get the first bitpattern that is not mapped to a pallette index
 // N.B.: map is unordered
+// TODO: optimize by not searching from the start every time?
 func (region *Region) getUnmappedBitPattern() (found bool, bitpattern int) {
 	for bitpattern, paletteIndex := range region.bitpatternToColor {
 		if paletteIndex < 0 {

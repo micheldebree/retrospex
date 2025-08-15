@@ -22,7 +22,7 @@ type Pixel struct {
 }
 
 func (pixel Pixel) GetIndexedColor(palette Palette) color.Color {
-	pixel.assertQuantized()
+	pixel.AssertQuantized()
 	return palette[pixel.PaletteIndex]
 }
 
@@ -30,7 +30,7 @@ func (pixel Pixel) isQuantized() bool {
 	return pixel.PaletteIndex >= 0
 }
 
-func (pixel Pixel) assertQuantized() {
+func (pixel Pixel) AssertQuantized() {
 	if !pixel.isQuantized() {
 		panic(fmt.Sprintf("Pixel %v is not quantized", pixel))
 	}
