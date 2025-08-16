@@ -36,6 +36,11 @@ var DitherMatrices = map[string]IntMatrix{
 // a matrix. N.B. the image itself is adjusted
 func OrderedDither(img *indexedimage.IndexedImage, matrix IntMatrix, depth int) {
 
+	// no need to waste time if the effect is none
+	if depth == 0 || len(matrix) <= 1 {
+		return
+	}
+
 	normalizedMatrix := normalize(matrix, depth)
 	matrixH := len(matrix)
 	matrixW := len(matrix[0])

@@ -13,12 +13,51 @@ type IndexedImage struct {
 	Spec    Retrospec
 	Palette pixels.Palette
 	Pixels  []pixels.Pixel
+	Regions map[int][]Region // regions per layer
 }
 
 func ToIndexedImage(img *image.Image, spec Retrospec, pal pixels.Palette) IndexedImage {
 	thePixels := pixels.GetPixels(img)
 	w, h := pixels.GetDimensions(img)
-	return IndexedImage{w, h, spec, pal, thePixels}
+
+	regions := make(map[int][]Region, len(spec.Layers))
+
+	result := IndexedImage{w, h, spec, pal, thePixels, regions}
+
+	// for each layer, create the regions
+	for layerIndex, layer := range spec.Layers {
+		regions[layerIndex] = getRegions(&result, w, h, layer)
+	}
+
+	return result
+}
+
+// Cut up image into regions for a particular layer
+func getRegions(img *IndexedImage, w, h int, layer Layer) []Region {
+
+	nrCols, nrRows := w/layer.CellWidth, h/layer.CellHeight
+
+	regions := make([]Region, nrCols*nrRows)
+
+	for cy := range nrRows {
+		for cx := range nrCols {
+
+			regionIndex := cy*nrCols + cx
+
+			regions[regionIndex] = Region{
+				img,
+				cx * layer.CellWidth,
+				cy * layer.CellHeight,
+				layer.CellWidth,
+				layer.CellHeight,
+				make(map[int]int),
+				make(map[int]int),
+				layer.IsLast,
+			}
+			regions[regionIndex].initBitPatterns(layer)
+		}
+	}
+	return regions
 }
 
 func (img *IndexedImage) PixelAt(x, y int) pixels.Pixel {

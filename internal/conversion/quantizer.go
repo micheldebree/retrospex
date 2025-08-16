@@ -44,47 +44,17 @@ func sqDiff(x, y uint32) uint32 {
 	return (d * d) >> 2
 }
 
-// Cut up image into regions for a particular layer
-func getRegions(img indexedimage.IndexedImage, layer indexedimage.Layer) []Region {
-	w, h := img.Width, img.Height
-
-	nrCols, nrRows := w/layer.CellWidth, h/layer.CellHeight
-
-	regions := make([]Region, nrCols*nrRows)
-
-	for cy := range nrRows {
-		for cx := range nrCols {
-
-			regionIndex := cy*nrCols + cx
-
-			regions[regionIndex] = Region{
-				&img,
-				cx * layer.CellWidth,
-				cy * layer.CellHeight,
-				layer.CellWidth,
-				layer.CellHeight,
-				make(map[int]int),
-				make(map[int]int),
-				layer.IsLast,
-			}
-			regions[regionIndex].initBitPatterns(layer)
-		}
-	}
-	return regions
-}
-
-func quantizeRegion(region Region) {
+func quantizeRegion(region indexedimage.Region) {
 	//region.assignColorToBitPattern(0b00, 0)
 	assignBitPatterns(region)
-	localPalette := region.getPalette()
+	localPalette := region.GetPalette()
 
-	for y := 0; y < region.height; y++ {
-		for x := 0; x < region.width; x++ {
-			pixelIndex := region.coordsToIndex(x, y)
-			pixel := &region.img.Pixels[pixelIndex]
+	for y := 0; y < region.Height; y++ {
+		for x := 0; x < region.Width; x++ {
+			pixel := region.GetPixel(x, y)
 			// only process pixels that don't have a bitpattern assigned yet
 			if !pixel.HasBitPattern() {
-				if region.isLastLayer {
+				if region.IsLastLayer {
 					// last layer, all remaining pixels should be re-quantized
 					// against the local palette
 					QuantizePixel(pixel, localPalette)
@@ -99,12 +69,10 @@ func quantizeRegion(region Region) {
 func Quantize(img indexedimage.IndexedImage) indexedimage.IndexedImage {
 	result := img
 
-	for _, layer := range img.Spec.Layers {
-		// cut the image up according to layer specs
-		regions := getRegions(result, layer)
+	for layerIndex := range img.Spec.Layers {
 
 		// quantize the regions
-		for _, region := range regions {
+		for _, region := range img.Regions[layerIndex] {
 			quantizeRegion(region)
 		}
 	}
@@ -114,10 +82,10 @@ func Quantize(img indexedimage.IndexedImage) indexedimage.IndexedImage {
 // reduce a palette to maximum number of colors according to their
 // quantized occurence in pixels. assign a bitpattern to each palette entry
 // only considers pixels that don't have a bitpattern assigned yet
-func assignBitPatterns(region Region) {
+func assignBitPatterns(region indexedimage.Region) {
 
 	unassignedColors := getUnassignedColors(region)
-	unmappedBitPatterns := region.getUnmappedBitpatterns()
+	unmappedBitPatterns := region.GetUnmappedBitpatterns()
 
 	nrOfUnassignedColors := len(unassignedColors)
 	nrOfUnmappedBitPatterns := len(unmappedBitPatterns)
@@ -131,7 +99,7 @@ func assignBitPatterns(region Region) {
 
 	for !done {
 		bitpattern := unmappedBitPatterns[index]
-		region.assignColorToBitPattern(bitpattern, unassignedColors[index])
+		region.AssignColorToBitPattern(bitpattern, unassignedColors[index])
 		index++
 		done = index >= nrOfUnassignedColors || index >= nrOfUnmappedBitPatterns
 	}
@@ -140,19 +108,18 @@ func assignBitPatterns(region Region) {
 
 // Get colors that don't have a bitpattern assigned
 // Sorted most occuring color first
-func getUnassignedColors(region Region) []int {
+func getUnassignedColors(region indexedimage.Region) []int {
 	// maps color index to occurence count
 	indexToCount := make(map[int]int)
 
 	// count nr of pixels for each quantized color
-	for y := 0; y < region.height; y++ {
-		for x := 0; x < region.width; x++ {
-			pixelIndex := region.coordsToIndex(x, y)
-			pixel := &region.img.Pixels[pixelIndex]
+	for y := 0; y < region.Height; y++ {
+		for x := 0; x < region.Width; x++ {
+			pixel := region.GetPixel(x, y)
 
 			// pixels that are already assigned a bitpattern don't count
 			if !pixel.HasBitPattern() {
-				QuantizePixel(pixel, region.img.Palette)
+				QuantizePixel(pixel, region.Img.Palette)
 
 				// there could already be colors associated with bitpatterns
 				// initially. If so, use it and don't count as unassigned
