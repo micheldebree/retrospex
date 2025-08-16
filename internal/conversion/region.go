@@ -1,6 +1,8 @@
 package conversion
 
 import (
+	"fmt"
+
 	"github.com/micheldebree/retrospex/internal/indexedimage"
 	"github.com/micheldebree/retrospex/internal/pixels"
 )
@@ -25,33 +27,43 @@ func (region *Region) initBitPatterns(layer indexedimage.Layer) {
 	}
 }
 
-func (region *Region) bitPatternIsAssigned(bitPattern int) bool {
-	return region.bitpatternToColor[bitPattern] != UNKNOWN
+func (region *Region) bitPatternIsAssigned(colorIndex int) bool {
+	colorIndex, present := region.bitpatternToColor[colorIndex]
+	return present && colorIndex != UNKNOWN
 }
 
 // associates a bitpattern with an index in the color palette
 func (region *Region) assignColorToBitPattern(bitPattern int, paletteIndex int) {
 	if region.bitPatternIsAssigned(bitPattern) {
-		panic("cannot assign color to bit pattern, a color is already assigned")
+		panic(fmt.Sprintf("cannot assign color %d to bit pattern %d, a color is already assigned for region %v", paletteIndex, bitPattern, region))
 	}
 	region.bitpatternToColor[bitPattern] = paletteIndex
 	region.colorToBitpattern[paletteIndex] = bitPattern
+}
+
+// if a bitpattern is associated with the pixel's quantized color, assign the bitpattern to the pixel
+func (region *Region) AssignBitpatternToPixel(pixel *pixels.Pixel) bool {
+	pixel.AssertQuantized()
+
+	if bitpattern, present := region.colorToBitpattern[pixel.PaletteIndex]; present {
+		pixel.BitPattern = bitpattern
+		return true
+	}
+	return false
 }
 
 func (region *Region) coordsToIndex(x, y int) int {
 	return (region.y+y)*region.img.Width + (region.x + x)
 }
 
-// get the first bitpattern that is not mapped to a pallette index
-// N.B.: map is unordered
-// TODO: optimize by not searching from the start every time?
-func (region *Region) getUnmappedBitPattern() (found bool, bitpattern int) {
+func (region *Region) getUnmappedBitpatterns() []int {
+	result := make([]int, 0)
 	for bitpattern, paletteIndex := range region.bitpatternToColor {
-		if paletteIndex < 0 {
-			return true, bitpattern
+		if paletteIndex == UNKNOWN {
+			result = append(result, bitpattern)
 		}
 	}
-	return false, UNKNOWN
+	return result
 }
 
 // create a pallete containing only the colors assigned to a bitpattern

@@ -74,6 +74,7 @@ func getRegions(img indexedimage.IndexedImage, layer indexedimage.Layer) []Regio
 }
 
 func quantizeRegion(region Region) {
+	//region.assignColorToBitPattern(0b00, 0)
 	assignBitPatterns(region)
 	localPalette := region.getPalette()
 
@@ -87,15 +88,8 @@ func quantizeRegion(region Region) {
 					// last layer, all remaining pixels should be re-quantized
 					// against the local palette
 					QuantizePixel(pixel, localPalette)
-					pixel.BitPattern = region.colorToBitpattern[pixel.PaletteIndex]
-				} else {
-					// The pixel should have already been quantized when
-					// assigning bitpatterns
-					pixel.AssertQuantized()
-					if bitpattern, present := region.colorToBitpattern[pixel.PaletteIndex]; present {
-						pixel.BitPattern = bitpattern
-					}
 				}
+				region.AssignBitpatternToPixel(pixel)
 			}
 		}
 	}
@@ -122,25 +116,24 @@ func Quantize(img indexedimage.IndexedImage) indexedimage.IndexedImage {
 // only considers pixels that don't have a bitpattern assigned yet
 func assignBitPatterns(region Region) {
 
-	if found, _ := region.getUnmappedBitPattern(); !found {
-		panic("All bit patterns have been assigned a color already.")
-	}
-
 	unassignedColors := getUnassignedColors(region)
-
-	// assign bitpatterns until there are no more colors or no more bitpatterns
-	// to map to
+	unmappedBitPatterns := region.getUnmappedBitpatterns()
 
 	nrOfUnassignedColors := len(unassignedColors)
-	colorIndex := 0
-	bitpatternFound, bitPattern := region.getUnmappedBitPattern()
-	done := nrOfUnassignedColors <= 0 || !bitpatternFound
+	nrOfUnmappedBitPatterns := len(unmappedBitPatterns)
+
+	if nrOfUnassignedColors <= 0 || nrOfUnmappedBitPatterns <= 0 {
+		return
+	}
+
+	index := 0
+	done := false
 
 	for !done {
-		region.assignColorToBitPattern(bitPattern, unassignedColors[colorIndex])
-		colorIndex++
-		bitpatternFound, bitPattern = region.getUnmappedBitPattern()
-		done = (colorIndex >= nrOfUnassignedColors) || !bitpatternFound
+		bitpattern := unmappedBitPatterns[index]
+		region.assignColorToBitPattern(bitpattern, unassignedColors[index])
+		index++
+		done = index >= nrOfUnassignedColors || index >= nrOfUnmappedBitPatterns
 	}
 
 }
@@ -160,7 +153,12 @@ func getUnassignedColors(region Region) []int {
 			// pixels that are already assigned a bitpattern don't count
 			if !pixel.HasBitPattern() {
 				QuantizePixel(pixel, region.img.Palette)
-				indexToCount[pixel.PaletteIndex]++
+
+				// there could already be colors associated with bitpatterns
+				// initially. If so, use it and don't count as unassigned
+				if success := region.AssignBitpatternToPixel(pixel); !success {
+					indexToCount[pixel.PaletteIndex]++
+				}
 			}
 		}
 	}
