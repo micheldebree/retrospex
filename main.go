@@ -14,6 +14,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"strings"
+	"time"
 
 	"github.com/micheldebree/retrospex/internal/c64io"
 	"github.com/micheldebree/retrospex/internal/conversion"
@@ -41,8 +42,8 @@ type Options struct {
 type FormatType string
 
 const (
-	PNG    FormatType = "png"
-	BINARY FormatType = "binary"
+	PNG FormatType = "png"
+	BIN FormatType = "bin"
 )
 
 var defaultOptions = Options{
@@ -55,6 +56,10 @@ var defaultOptions = Options{
 }
 
 func main() {
+
+	startTime := time.Now()
+
+	fmt.Printf("\nretrospex %s.%s by yth\n", Version, Arch)
 
 	var options Options
 
@@ -69,6 +74,11 @@ func main() {
 	flag.Parse()
 
 	options.Format = FormatType(formatString)
+
+	if options.Format != PNG && options.Format != BIN {
+		printError(fmt.Sprintf("Unknown format: %s", options.Format))
+		return
+	}
 
 	args := flag.Args()
 
@@ -102,7 +112,6 @@ func main() {
 	}
 
 	spec := indexedimage.MakeSpec(options.Mode, &img)
-	fmt.Printf("Mode: %s\n", options.Mode)
 	indexedImage := indexedimage.ToIndexedImage(&img, spec, palette)
 	dithering.OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
 	newImage := conversion.Quantize(indexedImage)
@@ -111,10 +120,11 @@ func main() {
 	case PNG:
 		// TODO: add overwrite flag
 		imageio.WriteImage(options.OutFile, newImage.Render())
-	case BINARY:
+	case BIN:
 		c64io.SaveBinary(options.OutFile, &newImage, true)
 	}
-	fmt.Print(options.OutFile)
+
+	fmt.Printf("%s --> %s (%s) in %s\n", infile, options.OutFile, options.Mode, time.Since(startTime))
 }
 
 func printError(message string) {
@@ -123,7 +133,6 @@ func printError(message string) {
 }
 
 func help() {
-	fmt.Printf("\nretrospex %s.%s by yth\n", Version, Arch)
 	fmt.Printf("\nUsage: retrospex [options] input.png\n\n")
 	fmt.Printf("Options:\n\n")
 	fmt.Printf("\t-o\n\t\tOutput filename (default %s)\n", defaultOptions.OutFile)
@@ -131,5 +140,5 @@ func help() {
 	fmt.Printf("\t-p\n\t\tPalette (default %s). One of %s\n", defaultOptions.Palette, strings.Join(maps.Keys(pixels.C64Palettes), ","))
 	fmt.Printf("\t-dm\n\t\tDither matrix (default %s). One of %s\n", defaultOptions.DitherMatrix, strings.Join(maps.Keys(dithering.DitherMatrices), ","))
 	fmt.Printf("\t-dd\n\t\tDither depth (default %d). 0-255\n", defaultOptions.DitherDepth)
-	fmt.Printf("\t-f\n\t\tOutput format (default %s). One of png, binary\n", defaultOptions.Format) // Added Format option to help
+	fmt.Printf("\t-f\n\t\tOutput format (default %s). One of png, bin\n", defaultOptions.Format) // Added Format option to help
 }
