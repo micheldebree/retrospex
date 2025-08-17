@@ -44,8 +44,14 @@ func sqDiff(x, y uint32) uint32 {
 	return (d * d) >> 2
 }
 
-func quantizeRegion(region indexedimage.Region) {
-	region.AssignColorToBitPattern(0b00, 0)
+func quantizeRegion(region indexedimage.Region, bitpatternToColor map[int]int) {
+
+	// initial mapping so we are able to force color to bitpattern assignment
+	// beforehand
+	for bitpattern, colorIndex := range bitpatternToColor {
+		region.AssignColorToBitPattern(bitpattern, colorIndex)
+	}
+
 	assignBitPatterns(region)
 	localPalette := region.GetPalette()
 
@@ -66,14 +72,14 @@ func quantizeRegion(region indexedimage.Region) {
 }
 
 // quantize all the pixels in the image according to the image specs
-func Quantize(img indexedimage.IndexedImage) indexedimage.IndexedImage {
+func Quantize(img indexedimage.IndexedImage, bitpatternToColor map[int]int) indexedimage.IndexedImage {
 	result := img
 
 	for layerIndex := range img.Spec.Layers {
 
 		// quantize the regions
 		for _, region := range img.Regions[layerIndex] {
-			quantizeRegion(region)
+			quantizeRegion(region, bitpatternToColor)
 		}
 	}
 	return result

@@ -114,7 +114,10 @@ func main() {
 	spec := indexedimage.MakeSpec(indexedimage.RetrospecName(options.Mode), &img)
 	indexedImage := indexedimage.ToIndexedImage(&img, spec, palette)
 	dithering.OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
-	newImage := conversion.Quantize(indexedImage)
+
+	forcedBitpatternMapping := make(map[int]int, 0)
+
+	newImage := conversion.Quantize(indexedImage, forcedBitpatternMapping)
 
 	switch options.Format {
 	case PNG:
