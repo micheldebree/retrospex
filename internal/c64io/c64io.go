@@ -7,6 +7,10 @@ import (
 	"github.com/micheldebree/retrospex/internal/indexedimage"
 )
 
+var binaryFactories = map[string]func(*indexedimage.IndexedImage) [][]byte{
+	indexedimage.MCCharsetType: mcCharsetBinary,
+}
+
 // Bitpatterns are packed into bytes;
 // if the image's spec has a bitPatternSize of 1, 8 bit patterns are packed into one byte, msb to lsb order
 // if the image's spec has a bitPatternSize of 2, 4 bit patterns are packed into one byte, msb to lsb order
@@ -65,6 +69,18 @@ func reOrderToVicBitmapOrder(input []byte, bytesPerInputRow int) []byte {
 	return result
 }
 
+// get the bitmap data, in the right ordering
+func getOrderedBitmapData(img *indexedimage.IndexedImage) []byte {
+
+	bitmapData := getBitmapData(img)
+
+	if img.Spec.BitmapByteOrder == indexedimage.VicByteOrder {
+		return reOrderToVicBitmapOrder(bitmapData, img.BytesPerRow())
+	} else {
+		return bitmapData
+	}
+}
+
 // Helper function to check if a file exists
 func fileExists(filename string) bool {
 	info, err := os.Stat(filename)
@@ -74,21 +90,42 @@ func fileExists(filename string) bool {
 	return !info.IsDir()
 }
 
-func SaveBinary(filename string, img *indexedimage.IndexedImage, overwrite bool) {
-	bitmapData := getBitmapData(img)
+func mcCharsetBinary(img *indexedimage.IndexedImage) [][]byte {
+	return [][]byte{getOrderedBitmapData(img)}
+}
 
-	var properlyOrderedBytes []byte
-	if img.Spec.BitmapByteOrder == indexedimage.VicByteOrder {
-		properlyOrderedBytes = reOrderToVicBitmapOrder(bitmapData, img.BytesPerRow())
-	} else {
-		properlyOrderedBytes = bitmapData
+func concat(data [][]byte) []byte {
+
+	result := make([]byte, 0)
+
+	for _, slice := range data {
+		result = append(result, slice...)
 	}
+
+	return result
+}
+
+func SaveBinary(filename string, img *indexedimage.IndexedImage, overwrite bool) {
+
+	binaryFactory, present := binaryFactories[indexedimage.MCCharsetType]
+
+	if !present {
+		panic("No method to save binary")
+	}
+
+	data := binaryFactory(img)
+	saveData(filename, data, overwrite)
+
+}
+
+func saveData(filename string, data [][]byte, overwrite bool) {
 
 	if !overwrite && fileExists(filename) {
 		panic(fmt.Sprintf("File %s already exists", filename))
 	}
 
-	err := os.WriteFile(filename, properlyOrderedBytes, 0644)
+	binary := concat(data)
+	err := os.WriteFile(filename, binary, 0644)
 	if err != nil {
 		panic(err)
 	}

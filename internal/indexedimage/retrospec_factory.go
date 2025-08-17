@@ -6,15 +6,28 @@ import (
 	"github.com/micheldebree/retrospex/internal/pixels"
 )
 
+type RetrospecName string
+
+const (
+	KoalaType        = "koala"
+	HiresType        = "hires"
+	MixedCharsetType = "mixedcharset"
+	MCCharsetType    = "mccharset"
+	SCCharsetType    = "scccharset"
+	MCIBitmapType    = "mcibitmap"
+	SCSpritesType    = "scsprites"
+	MCSpritesType    = "mcsprites"
+)
+
 var RetrospecFactories = map[string]func(*image.Image) Retrospec{
-	"koala":        makeKoalaSpec,
-	"hires":        makeHiresSpec,
-	"mixedcharset": makeMixedCharsetSpec,
-	"mccharset":    makeMCCharsetSpec,
-	"scccharset":   makeSCCCharsetSpecSpec,
-	"mcibitmap":    makeMCiBitmapSpec,
-	"scsprites":    makeSCSpritesSpec,
-	"mcsprites":    makeMCSpritesSpec,
+	KoalaType:        makeKoalaSpec,
+	HiresType:        makeHiresSpec,
+	MixedCharsetType: makeMixedCharsetSpec,
+	MCCharsetType:    makeMCCharsetSpec,
+	SCCharsetType:    makeSCCCharsetSpecSpec,
+	MCIBitmapType:    makeMCiBitmapSpec,
+	SCSpritesType:    makeSCSpritesSpec,
+	MCSpritesType:    makeMCSpritesSpec,
 }
 
 func MakeSpec(specName string, img *image.Image) Retrospec {

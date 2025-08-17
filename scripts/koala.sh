@@ -1,4 +1,6 @@
 #!/bin/bash
+set -ex
+
 MODE=koala
 
 # resize source to koala proportions

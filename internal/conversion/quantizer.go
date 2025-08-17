@@ -45,7 +45,7 @@ func sqDiff(x, y uint32) uint32 {
 }
 
 func quantizeRegion(region indexedimage.Region) {
-	//region.assignColorToBitPattern(0b00, 0)
+	// region.AssignColorToBitPattern(0b00, 0)
 	assignBitPatterns(region)
 	localPalette := region.GetPalette()
 

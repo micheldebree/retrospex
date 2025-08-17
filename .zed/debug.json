@@ -8,6 +8,7 @@
     "adapter": "Delve",
     "request": "launch",
     "mode": "debug",
+    "dlvFlags": ["--check-go-version=false"],
     // For Delve, the program can be a package name
     "program": ".",
     "args": [
@@ -24,6 +25,7 @@
     "adapter": "Delve",
     "request": "launch",
     "mode": "debug",
+    "dlvFlags": ["--check-go-version=false"],
     // For Delve, the program can be a package name
     "program": ".",
     "args": [
@@ -40,6 +42,7 @@
     "adapter": "Delve",
     "request": "launch",
     "mode": "debug",
+    "dlvFlags": ["--check-go-version=false"],
     // For Delve, the program can be a package name
     "program": ".",
     "args": [
@@ -56,6 +59,7 @@
     "adapter": "Delve",
     "request": "launch",
     "mode": "debug",
+    "dlvFlags": ["--check-go-version=false"],
     // For Delve, the program can be a package name
     "program": ".",
     "args": [
