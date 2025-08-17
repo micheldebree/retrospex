@@ -7,6 +7,8 @@ type Layer struct {
 	IsLast bool // the last layer should quantize all remaining pixels
 }
 
+type RetrospecName string
+
 type ByteOrder int
 
 const (
@@ -15,6 +17,7 @@ const (
 )
 
 type Retrospec struct {
+	Name            RetrospecName
 	Layers          []Layer
 	BitPatternSize  int
 	BitmapByteOrder ByteOrder

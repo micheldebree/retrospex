@@ -7,7 +7,7 @@ import (
 	"github.com/micheldebree/retrospex/internal/indexedimage"
 )
 
-var binaryFactories = map[string]func(*indexedimage.IndexedImage) [][]byte{
+var binaryFactories = map[indexedimage.RetrospecName]func(*indexedimage.IndexedImage) [][]byte{
 	indexedimage.MCCharsetType: mcCharsetBinary,
 }
 
@@ -32,7 +32,7 @@ func getBitmapData(img *indexedimage.IndexedImage) []byte {
 	for y := range height {
 		for x := range width {
 			pixel := img.PixelAt(x, y)
-			pixel.AssertHasBitPattern() // Ensure the pixel has a bit pattern
+			pixel.AssertHasBitPattern()
 
 			outIndex := byteIndex / pixelsPerByte
 			shiftLeft := bitPatternSize * (pixelsPerByte - 1 - byteIndex%pixelsPerByte)
@@ -65,7 +65,6 @@ func reOrderToVicBitmapOrder(input []byte, bytesPerInputRow int) []byte {
 			}
 		}
 	}
-
 	return result
 }
 
@@ -110,12 +109,11 @@ func SaveBinary(filename string, img *indexedimage.IndexedImage, overwrite bool)
 	binaryFactory, present := binaryFactories[indexedimage.MCCharsetType]
 
 	if !present {
-		panic("No method to save binary")
+		panic(fmt.Sprintf("Binary export for %s is not supported.", img.Spec.Name))
 	}
 
 	data := binaryFactory(img)
 	saveData(filename, data, overwrite)
-
 }
 
 func saveData(filename string, data [][]byte, overwrite bool) {

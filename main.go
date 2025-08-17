@@ -111,7 +111,7 @@ func main() {
 		return
 	}
 
-	spec := indexedimage.MakeSpec(options.Mode, &img)
+	spec := indexedimage.MakeSpec(indexedimage.RetrospecName(options.Mode), &img)
 	indexedImage := indexedimage.ToIndexedImage(&img, spec, palette)
 	dithering.OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
 	newImage := conversion.Quantize(indexedImage)
@@ -133,10 +133,19 @@ func printError(message string) {
 }
 
 func help() {
+
+	// convert modes to strings
+	modes := maps.Keys(indexedimage.RetrospecFactories)
+	nrModes := len(modes)
+	modeStrings := make([]string, nrModes)
+	for i, mode := range modes {
+		modeStrings[i] = string(mode)
+	}
+
 	fmt.Printf("\nUsage: retrospex [options] input.png\n\n")
 	fmt.Printf("Options:\n\n")
 	fmt.Printf("\t-o\n\t\tOutput filename (default %s)\n", defaultOptions.OutFile)
-	fmt.Printf("\t-m\n\t\tGraphics mode. (default %s), One of %s\n", defaultOptions.Mode, strings.Join(maps.Keys(indexedimage.RetrospecFactories), ","))
+	fmt.Printf("\t-m\n\t\tGraphics mode. (default %s), One of %s\n", defaultOptions.Mode, strings.Join(modeStrings, ","))
 	fmt.Printf("\t-p\n\t\tPalette (default %s). One of %s\n", defaultOptions.Palette, strings.Join(maps.Keys(pixels.C64Palettes), ","))
 	fmt.Printf("\t-dm\n\t\tDither matrix (default %s). One of %s\n", defaultOptions.DitherMatrix, strings.Join(maps.Keys(dithering.DitherMatrices), ","))
 	fmt.Printf("\t-dd\n\t\tDither depth (default %d). 0-255\n", defaultOptions.DitherDepth)

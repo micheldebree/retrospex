@@ -6,20 +6,18 @@ import (
 	"github.com/micheldebree/retrospex/internal/pixels"
 )
 
-type RetrospecName string
-
 const (
-	KoalaType        = "koala"
-	HiresType        = "hires"
-	MixedCharsetType = "mixedcharset"
-	MCCharsetType    = "mccharset"
-	SCCharsetType    = "scccharset"
-	MCIBitmapType    = "mcibitmap"
-	SCSpritesType    = "scsprites"
-	MCSpritesType    = "mcsprites"
+	KoalaType        RetrospecName = "koala"
+	HiresType        RetrospecName = "hires"
+	MixedCharsetType RetrospecName = "mixedcharset"
+	MCCharsetType    RetrospecName = "mccharset"
+	SCCharsetType    RetrospecName = "scccharset"
+	MCIBitmapType    RetrospecName = "mcibitmap"
+	SCSpritesType    RetrospecName = "scsprites"
+	MCSpritesType    RetrospecName = "mcsprites"
 )
 
-var RetrospecFactories = map[string]func(*image.Image) Retrospec{
+var RetrospecFactories = map[RetrospecName]func(*image.Image) Retrospec{
 	KoalaType:        makeKoalaSpec,
 	HiresType:        makeHiresSpec,
 	MixedCharsetType: makeMixedCharsetSpec,
@@ -30,7 +28,7 @@ var RetrospecFactories = map[string]func(*image.Image) Retrospec{
 	MCSpritesType:    makeMCSpritesSpec,
 }
 
-func MakeSpec(specName string, img *image.Image) Retrospec {
+func MakeSpec(specName RetrospecName, img *image.Image) Retrospec {
 	factory, isPresent := RetrospecFactories[specName]
 	if !isPresent {
 		panic("Unknown mode")
@@ -40,7 +38,7 @@ func MakeSpec(specName string, img *image.Image) Retrospec {
 
 func makeKoalaSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
-	return Retrospec{
+	return Retrospec{KoalaType,
 		[]Layer{
 			{w, h, []int{0b00}, false},            // d021
 			{4, 8, []int{0b01, 0b10, 0b11}, true}, // 0400,x (upper nibble), 0400,x (lower nibble), d800,x
@@ -49,7 +47,7 @@ func makeKoalaSpec(img *image.Image) Retrospec {
 }
 
 func makeHiresSpec(_ *image.Image) Retrospec {
-	return Retrospec{
+	return Retrospec{HiresType,
 		[]Layer{
 			{8, 8, []int{0b00, 0b01}, true}, // 0400,x (lower nibble), 0400,x (upper nibble)
 		}, 1, VicByteOrder,
@@ -58,7 +56,7 @@ func makeHiresSpec(_ *image.Image) Retrospec {
 
 func makeMixedCharsetSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
-	return Retrospec{
+	return Retrospec{MixedCharsetType,
 		[]Layer{
 			{w, h, []int{0b00, 0b01, 0b10}, false}, // d021, d022, d023
 			{4, 8, []int{0b11}, true},              // d800,x
@@ -68,7 +66,7 @@ func makeMixedCharsetSpec(img *image.Image) Retrospec {
 
 func makeMCCharsetSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
-	return Retrospec{
+	return Retrospec{MCCharsetType,
 		[]Layer{
 			{w, h, []int{0b00, 0b01, 0b10, 0b11}, true}, // d021, d022, d023, d800...
 		}, 2, VicByteOrder,
@@ -77,7 +75,7 @@ func makeMCCharsetSpec(img *image.Image) Retrospec {
 
 func makeSCCCharsetSpecSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
-	return Retrospec{
+	return Retrospec{SCCharsetType,
 		[]Layer{
 			{w, h, []int{0b00}, false}, // d021
 			{8, 8, []int{0b01}, true},  // d800,x
@@ -87,7 +85,7 @@ func makeSCCCharsetSpecSpec(img *image.Image) Retrospec {
 
 func makeMCiBitmapSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
-	return Retrospec{
+	return Retrospec{MCIBitmapType,
 		[]Layer{
 			{w, h, []int{0b00}, false},            // d021
 			{8, 8, []int{0b01, 0b10, 0b11}, true}, // 0400,x (upper nibble), 0400,x (lower nibble), d800,x
@@ -98,7 +96,7 @@ func makeMCiBitmapSpec(img *image.Image) Retrospec {
 // TODO: does png2prg only support one color?
 func makeSCSpritesSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
-	return Retrospec{
+	return Retrospec{SCSpritesType,
 		[]Layer{
 			{w, h, []int{0b00}, false}, // d021
 			{w, h, []int{0b01}, true},  // sprite color
@@ -109,7 +107,7 @@ func makeSCSpritesSpec(img *image.Image) Retrospec {
 // TODO: does png2prg only support 4 colors?
 func makeMCSpritesSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
-	return Retrospec{
+	return Retrospec{MCSpritesType,
 		[]Layer{
 			{w, h, []int{0b00}, false}, // d021
 			{w, h, []int{0b01}, false}, // d025
