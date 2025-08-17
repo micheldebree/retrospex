@@ -13,6 +13,7 @@ import (
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,20 +24,19 @@ import (
 	"github.com/micheldebree/retrospex/internal/imageio"
 	"github.com/micheldebree/retrospex/internal/indexedimage"
 	"github.com/micheldebree/retrospex/internal/pixels"
-
-	"golang.org/x/exp/maps"
 )
 
 var Version = "0.0"
 var Arch = "dev"
 
 type Options struct {
-	OutFile      string
-	Mode         string
-	Palette      string
-	DitherMatrix string
-	DitherDepth  int
-	Format       FormatType // Changed to use enum type
+	OutFile          string
+	Mode             string
+	Palette          string
+	DitherMatrix     string
+	DitherDepth      int
+	Format           FormatType // Changed to use enum type
+	BitpatternColors string
 }
 
 type FormatType string
@@ -47,12 +47,43 @@ const (
 )
 
 var defaultOptions = Options{
-	OutFile:      "out.png",
-	Mode:         "koala",
-	Palette:      "colodore",
-	DitherMatrix: "bayer4x4",
-	DitherDepth:  25,
-	Format:       PNG, // Default format is png
+	OutFile:          "out.png",
+	Mode:             "koala",
+	Palette:          "colodore",
+	DitherMatrix:     "bayer4x4",
+	DitherDepth:      25,
+	Format:           PNG, // Default format is png
+	BitpatternColors: "",
+}
+
+func parseBitpatternColors(value string) map[int]int {
+
+	if len(value) == 0 {
+		return make(map[int]int, 0)
+	}
+
+	pairs := strings.Split(value, ",")
+	result := make(map[int]int, len(pairs))
+
+	for _, pair := range pairs {
+
+		numbers := strings.Split(pair, ":")
+
+		if len(numbers) != 2 {
+			panic("Need two numbers to map bit pattern to color")
+		}
+
+		bitpattern, err := strconv.Atoi(numbers[0])
+		if err != nil {
+			panic("Illegal bitpattern")
+		}
+		color, err := strconv.Atoi(numbers[1])
+		if err != nil {
+			panic("Illegal color")
+		}
+		result[bitpattern] = color
+	}
+	return result
 }
 
 func main() {
@@ -63,14 +94,15 @@ func main() {
 
 	var options Options
 
-	flag.StringVar(&options.OutFile, "o", defaultOptions.OutFile, "output filename")
-	flag.StringVar(&options.Mode, "m", defaultOptions.Mode, "graphics mode")
-	flag.StringVar(&options.Palette, "p", defaultOptions.Palette, "palette")
-	flag.StringVar(&options.DitherMatrix, "dm", defaultOptions.DitherMatrix, "dither matrix")
-	flag.IntVar(&options.DitherDepth, "dd", defaultOptions.DitherDepth, "dither depth")
+	flag.StringVar(&options.OutFile, "o", defaultOptions.OutFile, "Output filename")
+	flag.StringVar(&options.Mode, "m", defaultOptions.Mode, "Graphics mode")
+	flag.StringVar(&options.Palette, "p", defaultOptions.Palette, "Palette")
+	flag.StringVar(&options.DitherMatrix, "dm", defaultOptions.DitherMatrix, "The name of a predefined ordered dithering matrix")
+	flag.IntVar(&options.DitherDepth, "dd", defaultOptions.DitherDepth, "Dither depth (0-255). Depth of dithering.")
+	flag.StringVar(&options.BitpatternColors, "bpc", defaultOptions.BitpatternColors, "Force bitpattern/color pairs. For example 0:0 to force background black.")
 
 	var formatString string
-	flag.StringVar(&formatString, "f", string(defaultOptions.Format), "output format (png or binary)")
+	flag.StringVar(&formatString, "f", string(defaultOptions.Format), "Output format (png or binary)")
 	flag.Parse()
 
 	options.Format = FormatType(formatString)
@@ -115,7 +147,7 @@ func main() {
 	indexedImage := indexedimage.ToIndexedImage(&img, spec, palette)
 	dithering.OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
 
-	forcedBitpatternMapping := make(map[int]int, 0)
+	forcedBitpatternMapping := parseBitpatternColors(options.BitpatternColors)
 
 	newImage := conversion.Quantize(indexedImage, forcedBitpatternMapping)
 
@@ -136,21 +168,7 @@ func printError(message string) {
 }
 
 func help() {
-
-	// convert modes to strings
-	modes := maps.Keys(indexedimage.RetrospecFactories)
-	nrModes := len(modes)
-	modeStrings := make([]string, nrModes)
-	for i, mode := range modes {
-		modeStrings[i] = string(mode)
-	}
-
 	fmt.Printf("\nUsage: retrospex [options] input.png\n\n")
 	fmt.Printf("Options:\n\n")
-	fmt.Printf("\t-o\n\t\tOutput filename (default %s)\n", defaultOptions.OutFile)
-	fmt.Printf("\t-m\n\t\tGraphics mode. (default %s), One of %s\n", defaultOptions.Mode, strings.Join(modeStrings, ","))
-	fmt.Printf("\t-p\n\t\tPalette (default %s). One of %s\n", defaultOptions.Palette, strings.Join(maps.Keys(pixels.C64Palettes), ","))
-	fmt.Printf("\t-dm\n\t\tDither matrix (default %s). One of %s\n", defaultOptions.DitherMatrix, strings.Join(maps.Keys(dithering.DitherMatrices), ","))
-	fmt.Printf("\t-dd\n\t\tDither depth (default %d). 0-255\n", defaultOptions.DitherDepth)
-	fmt.Printf("\t-f\n\t\tOutput format (default %s). One of png, bin\n", defaultOptions.Format) // Added Format option to help
+	flag.PrintDefaults()
 }
