@@ -163,7 +163,7 @@ func main() {
 }
 
 func printError(message string) {
-	fmt.Print("\nERROR: ", message, "\n")
+	fmt.Printf("\nERROR: %s\n", message)
 	help()
 }
 

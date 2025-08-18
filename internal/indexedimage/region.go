@@ -15,19 +15,19 @@ type Region struct {
 	Img               *IndexedImage
 	x, y              int
 	Width, Height     int
-	bitpatternToColor map[int]int // maps each bit pattern to a palette index
+	BitpatternToColor map[int]int // maps each bit pattern to a palette index
 	colorToBitpattern map[int]int // reverse lookup for bitpatternToColor (optimization)
 	IsLastLayer       bool        // is this region in the last layer?
 }
 
 func (region *Region) initBitPatterns(layer Layer) {
 	for _, bitPattern := range layer.Bitpatterns {
-		region.bitpatternToColor[bitPattern] = UNKNOWN
+		region.BitpatternToColor[bitPattern] = UNKNOWN
 	}
 }
 
 func (region *Region) bitPatternIsAssigned(colorIndex int) bool {
-	colorIndex, present := region.bitpatternToColor[colorIndex]
+	colorIndex, present := region.BitpatternToColor[colorIndex]
 	return present && colorIndex != UNKNOWN
 }
 
@@ -36,7 +36,7 @@ func (region *Region) AssignColorToBitPattern(bitPattern int, paletteIndex int) 
 	if region.bitPatternIsAssigned(bitPattern) {
 		panic(fmt.Sprintf("cannot assign color %d to bit pattern %d, a color is already assigned for region %v", paletteIndex, bitPattern, region))
 	}
-	region.bitpatternToColor[bitPattern] = paletteIndex
+	region.BitpatternToColor[bitPattern] = paletteIndex
 	region.colorToBitpattern[paletteIndex] = bitPattern
 }
 
@@ -58,7 +58,7 @@ func (region *Region) GetPixel(x, y int) *pixels.Pixel {
 
 func (region *Region) GetUnmappedBitpatterns() []int {
 	result := make([]int, 0)
-	for bitpattern, paletteIndex := range region.bitpatternToColor {
+	for bitpattern, paletteIndex := range region.BitpatternToColor {
 		if paletteIndex == UNKNOWN {
 			result = append(result, bitpattern)
 		}
@@ -70,7 +70,7 @@ func (region *Region) GetUnmappedBitpatterns() []int {
 func (region *Region) GetPalette() pixels.Palette {
 
 	result := make(pixels.Palette)
-	for _, paletteIndex := range region.bitpatternToColor {
+	for _, paletteIndex := range region.BitpatternToColor {
 		if paletteIndex >= 0 {
 			result[paletteIndex] = region.Img.Palette[paletteIndex]
 		}

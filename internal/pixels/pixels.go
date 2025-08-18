@@ -47,8 +47,8 @@ func (pixel Pixel) AssertHasBitPattern() {
 }
 
 func getPixel(image *image.Image, x, y int) Pixel {
-	color := (*image).At(x, y)
-	return Pixel{x, y, color, -1, -1.0, -1}
+	theColor := (*image).At(x, y)
+	return Pixel{x, y, theColor, -1, -1.0, -1}
 }
 
 func GetDimensions(image *image.Image) (int, int) {

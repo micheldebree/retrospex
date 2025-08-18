@@ -7,8 +7,30 @@ import (
 	"github.com/micheldebree/retrospex/internal/indexedimage"
 )
 
-var binaryFactories = map[indexedimage.RetrospecName]func(*indexedimage.IndexedImage) [][]byte{
+type BinaryChunk struct {
+	label string
+	data  []byte
+}
+
+type BinaryFile []BinaryChunk
+
+var binaryFactories = map[indexedimage.RetrospecName]func(*indexedimage.IndexedImage) BinaryFile{
 	indexedimage.MCCharsetType: mcCharsetBinary,
+	indexedimage.KoalaType:     koalaBinary,
+}
+
+func (binary BinaryFile) getBytes() []byte {
+	result := make([]byte, 0)
+	for _, chunk := range binary {
+		result = append(result, chunk.data...)
+	}
+	return result
+}
+
+func (binary BinaryFile) printLayout() {
+	for _, chunk := range binary {
+		fmt.Printf("%s: %d bytes\n", chunk.label, len(chunk.data))
+	}
 }
 
 // Bitpatterns are packed into bytes;
@@ -69,15 +91,14 @@ func reOrderToVicBitmapOrder(input []byte, bytesPerInputRow int) []byte {
 }
 
 // get the bitmap data, in the right ordering
-func getOrderedBitmapData(img *indexedimage.IndexedImage) []byte {
+func getOrderedBitmapData(img *indexedimage.IndexedImage) BinaryChunk {
 
 	bitmapData := getBitmapData(img)
 
 	if img.Spec.BitmapByteOrder == indexedimage.VicByteOrder {
-		return reOrderToVicBitmapOrder(bitmapData, img.BytesPerRow())
-	} else {
-		return bitmapData
+		return BinaryChunk{"Bitmap (vic order)", reOrderToVicBitmapOrder(bitmapData, img.BytesPerRow())}
 	}
+	return BinaryChunk{"Bitmap (normal order)", bitmapData}
 }
 
 // Helper function to check if a file exists
@@ -89,41 +110,71 @@ func fileExists(filename string) bool {
 	return !info.IsDir()
 }
 
-func mcCharsetBinary(img *indexedimage.IndexedImage) [][]byte {
-	return [][]byte{getOrderedBitmapData(img)}
+func mcCharsetBinary(img *indexedimage.IndexedImage) BinaryFile {
+	return BinaryFile{getOrderedBitmapData(img)}
 }
 
-func concat(data [][]byte) []byte {
+func koalaBinary(img *indexedimage.IndexedImage) BinaryFile {
 
-	result := make([]byte, 0)
+	// background is  layer 0, one region, bit pattern 00
+	backgroundColor := img.Regions[0][0].BitpatternToColor[0b00]
 
-	for _, slice := range data {
-		result = append(result, slice...)
+	// layer 1 is char-sized regions, bit patterns 01 10 and 11
+	nrRegions := len(img.Regions[1])
+	screenRam := make([]byte, nrRegions)
+	colorRam := make([]byte, nrRegions)
+	for i, region := range img.Regions[1] {
+
+		var screenByte byte
+		upperNibble, present := region.BitpatternToColor[0b10]
+		if present {
+			screenByte = byte(upperNibble) << 4
+		}
+
+		lowerNibble, present := region.BitpatternToColor[0b10]
+		if present {
+			screenByte |= byte(lowerNibble)
+		}
+
+		colorByte, present := region.BitpatternToColor[0b11]
+		if present {
+			colorRam[i] = byte(colorByte)
+		}
+
+		screenRam[i] = screenByte
+
 	}
 
-	return result
+	bitmapChunk := getOrderedBitmapData(img)
+	screenRamChunk := BinaryChunk{"ScreenRAM", screenRam}
+	colorRamChunk := BinaryChunk{"ColorRAM", colorRam}
+	backgroundChunk := BinaryChunk{"Background color", []byte{byte(backgroundColor)}}
+
+	return BinaryFile{bitmapChunk, screenRamChunk, colorRamChunk, backgroundChunk}
+
 }
 
 func SaveBinary(filename string, img *indexedimage.IndexedImage, overwrite bool) {
 
-	binaryFactory, present := binaryFactories[indexedimage.MCCharsetType]
+	binaryFactory, present := binaryFactories[img.Spec.Name]
 
 	if !present {
 		panic(fmt.Sprintf("Binary export for %s is not supported.", img.Spec.Name))
 	}
 
 	data := binaryFactory(img)
+
 	saveData(filename, data, overwrite)
+	data.printLayout()
 }
 
-func saveData(filename string, data [][]byte, overwrite bool) {
+func saveData(filename string, data BinaryFile, overwrite bool) {
 
 	if !overwrite && fileExists(filename) {
 		panic(fmt.Sprintf("File %s already exists", filename))
 	}
 
-	binary := concat(data)
-	err := os.WriteFile(filename, binary, 0644)
+	err := os.WriteFile(filename, data.getBytes(), 0644)
 	if err != nil {
 		panic(err)
 	}
