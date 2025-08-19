@@ -20,6 +20,7 @@ register: {
 size: {
     .label SPRITE           = $40
     .label FONT             = $800
+    .label BITMAP           = $2000
     .label BANK             = $4000
     .label CHARS_PER_LINE   = 40 
     .label CHAR             = 8
@@ -48,8 +49,15 @@ memory: {
 }
 
 // d018
-.function @vic_layout(font, screen) {
-    .return ((font >> 10) & $0f) | ((screen >> 6) & $f0)
+
+
+//  $d018 |VM13|VM12|VM11|VM10|CB13|CB12|CB11| - |    Memory pointers
+// VM = video matrix
+// CB = characters / bitmap (bitmap only CB13)
+
+
+.function @vic_layout(bitmap, screen) {
+    .return ((bitmap >> 10) & $0f) | ((screen >> 6) & $f0)
 }
 
 // set pointers to font mem and screen mem

@@ -1,5 +1,5 @@
 .PHONY: all
-koala.prg: koala.asm pic.bin
+koala.prg: koala.asm pic.bin ./lib/vic.asm
 
 pic.bin: ../scripts/paintface.src.png.tmp1.png
 	retrospex -f bin -o $@ $<
