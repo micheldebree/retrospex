@@ -1,0 +1,104 @@
+<C64debugger version="1.0">
+   <Sources values="INDEX,FILE">
+      0,KickAss.jar:/include/autoinclude.asm
+      1,/Users/michel/dev/micheldebree/retrospex/c64/lib/vic.asm
+      2,/Users/michel/dev/micheldebree/retrospex/c64/koala.asm
+   </Sources>
+
+   <Segment name="Default" dest="" values="START,END,FILE_IDX,LINE1,COL1,LINE2,COL2">
+   </Segment>
+
+   <Segment name="code" dest="" values="START,END,FILE_IDX,LINE1,COL1,LINE2,COL2">
+      <Block name="code">
+         $080e,$080f,2,15,5,15,7
+         $0810,$0812,2,16,5,16,7
+         $0813,$0814,2,17,5,17,7
+         $0815,$0817,2,18,5,18,7
+         $0818,$0819,2,19,5,19,7
+         $081a,$081c,2,20,5,20,7
+         $081d,$081e,2,21,5,21,7
+         $081f,$0821,2,22,5,22,7
+         $0822,$0824,2,23,5,23,7
+         $0825,$0827,2,24,5,24,7
+         $0828,$0829,2,25,5,25,7
+         $082a,$082c,2,28,9,28,11
+         $082d,$082f,2,29,9,29,11
+         $0830,$0832,2,30,9,30,11
+         $0833,$0835,2,31,9,31,11
+         $0836,$0838,2,28,9,28,11
+         $0839,$083b,2,29,9,29,11
+         $083c,$083e,2,30,9,30,11
+         $083f,$0841,2,31,9,31,11
+         $0842,$0844,2,28,9,28,11
+         $0845,$0847,2,29,9,29,11
+         $0848,$084a,2,30,9,30,11
+         $084b,$084d,2,31,9,31,11
+         $084e,$0850,2,28,9,28,11
+         $0851,$0853,2,29,9,29,11
+         $0854,$0856,2,30,9,30,11
+         $0857,$0859,2,31,9,31,11
+         $085a,$085a,2,33,5,33,7
+         $085b,$085c,2,34,5,34,7
+         $085d,$085f,2,35,5,35,7
+         $0860,$0860,2,37,5,37,7
+      </Block>
+   </Segment>
+
+   <Segment name="pic" dest="" values="START,END,FILE_IDX,LINE1,COL1,LINE2,COL2">
+      <Block name="pic">
+         $2000,$4710,2,46,1,46,7
+      </Block>
+   </Segment>
+
+   <Segment name="basic" dest="" values="START,END,FILE_IDX,LINE1,COL1,LINE2,COL2">
+      <Block name="Basic">
+         $0801,$0802,0,56,2,56,6
+         $0803,$0804,0,57,5,57,9
+         $0805,$0805,0,58,5,58,9
+         $0806,$0809,0,59,2,59,6
+         $080a,$080a,0,60,2,60,6
+         $080b,$080c,0,62,5,62,9
+      </Block>
+   </Segment>
+
+   <Labels values="SEGMENT,ADDRESS,NAME,START,END,FILE_IDX,LINE1,COL1,LINE2,COL2">
+      Default,$2000,register,1,5,1,5,9
+      Default,$d011,CONTROL1,1,6,12,6,19
+      Default,$d015,SPRITE_ENABLE,1,7,12,7,24
+      Default,$d016,CONTROL2,1,8,12,8,19
+      Default,$d018,MEM_LAYOUT,1,9,12,9,21
+      Default,$d020,BORDER,1,10,12,10,17
+      Default,$d021,BACKGROUND,1,11,12,11,21
+      Default,$d022,MULTICOLOR_1,1,12,12,12,23
+      Default,$d023,MULTICOLOR_2,1,13,12,13,23
+      Default,$d027,SPRITE_COLOR,1,14,12,14,23
+      Default,$d800,COLOR_MEM,1,15,12,15,20
+      Default,$dd00,BANK_SELECT,1,16,12,16,22
+      Default,$2000,size,1,20,1,20,5
+      Default,$0040,SPRITE,1,21,12,21,17
+      Default,$0800,FONT,1,22,12,22,15
+      Default,$4000,BANK,1,23,12,23,15
+      Default,$0028,CHARS_PER_LINE,1,24,12,24,25
+      Default,$0008,CHAR,1,25,12,25,15
+      Default,$2000,memory,1,28,1,28,7
+      Default,$0003,BANK_0000,1,29,12,29,20
+      Default,$0002,BANK_4000,1,30,12,30,20
+      Default,$0001,BANK_8000,1,31,12,31,20
+      Default,$0000,BANK_C000,1,32,12,32,20
+      Default,$07f8,POINTER_OFFSET,1,74,8,74,21
+      pic,$2000,bitmap,2,41,8,41,13
+      pic,$3f40,screenram,2,42,8,42,16
+      pic,$4328,colorram,2,43,8,43,15
+      pic,$4710,backgroundcolor,2,44,8,44,22
+      code,$080e,main,2,14,1,14,5
+      code,$082a,loop,2,26,1,26,5
+      basic,$080b,upstartEnd,0,61,1,61,11
+   </Labels>
+
+   <Breakpoints values="SEGMENT,ADDRESS,ARGUMENT">
+   </Breakpoints>
+
+   <Watchpoints values="SEGMENT,ADDRESS1,ADDRESS2,ARGUMENT">
+   </Watchpoints>
+
+</C64debugger>

@@ -63,7 +63,6 @@ func getBitmapData(img *indexedimage.IndexedImage) []byte {
 			byteIndex++
 		}
 	}
-
 	return result
 }
 
@@ -127,14 +126,14 @@ func koalaBinary(img *indexedimage.IndexedImage) BinaryFile {
 	for i, region := range img.Regions[1] {
 
 		var screenByte byte
-		upperNibble, present := region.BitpatternToColor[0b10]
+		upperNibble, present := region.BitpatternToColor[0b01]
 		if present {
 			screenByte = byte(upperNibble) << 4
 		}
 
 		lowerNibble, present := region.BitpatternToColor[0b10]
 		if present {
-			screenByte |= byte(lowerNibble)
+			screenByte |= byte(lowerNibble & 0x0f)
 		}
 
 		colorByte, present := region.BitpatternToColor[0b11]

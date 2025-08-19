@@ -36,6 +36,13 @@ func MakeSpec(specName RetrospecName, img *image.Image) Retrospec {
 	return factory(img)
 }
 
+// +----+----+----+----+----+----+----+----+----+----+----+----+
+// | 11 | 10 |  9 |  8 |  7 |  6 |  5 |  4 |  3 |  2 |  1 |  0 |
+// +----+----+----+----+----+----+----+----+----+----+----+----+
+// |     Color of      |     Color of      |     Color of      |
+// |    "11 pixels"    |    "01" pixels    |    "10" pixels    |
+// +-------------------+-------------------+-------------------+
+
 func makeKoalaSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
 	return Retrospec{KoalaType,

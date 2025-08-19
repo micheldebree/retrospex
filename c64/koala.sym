@@ -1,0 +1,37 @@
+.namespace vic {
+  .label memory=$2000 {
+    .label BANK_0000=$3
+    .label BANK_4000=$2
+    .label BANK_8000=$1
+    .label BANK_C000=$0
+  }
+  .label size=$2000 {
+    .label BANK=$4000
+    .label CHARS_PER_LINE=$28
+    .label CHAR=$8
+    .label SPRITE=$40
+    .label FONT=$800
+  }
+  .namespace sprite {
+    .label POINTER_OFFSET=$7f8
+  }
+  .label register=$2000 {
+    .label BANK_SELECT=$dd00
+    .label SPRITE_ENABLE=$d015
+    .label BORDER=$d020
+    .label MEM_LAYOUT=$d018
+    .label SPRITE_COLOR=$d027
+    .label MULTICOLOR_1=$d022
+    .label MULTICOLOR_2=$d023
+    .label COLOR_MEM=$d800
+    .label BACKGROUND=$d021
+    .label CONTROL2=$d016
+    .label CONTROL1=$d011
+  }
+}
+.label loop=$82a
+.label bitmap=$2000
+.label screenram=$3f40
+.label main=$80e
+.label colorram=$4328
+.label backgroundcolor=$4710
