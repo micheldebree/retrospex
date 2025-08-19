@@ -16,7 +16,7 @@ type Pixel struct {
 	Color color.Color // the color in the original image
 	// available after quantizing
 	PaletteIndex      int
-	QuantizationError float64
+	QuantizationError uint32
 	// available when a bit pattern has been assigned
 	BitPattern int
 }
@@ -48,7 +48,7 @@ func (pixel Pixel) AssertHasBitPattern() {
 
 func getPixel(image *image.Image, x, y int) Pixel {
 	theColor := (*image).At(x, y)
-	return Pixel{x, y, theColor, -1, -1.0, -1}
+	return Pixel{x, y, theColor, -1, 0, -1}
 }
 
 func GetDimensions(image *image.Image) (int, int) {

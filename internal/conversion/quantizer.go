@@ -15,14 +15,11 @@ type PaletteDistance map[int]float64
 
 // QuantizePixel quantizes a pixel to the nearest color in the palette
 func QuantizePixel(p *pixels.Pixel, pal pixels.Palette) {
-	p.PaletteIndex = bestIndex(p, pal)
-	// TODO: store quantization error for when we want to do error diffusion
-	// dithering later
-	p.QuantizationError = 0
+	p.PaletteIndex, p.QuantizationError = bestIndex(p, pal)
 }
 
 // borrowed from golang color package, leaving out alpha channel
-func bestIndex(p *pixels.Pixel, pal pixels.Palette) int {
+func bestIndex(p *pixels.Pixel, pal pixels.Palette) (int, uint32) {
 	cr, cg, cb, _ := p.Color.RGBA()
 	ret, bestSum := 0, uint32(1<<32-1)
 	for i, v := range pal {
@@ -30,12 +27,12 @@ func bestIndex(p *pixels.Pixel, pal pixels.Palette) int {
 		sum := sqDiff(cr, vr) + sqDiff(cg, vg) + sqDiff(cb, vb)
 		if sum < bestSum {
 			if sum == 0 {
-				return i
+				return i, 0
 			}
 			ret, bestSum = i, sum
 		}
 	}
-	return ret
+	return ret, bestSum
 }
 
 // borrowed from golang color package
