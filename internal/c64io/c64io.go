@@ -19,16 +19,16 @@ var binaryFactories = map[indexedimage.RetrospecName]func(*indexedimage.IndexedI
 	indexedimage.KoalaType:     koalaBinary,
 }
 
-func (binary BinaryFile) getBytes() []byte {
+func (binaryFile BinaryFile) getBytes() []byte {
 	result := make([]byte, 0)
-	for _, chunk := range binary {
+	for _, chunk := range binaryFile {
 		result = append(result, chunk.data...)
 	}
 	return result
 }
 
-func (binary BinaryFile) printLayout() {
-	for _, chunk := range binary {
+func (binaryFile BinaryFile) printLayout() {
+	for _, chunk := range binaryFile {
 		fmt.Printf("%s: %d bytes\n", chunk.label, len(chunk.data))
 	}
 }
@@ -80,8 +80,9 @@ func reOrderToVicBitmapOrder(input []byte, bytesPerInputRow int) []byte {
 	for row := range numRows {
 		rowIndex := row * bytesPerOutputRow
 		for col := range bytesPerInputRow {
+			colIndex := rowIndex + col
 			for byteInCol := range 8 {
-				srcIndex := rowIndex + col + byteInCol*bytesPerInputRow
+				srcIndex := colIndex + byteInCol*bytesPerInputRow
 				result[dstIndex] = input[srcIndex]
 				dstIndex++
 			}

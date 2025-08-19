@@ -21,13 +21,13 @@ func QuantizePixel(p *pixels.Pixel, pal pixels.Palette) {
 	p.QuantizationError = 0
 }
 
-// borrowed from golang color package
+// borrowed from golang color package, leaving out alpha channel
 func bestIndex(p *pixels.Pixel, pal pixels.Palette) int {
-	cr, cg, cb, ca := p.Color.RGBA()
+	cr, cg, cb, _ := p.Color.RGBA()
 	ret, bestSum := 0, uint32(1<<32-1)
 	for i, v := range pal {
-		vr, vg, vb, va := v.RGBA()
-		sum := sqDiff(cr, vr) + sqDiff(cg, vg) + sqDiff(cb, vb) + sqDiff(ca, va)
+		vr, vg, vb, _ := v.RGBA()
+		sum := sqDiff(cr, vr) + sqDiff(cg, vg) + sqDiff(cb, vb)
 		if sum < bestSum {
 			if sum == 0 {
 				return i
