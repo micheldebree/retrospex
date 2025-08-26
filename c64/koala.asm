@@ -1,8 +1,7 @@
 #import "lib/vic.asm"
 
 .const SCREENRAM = $0400
-.const KOALA_TEMPLATE = "Bitmap=$0000, ScreenRam=$1f40, ColorRam=$2328, BackgroundColor = $2710"
-.var picture = LoadBinary("pic.bin", KOALA_TEMPLATE)
+.var picture = LoadBinary("pic.bin", BF_KOALA)
 
 .file [name="%o.prg", segments="basic,code,data,bitmap"]
 
@@ -21,10 +20,9 @@ main:
     @vic_memory_bank(vic.memory.BANK_0000)
     lda #@vic_layout(bitmap, SCREENRAM)
     sta $d018
-
     lda #@vic_control2_value(0, false, true)
     sta $d016
-    lda #$3b
+    lda #@vic_d011(0, false, false, true) 
     sta $d011
     lda #picture.getBackgroundColor()
     sta $d020
@@ -32,10 +30,10 @@ main:
     ldx #0
 loop:
     .for (var i = 0; i < 4; i++) {
-        lda i * $100 + screenram,x
-        sta i * $100 + $0400,x
-        lda i * $100 + colorram,x
-        sta i * $100 + $d800,x
+        lda i * $100 + screenram_data,x
+        sta i * $100 + SCREENRAM,x
+        lda i * $100 + colorram_data,x
+        sta i * $100 + vic.register.COLOR_RAM,x
     }
     inx
     bne loop
@@ -45,15 +43,13 @@ loop:
 
 .segment data
 
-colorram:
+colorram_data:
     .fill picture.getColorRamSize(), picture.getColorRam(i)
 
-screenram:
+screenram_data:
     .fill picture.getScreenRamSize(), picture.getScreenRam(i)
 
 .segment bitmap
 bitmap:
     .fill picture.getBitmapSize(), picture.getBitmap(i)
-
-
 

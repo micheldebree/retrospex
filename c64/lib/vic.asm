@@ -12,7 +12,7 @@ register: {
     .label MULTICOLOR_1     = $d022
     .label MULTICOLOR_2     = $d023
     .label SPRITE_COLOR     = $d027
-    .label COLOR_MEM        = $d800
+    .label COLOR_RAM        = $d800
     .label BANK_SELECT      = $dd00
 }
 
@@ -41,6 +41,45 @@ memory: {
     sta vic.register.BANK_SELECT
 }
 
+ // RSEL|  Display window height   | First line  | Last line
+ // ----+--------------------------+-------------+----------
+ //   0 | 24 text lines/192 pixels |   55 ($37)  | 246 ($f6)
+ //   1 | 25 text lines/200 pixels |   51 ($33)  | 250 ($fa)
+ //
+ // CSEL|   Display window width   | First X coo. | Last X coo.
+ // ----+--------------------------+--------------+------------
+ //   0 | 38 characters/304 pixels |   31 ($1f)   |  334 ($14e)
+ //   1 | 40 characters/320 pixels |   24 ($18)   |  343 ($157)
+
+// d011
+
+// 3.7.3.1. Standard text mode (ECM/BMM/MCM=0/0/0)
+// 3.7.3.2. Multicolor text mode (ECM/BMM/MCM=0/0/1)
+// 3.7.3.3. Standard bitmap mode (ECM/BMM/MCM=0/1/0)
+// 3.7.3.4. Multicolor bitmap mode (ECM/BMM/MCM=0/1/1)
+// 3.7.3.5. ECM text mode (ECM/BMM/MCM=1/0/0)
+// 3.7.3.6. Invalid text mode (ECM/BMM/MCM=1/0/1)
+// 3.7.3.7. Invalid bitmap mode 1 (ECM/BMM/MCM=1/1/0)
+// 3.7.3.8. Invalid bitmap mode 2 (ECM/BMM/MCM=1/1/1)
+
+
+// | $d011 |RST8| ECM| BMM| DEN|RSEL|    YSCROLL (3)  
+.function @vic_d011(ver_scroll, set_24lines, ecm, bitmap) {
+
+    .const bit6 = ecm ? 1 : 0
+    .const bit5 = bitmap ? 1 : 0
+    .const bit3 = set_24lines ? 0 : 1
+    .return %00010000 | bit6 << 6 | bit5 << 5 | bit3 << 3 | ver_scroll & %00000111
+}
+
+.function @vic_enable(value, bits) {
+    .return value | bits
+}
+
+.function @vic_disable(value, bits) {
+    .return value & bits^%11111111
+}
+
 // d016
 .function @vic_control2_value(hor_scroll, set_38columns, multicolor) {
     .const bit3 = set_38columns ? 0 : 1
@@ -49,7 +88,6 @@ memory: {
 }
 
 // d018
-
 
 //  $d018 |VM13|VM12|VM11|VM10|CB13|CB12|CB11| - |    Memory pointers
 // VM = video matrix
