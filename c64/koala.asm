@@ -16,14 +16,17 @@ BasicUpstart2(main)
 .segment code
 
 main:
+    .var d011 = vic.default.d011 | vic.bit.BITMAP_MODE
+    .var d016 = vic.default.d016 | vic.bit.MULTICOLOR_MODE
+    .var d018 = @vic_bitmap(bitmap) | @vic_screenram(SCREENRAM)
 
     @vic_memory_bank(vic.memory.BANK_0000)
-    lda #@vic_layout(bitmap, SCREENRAM)
-    sta $d018
-    lda #@vic_control2_value(0, false, true)
-    sta $d016
-    lda #@vic_d011(0, false, false, true) 
+    lda #d011
     sta $d011
+    lda #d016
+    sta $d016
+    lda #d018
+    sta $d018
     lda #picture.getBackgroundColor()
     sta $d020
     sta $d021
@@ -52,4 +55,3 @@ screenram_data:
 .segment bitmap
 bitmap:
     .fill picture.getBitmapSize(), picture.getBitmap(i)
-

@@ -16,6 +16,16 @@ register: {
     .label BANK_SELECT      = $dd00
 }
 
+default: {
+    .label d011 = %00011000
+    .label d016 = %00001000
+}
+
+bit: {
+    .label BITMAP_MODE = %00100000
+    .label MULTICOLOR_MODE = %00010000
+}
+
 // some common VIC data sizes
 size: {
     .label SPRITE           = $40
@@ -63,45 +73,20 @@ memory: {
 // 3.7.3.8. Invalid bitmap mode 2 (ECM/BMM/MCM=1/1/1)
 
 
-// | $d011 |RST8| ECM| BMM| DEN|RSEL|    YSCROLL (3)  
-.function @vic_d011(ver_scroll, set_24lines, ecm, bitmap) {
-
-    .const bit6 = ecm ? 1 : 0
-    .const bit5 = bitmap ? 1 : 0
-    .const bit3 = set_24lines ? 0 : 1
-    .return %00010000 | bit6 << 6 | bit5 << 5 | bit3 << 3 | ver_scroll & %00000111
-}
-
-.function @vic_enable(value, bits) {
-    .return value | bits
-}
-
-.function @vic_disable(value, bits) {
-    .return value & bits^%11111111
-}
-
-// d016
-.function @vic_control2_value(hor_scroll, set_38columns, multicolor) {
-    .const bit3 = set_38columns ? 0 : 1
-    .const bit4 = multicolor ? 1 : 0
-    .return (bit4 << 4) | (bit3 << 3) | (hor_scroll & %111)
-}
-
 // d018
 
 //  $d018 |VM13|VM12|VM11|VM10|CB13|CB12|CB11| - |    Memory pointers
 // VM = video matrix
 // CB = characters / bitmap (bitmap only CB13)
 
-
-.function @vic_layout(bitmap, screen) {
-    .return ((bitmap >> 10) & $0f) | ((screen >> 6) & $f0)
+// d018
+.function @vic_bitmap(address) {
+    .return ((address >> 10) & $0f)
 }
 
-// set pointers to font mem and screen mem
-.macro vic_memory_layout(font, screen) {
-    lda #vic_layout(font,screen)
-    sta vic.register.MEM_LAYOUT
+// d018
+.function @vic_screenram(address) {
+    .return ((address >> 6) & $f0)
 }
 
 .macro @vic_fill_screen(address, value) {

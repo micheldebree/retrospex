@@ -22,7 +22,7 @@ var RetrospecFactories = map[RetrospecName]func(*image.Image) Retrospec{
 	HiresType:        makeHiresSpec,
 	MixedCharsetType: makeMixedCharsetSpec,
 	MCCharsetType:    makeMCCharsetSpec,
-	SCCharsetType:    makeSCCCharsetSpecSpec,
+	SCCharsetType:    makeSCCCharsetSpec,
 	MCIBitmapType:    makeMCiBitmapSpec,
 	SCSpritesType:    makeSCSpritesSpec,
 	MCSpritesType:    makeMCSpritesSpec,
@@ -80,7 +80,7 @@ func makeMCCharsetSpec(img *image.Image) Retrospec {
 	}
 }
 
-func makeSCCCharsetSpecSpec(img *image.Image) Retrospec {
+func makeSCCCharsetSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
 	return Retrospec{SCCharsetType,
 		[]Layer{
