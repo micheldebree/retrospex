@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/micheldebree/retrospex/internal/indexedimage"
+	"github.com/micheldebree/retrospex/internal/io"
 )
 
 type BinaryChunk struct {
@@ -104,15 +105,6 @@ func getVicOrderBitmapData(img *indexedimage.IndexedImage) BinaryChunk {
 	return BinaryChunk{"Bitmap (vic order)", reOrderToVicBitmapOrder(bitmapData, img.BytesPerRow())}
 }
 
-// Helper function to check if a file exists
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
-}
-
 // Make a chunk of two bytes denoting the load address
 func loadAddress(address uint16) BinaryChunk {
 	return BinaryChunk{"Load address", []byte{byte(address & 0xff), byte(address >> 8)}}
@@ -143,9 +135,7 @@ func SaveBinary(filename string, img *indexedimage.IndexedImage, overwrite bool)
 
 	data := binaryFactory(img)
 
-	if !overwrite && fileExists(filename) {
-		panic(fmt.Sprintf("File %s already exists", filename))
-	}
+	io.AssertOverwrite(filename, overwrite)
 
 	err := os.WriteFile(filename, data.getBytes(), 0644)
 	if err != nil {

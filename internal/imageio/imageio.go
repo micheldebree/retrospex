@@ -4,6 +4,8 @@ import (
 	"image"
 	"image/png"
 	"os"
+
+	"github.com/micheldebree/retrospex/internal/io"
 )
 
 func abortOnError(err error) {
@@ -30,7 +32,9 @@ func ReadImageFile(filename string) (image.Image, error) {
 	return img, nil
 }
 
-func WriteImage(filename string, image image.Image) {
+func WriteImage(filename string, image image.Image, allowOverwrite bool) {
+
+	io.AssertOverwrite(filename, allowOverwrite)
 
 	out, err := os.Create(filename)
 	abortOnError(err)

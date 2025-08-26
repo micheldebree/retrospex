@@ -37,6 +37,7 @@ type Options struct {
 	DitherDepth      int
 	Format           FormatType // Changed to use enum type
 	BitpatternColors string
+	AllowOverwrite   bool
 }
 
 type FormatType string
@@ -54,6 +55,7 @@ var defaultOptions = Options{
 	DitherDepth:      25,
 	Format:           PNG, // Default format is png
 	BitpatternColors: "",
+	AllowOverwrite:   false,
 }
 
 func parseBitpatternColors(value string) map[int]int {
@@ -100,6 +102,7 @@ func main() {
 	flag.StringVar(&options.DitherMatrix, "dm", defaultOptions.DitherMatrix, "The name of a predefined ordered dithering matrix")
 	flag.IntVar(&options.DitherDepth, "dd", defaultOptions.DitherDepth, "Dither depth (0-255). Depth of dithering.")
 	flag.StringVar(&options.BitpatternColors, "bpc", defaultOptions.BitpatternColors, "Force bitpattern/color pairs. For example 0:0 to force background black.")
+	flag.BoolVar(&options.AllowOverwrite, "overwrite", defaultOptions.AllowOverwrite, "Allow overwriting output file")
 
 	var formatString string
 	flag.StringVar(&formatString, "f", string(defaultOptions.Format), "Output format (png or binary)")
@@ -154,9 +157,9 @@ func main() {
 	switch options.Format {
 	case PNG:
 		// TODO: add overwrite flag
-		imageio.WriteImage(options.OutFile, newImage.Render())
+		imageio.WriteImage(options.OutFile, newImage.Render(), options.AllowOverwrite)
 	case BIN:
-		c64io.SaveBinary(options.OutFile, &newImage, true)
+		c64io.SaveBinary(options.OutFile, &newImage, options.AllowOverwrite)
 	}
 
 	fmt.Printf("%s --> %s (%s) in %s\n", infile, options.OutFile, options.Mode, time.Since(startTime))
