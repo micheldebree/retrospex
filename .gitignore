@@ -28,3 +28,5 @@ retrospex_*
 scripts/*.prg
 retrospex
 .aider*
+*.dbg
+*.vs

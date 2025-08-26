@@ -2,28 +2,29 @@
 
 .filenamespace vic
 
-register: {
-    .label CONTROL1         = $d011
-    .label SPRITE_ENABLE    = $d015
-    .label CONTROL2         = $d016
-    .label MEM_LAYOUT       = $d018
-    .label BORDER           = $d020
-    .label BACKGROUND       = $d021
-    .label MULTICOLOR_1     = $d022
-    .label MULTICOLOR_2     = $d023
-    .label SPRITE_COLOR     = $d027
-    .label COLOR_RAM        = $d800
-    .label BANK_SELECT      = $dd00
-}
+.label CONTROL1         = $d011
+.label SPRITE_ENABLE    = $d015
+.label CONTROL2         = $d016
+.label MEM_LAYOUT       = $d018
+.label BORDER           = $d020
+.label BACKGROUND       = $d021
+.label MULTICOLOR_1     = $d022
+.label MULTICOLOR_2     = $d023
+.label SPRITE_COLOR     = $d027
+.label COLOR_RAM        = $d800
+.label BANK_SELECT      = $dd00
 
-default: {
+val: {
+    // default values
     .label d011 = %00011000
     .label d016 = %00001000
-}
 
-bit: {
-    .label BITMAP_MODE = %00100000
-    .label MULTICOLOR_MODE = %00010000
+    .label BITMAP_MODE      = %00100000
+    .label MULTICOLOR_MODE  = %00010000
+    .label BANK_3           = %00 
+    .label BANK_2           = %01
+    .label BANK_1           = %01
+    .label BANK_0           = %11
 }
 
 // some common VIC data sizes
@@ -81,12 +82,12 @@ memory: {
 
 // d018
 .function @vic_bitmap(address) {
-    .return ((address >> 10) & $0f)
+    .return >address >> 2
 }
 
 // d018
 .function @vic_screenram(address) {
-    .return ((address >> 6) & $f0)
+    .return >address << 2
 }
 
 .macro @vic_fill_screen(address, value) {
