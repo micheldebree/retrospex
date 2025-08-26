@@ -23,7 +23,7 @@ func koalaBinary(img *indexedimage.IndexedImage) BinaryFile {
 	}
 
 	address := loadAddress(0x6000)
-	bitmapChunk := getOrderedBitmapData(img)
+	bitmapChunk := getVicOrderBitmapData(img)
 	screenRamChunk := BinaryChunk{"ScreenRAM", screenRam}
 	colorRamChunk := BinaryChunk{"ColorRAM", colorRam}
 	backgroundChunk := BinaryChunk{"Background color", []byte{byte(backgroundColor)}}

@@ -15,7 +15,8 @@ type BinaryChunk struct {
 type BinaryFile []BinaryChunk
 
 var binaryFactories = map[indexedimage.RetrospecName]func(*indexedimage.IndexedImage) BinaryFile{
-	indexedimage.MCCharsetType: mcCharsetBinary,
+	indexedimage.MCCharsetType: charsetBinary,
+	indexedimage.SCCharsetType: charsetBinary,
 	indexedimage.KoalaType:     koalaBinary,
 	indexedimage.HiresType:     artstudioBinary,
 }
@@ -70,6 +71,7 @@ func getBitmapData(img *indexedimage.IndexedImage) []byte {
 // Reorders bytes to c64 bitmap byte ordering
 // The input is row-first, with bytesPerRow bytes per row
 // The output is row-first for a group of 8 bytes, but column first within each group of 8 bytes
+// TODO: do not use two steps; get bitmap data in the right order straight away
 func reOrderToVicBitmapOrder(input []byte, bytesPerInputRow int) []byte {
 	result := make([]byte, len(input))
 	bytesPerOutputRow := bytesPerInputRow * 8
@@ -91,16 +93,15 @@ func reOrderToVicBitmapOrder(input []byte, bytesPerInputRow int) []byte {
 	return result
 }
 
+// func getNormalOrderBitmapData(img *indexedimage.IndexedImage) BinaryChunk {
+// 	return BinaryChunk{"Bitmap (normal order)", getBitmapData(img)}
+// }
+
 // get the bitmap data, in the right ordering
 // TODO: do not store byteorder in the spec, the exporter functions know
-func getOrderedBitmapData(img *indexedimage.IndexedImage) BinaryChunk {
-
+func getVicOrderBitmapData(img *indexedimage.IndexedImage) BinaryChunk {
 	bitmapData := getBitmapData(img)
-
-	if img.Spec.BitmapByteOrder == indexedimage.VicByteOrder {
-		return BinaryChunk{"Bitmap (vic order)", reOrderToVicBitmapOrder(bitmapData, img.BytesPerRow())}
-	}
-	return BinaryChunk{"Bitmap (normal order)", bitmapData}
+	return BinaryChunk{"Bitmap (vic order)", reOrderToVicBitmapOrder(bitmapData, img.BytesPerRow())}
 }
 
 // Helper function to check if a file exists

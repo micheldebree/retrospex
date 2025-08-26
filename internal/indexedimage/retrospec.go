@@ -9,18 +9,10 @@ type Layer struct {
 
 type RetrospecName string
 
-type ByteOrder int
-
-const (
-	RegularByteOrder ByteOrder = iota // regular, row-first byte order
-	VicByteOrder                      // quirky vic byte order
-)
-
 type Retrospec struct {
-	Name            RetrospecName
-	Layers          []Layer
-	BitPatternSize  int
-	BitmapByteOrder ByteOrder
+	Name           RetrospecName
+	Layers         []Layer
+	BitPatternSize int
 }
 
 func (spec Retrospec) PixelsPerByte() int {

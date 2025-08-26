@@ -12,7 +12,7 @@ func artstudioBinary(img *indexedimage.IndexedImage) BinaryFile {
 		screenRam[i] = packScreenRamColors(region, 0b01, 0b10)
 	}
 	address := loadAddress(0x2000)
-	bitmapChunk := getOrderedBitmapData(img)
+	bitmapChunk := getVicOrderBitmapData(img)
 	screenRamChunk := BinaryChunk{"ScreenRAM", screenRam}
 	paddingChunk := BinaryChunk{"Padding", make([]byte, 7)}
 	return BinaryFile{address, bitmapChunk, screenRamChunk, paddingChunk}
