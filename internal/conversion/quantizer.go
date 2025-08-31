@@ -10,16 +10,13 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-// PaletteDistance The distance from an RGB pixel to each key in a Palette
-// In the order of the palette
-type PaletteDistance map[int]float64
 
 // QuantizePixel quantizes a pixel to the nearest color in the palette
 func QuantizePixel(p *pixels.Pixel, pal pixels.Palette, colorspace ColorspaceName) {
-	p.PaletteIndex, p.QuantizationError = convertertedBestIndex(p, pal, colorspace)
+	p.PaletteIndex, p.QuantizationError = bestIndex(p, pal, colorspace)
 }
 
-func convertertedBestIndex(p *pixels.Pixel, pal pixels.Palette, colorspace ColorspaceName) (int, float64) {
+func bestIndex(p *pixels.Pixel, pal pixels.Palette, colorspace ColorspaceName) (int, float64) {
 
 	bestIndex, shortestDistance := indexedimage.UNKNOWN, math.MaxFloat64
 

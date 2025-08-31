@@ -20,8 +20,8 @@ const (
 
 func euclidianDistance(color1, color2 color.Color, colorspace ColorspaceName) float64 {
 
-	ach1, ach2, ach3 := toColorSpace(toColorful(color1), colorspace)
-	bch1, bch2, bch3 := toColorSpace(toColorful(color2), colorspace)
+	ach1, ach2, ach3 := toColorSpace(color1, colorspace)
+	bch1, bch2, bch3 := toColorSpace(color2, colorspace)
 
 	diff1 := (bch1 - ach1)
 	diff2 := (bch2 - ach2)
@@ -30,33 +30,27 @@ func euclidianDistance(color1, color2 color.Color, colorspace ColorspaceName) fl
 	return math.Sqrt(diff1*diff1 + diff2*diff2 + diff3*diff3)
 }
 
-func toColorSpace(aColor colorful.Color, colorspace ColorspaceName) (float64, float64, float64) {
+func toColorSpace(aColor color.Color, colorspace ColorspaceName) (float64, float64, float64) {
 
-	switch colorspace {
-	case RGB:
-		return aColor.R, aColor.G, aColor.B
-	case LINEAR_RGB:
-		return aColor.LinearRgb()
-	case XYZ:
-		return aColor.Xyz()
-	case XYY:
-		return aColor.Xyy()
-	case LAB:
-		return aColor.Lab()
-	default:
-		panic(fmt.Sprintf("Colorspace %s is not supported", colorspace))
-	}
-
-}
-
-func toColorful(aColor color.Color) colorful.Color {
-
-	result, success := colorful.MakeColor(aColor)
+	colorfulColor, success := colorful.MakeColor(aColor)
 
 	if !success {
 		panic("Could not convert to colorspace")
 	}
 
-	return result
+	switch colorspace {
+	case RGB:
+		return colorfulColor.R, colorfulColor.G, colorfulColor.B
+	case LINEAR_RGB:
+		return colorfulColor.LinearRgb()
+	case XYZ:
+		return colorfulColor.Xyz()
+	case XYY:
+		return colorfulColor.Xyy()
+	case LAB:
+		return colorfulColor.Lab()
+	default:
+		panic(fmt.Sprintf("Colorspace %s is not supported", colorspace))
+	}
 
 }
