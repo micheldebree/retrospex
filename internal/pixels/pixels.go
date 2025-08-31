@@ -16,7 +16,7 @@ type Pixel struct {
 	Color color.Color // the color in the original image
 	// available after quantizing
 	PaletteIndex      int
-	QuantizationError uint32
+	QuantizationError float64
 	// available when a bit pattern has been assigned
 	BitPattern int
 }

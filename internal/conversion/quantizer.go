@@ -1,6 +1,7 @@
 package conversion
 
 import (
+	"math"
 	"sort"
 
 	"github.com/micheldebree/retrospex/internal/indexedimage"
@@ -14,34 +15,26 @@ import (
 type PaletteDistance map[int]float64
 
 // QuantizePixel quantizes a pixel to the nearest color in the palette
-func QuantizePixel(p *pixels.Pixel, pal pixels.Palette) {
-	p.PaletteIndex, p.QuantizationError = bestIndex(p, pal)
+func QuantizePixel(p *pixels.Pixel, pal pixels.Palette, colorspace ColorspaceName) {
+	p.PaletteIndex, p.QuantizationError = convertertedBestIndex(p, pal, colorspace)
 }
 
-// borrowed from golang color package, leaving out alpha channel
-func bestIndex(p *pixels.Pixel, pal pixels.Palette) (int, uint32) {
-	cr, cg, cb, _ := p.Color.RGBA()
-	ret, bestSum := 0, uint32(1<<32-1)
+func convertertedBestIndex(p *pixels.Pixel, pal pixels.Palette, colorspace ColorspaceName) (int, float64) {
+
+	bestIndex, shortestDistance := indexedimage.UNKNOWN, math.MaxFloat64
+
 	for i, v := range pal {
-		vr, vg, vb, _ := v.RGBA()
-		sum := sqDiff(cr, vr) + sqDiff(cg, vg) + sqDiff(cb, vb)
-		if sum < bestSum {
-			if sum == 0 {
-				return i, 0
-			}
-			ret, bestSum = i, sum
+		distance := euclidianDistance(p.Color, v, colorspace)
+
+		if distance < shortestDistance {
+			bestIndex, shortestDistance = i, distance
 		}
 	}
-	return ret, bestSum
+
+	return bestIndex, shortestDistance
 }
 
-// borrowed from golang color package
-func sqDiff(x, y uint32) uint32 {
-	d := x - y
-	return (d * d) >> 2
-}
-
-func quantizeRegion(region indexedimage.Region, bitpatternToColor map[int]int) {
+func quantizeRegion(region indexedimage.Region, bitpatternToColor map[int]int, colorspace ColorspaceName) {
 
 	// initial mapping so we are able to force color to bitpattern assignment
 	// beforehand
@@ -49,7 +42,7 @@ func quantizeRegion(region indexedimage.Region, bitpatternToColor map[int]int) {
 		region.AssignColorToBitPattern(bitpattern, colorIndex)
 	}
 
-	assignBitPatterns(region)
+	assignBitPatterns(region, colorspace)
 	localPalette := region.GetPalette()
 
 	for y := 0; y < region.Height; y++ {
@@ -60,7 +53,7 @@ func quantizeRegion(region indexedimage.Region, bitpatternToColor map[int]int) {
 				if region.IsLastLayer {
 					// last layer, all remaining pixels should be re-quantized
 					// against the local palette
-					QuantizePixel(pixel, localPalette)
+					QuantizePixel(pixel, localPalette, colorspace)
 				}
 				region.AssignBitpatternToPixel(pixel)
 			}
@@ -69,14 +62,14 @@ func quantizeRegion(region indexedimage.Region, bitpatternToColor map[int]int) {
 }
 
 // quantize all the pixels in the image according to the image specs
-func Quantize(img indexedimage.IndexedImage, bitpatternToColor map[int]int) indexedimage.IndexedImage {
+func Quantize(img indexedimage.IndexedImage, bitpatternToColor map[int]int, colorspace ColorspaceName) indexedimage.IndexedImage {
 	result := img
 
 	for layerIndex := range img.Spec.Layers {
 
 		// quantize the regions
 		for _, region := range img.Regions[layerIndex] {
-			quantizeRegion(region, bitpatternToColor)
+			quantizeRegion(region, bitpatternToColor, colorspace)
 		}
 	}
 	return result
@@ -85,9 +78,9 @@ func Quantize(img indexedimage.IndexedImage, bitpatternToColor map[int]int) inde
 // reduce a palette to maximum number of colors according to their
 // quantized occurence in pixels. assign a bitpattern to each palette entry
 // only considers pixels that don't have a bitpattern assigned yet
-func assignBitPatterns(region indexedimage.Region) {
+func assignBitPatterns(region indexedimage.Region, colorspace ColorspaceName) {
 
-	unassignedColors := getUnassignedColors(region)
+	unassignedColors := getUnassignedColors(region, colorspace)
 	unmappedBitPatterns := region.GetUnmappedBitpatterns()
 
 	nrOfUnassignedColors := len(unassignedColors)
@@ -111,7 +104,7 @@ func assignBitPatterns(region indexedimage.Region) {
 
 // Get colors that don't have a bitpattern assigned
 // Sorted most occuring color first
-func getUnassignedColors(region indexedimage.Region) []int {
+func getUnassignedColors(region indexedimage.Region, colorspace ColorspaceName) []int {
 	// maps color index to occurence count
 	indexToCount := make(map[int]int)
 
@@ -122,7 +115,7 @@ func getUnassignedColors(region indexedimage.Region) []int {
 
 			// pixels that are already assigned a bitpattern don't count
 			if !pixel.HasBitPattern() {
-				QuantizePixel(pixel, region.Img.Palette)
+				QuantizePixel(pixel, region.Img.Palette, colorspace)
 
 				// there could already be colors associated with bitpatterns
 				// initially. If so, use it and don't count as unassigned

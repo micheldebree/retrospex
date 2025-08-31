@@ -74,7 +74,7 @@ func TestQuantizePixel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			QuantizePixel(&tt.pixel, tt.palette)
+			QuantizePixel(&tt.pixel, tt.palette, RGB)
 			if tt.pixel.PaletteIndex != tt.expected {
 				t.Errorf("Expected PaletteIndex to be %d, got %d", tt.expected, tt.pixel.PaletteIndex)
 			}

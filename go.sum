@@ -1,2 +1,4 @@
+github.com/lucasb-eyer/go-colorful v1.2.0 h1:1nnpGOrhyZZuNyfu1QjKiUICQ74+3FNCN69Aj6K7nkY=
+github.com/lucasb-eyer/go-colorful v1.2.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
 golang.org/x/exp v0.0.0-20250808145144-a408d31f581a h1:Y+7uR/b1Mw2iSXZ3G//1haIiSElDQZ8KWh0h+sZPG90=
 golang.org/x/exp v0.0.0-20250808145144-a408d31f581a/go.mod h1:rT6SFzZ7oxADUDx58pcaKFTcZ+inxAa9fTrYx/uVYwg=

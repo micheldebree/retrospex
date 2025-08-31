@@ -33,6 +33,7 @@ type Options struct {
 	OutFile          string
 	Mode             string
 	Palette          string
+	ColorSpace       string
 	DitherMatrix     string
 	DitherDepth      int
 	Format           FormatType // Changed to use enum type
@@ -51,6 +52,7 @@ var defaultOptions = Options{
 	OutFile:          "out.png",
 	Mode:             "koala",
 	Palette:          "colodore",
+	ColorSpace:       "lineairRgb",
 	DitherMatrix:     "bayer4x4",
 	DitherDepth:      25,
 	Format:           PNG, // Default format is png
@@ -99,6 +101,7 @@ func main() {
 	flag.StringVar(&options.OutFile, "o", defaultOptions.OutFile, "Output filename")
 	flag.StringVar(&options.Mode, "m", defaultOptions.Mode, "Graphics mode")
 	flag.StringVar(&options.Palette, "p", defaultOptions.Palette, "Palette")
+	flag.StringVar(&options.ColorSpace, "cs", defaultOptions.ColorSpace, "Colorspace conversion")
 	flag.StringVar(&options.DitherMatrix, "dm", defaultOptions.DitherMatrix, "The name of a predefined ordered dithering matrix")
 	flag.IntVar(&options.DitherDepth, "dd", defaultOptions.DitherDepth, "Dither depth (0-255). Depth of dithering.")
 	flag.StringVar(&options.BitpatternColors, "bpc", defaultOptions.BitpatternColors, "Force bitpattern/color pairs. For example 0:0 to force background black.")
@@ -152,7 +155,7 @@ func main() {
 
 	forcedBitpatternMapping := parseBitpatternColors(options.BitpatternColors)
 
-	newImage := conversion.Quantize(indexedImage, forcedBitpatternMapping)
+	newImage := conversion.Quantize(indexedImage, forcedBitpatternMapping, conversion.ColorspaceName(options.ColorSpace))
 
 	switch options.Format {
 	case PNG:
