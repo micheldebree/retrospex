@@ -8,10 +8,11 @@
 		-gravity center \
 		"$@"
 
-# apply c64 specs
+%.hires.bin: %.hires.1.png
+	retrospex -f bin -m hires -o "$@" "$<"
+
 %.hires.png: %.hires.1.png
 	retrospex -m hires -o "$@" "$<"
 
-# convert to prg
 %.hires.prg: %.hires.png
 	png2prg -mode hires -display -o "$@" "$<"

@@ -1,11 +1,12 @@
 #import "vic.asm"
 
-.const PICTURE      = LoadBinary("../scripts/paintface.koala.bin", BF_KOALA)
-.const SCREENRAM    = $0400
-.const BITMAP       = $2000
+.const ARTSTUDIO_TEMPLATE = "C64FILE, Bitmap=0, ScreenRam = 8000"
+.const PICTURE            = LoadBinary("../scripts/paintface.hires.bin", ARTSTUDIO_TEMPLATE)
+.const SCREENRAM          = $0400
+.const BITMAP             = $2000
 
 .var d011 = vic.val.d011 | vic.val.BITMAP_MODE
-.var d016 = vic.val.d016 | vic.val.MULTICOLOR_MODE
+.var d016 = vic.val.d016
 .var d018 = @vic_bitmap(bitmap) | @vic_screenram(SCREENRAM)
 .var dd00 = vic.val.BANK_0
 
@@ -23,26 +24,18 @@ main:
     sta $d016
     lda #d018
     sta $d018
-    lda #PICTURE.getBackgroundColor()
-    sta $d020
-    sta $d021
     ldx #0
+    stx $d020
+    stx $d021
 
 loop:
     .for (var i = 0; i < 4; i++) {
         lda i * $100 + screenram_data,x
         sta i * $100 + SCREENRAM,x
-        lda i * $100 + colorram_data,x
-        sta i * $100 + vic.COLOR_RAM,x
     }
     inx
     bne loop
     jmp *
-
-* = * "Color RAM data"
-
-colorram_data:
-    .fill PICTURE.getColorRamSize(), PICTURE.getColorRam(i)
 
 * = * "Screen RAM data"
 

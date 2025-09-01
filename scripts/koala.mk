@@ -10,12 +10,15 @@
 
 # apply c64 specs
 %.koala.2.png: %.koala.1.png
-	time retrospex -m koala -o "$@" "$<"
+	retrospex -m koala -o "$@" "$<"
+
+%.koala.bin: %.koala.1.png
+	retrospex -f bin  -m koala -o "$@" "$<"
 
 # rescale back to double-width pixel proportions
 %.koala.png: %.koala.2.png
 	magick "$<" -sample 320x200\! "$@"
 
-# convert to prg
 %.koala.prg: %.koala.png
 	png2prg --mode koala -display -o "$@" "$<"
+

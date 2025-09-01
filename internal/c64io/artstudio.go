@@ -9,7 +9,7 @@ func artstudioBinary(img *indexedimage.IndexedImage) BinaryFile {
 	nrRegions := len(layer)
 	screenRam := make([]byte, nrRegions)
 	for i, region := range layer {
-		screenRam[i] = packScreenRamColors(region, 0b01, 0b10)
+		screenRam[i] = packScreenRamColors(region, 1, 0)
 	}
 	address := loadAddress(0x2000)
 	bitmapChunk := getVicOrderBitmapData(img)

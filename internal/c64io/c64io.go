@@ -94,10 +94,6 @@ func reOrderToVicBitmapOrder(input []byte, bytesPerInputRow int) []byte {
 	return result
 }
 
-// func getNormalOrderBitmapData(img *indexedimage.IndexedImage) BinaryChunk {
-// 	return BinaryChunk{"Bitmap (normal order)", getBitmapData(img)}
-// }
-
 // get the bitmap data, in the right ordering
 // TODO: do not store byteorder in the spec, the exporter functions know
 func getVicOrderBitmapData(img *indexedimage.IndexedImage) BinaryChunk {
@@ -113,12 +109,12 @@ func loadAddress(address uint16) BinaryChunk {
 // pack two colors associated with a bitpattern into one screenRam byte
 func packScreenRamColors(region indexedimage.Region, upperBitpattern, lowerBitpattern int) byte {
 	var result byte
-	upperNibble, present := region.BitpatternToColor[upperBitpattern]
+	upperNibble, present := region.ColorAssignedToBitPattern(upperBitpattern)
 	if present {
 		result = byte(upperNibble) << 4
 	}
 
-	lowerNibble, present := region.BitpatternToColor[lowerBitpattern]
+	lowerNibble, present := region.ColorAssignedToBitPattern(lowerBitpattern)
 	if present {
 		result |= byte(lowerNibble & 0x0f)
 	}

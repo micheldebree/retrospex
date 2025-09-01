@@ -1,11 +1,14 @@
 .PHONY: all
-koala.prg: koala.asm pic.bin ./lib/vic.asm
+all: koala.prg hires.prg
 
-pic.bin: ../scripts/paintface.src.png.tmp1.png
-	retrospex -f bin -o $@ $<
+koala.prg: koala.asm ../scripts/paintface.koala.bin ./lib/vic.asm
+
+hires.prg: hires.asm ../scripts/paintface.hires.bin ./lib/vic.asm
 
 .PHONY: clean
 clean: cleankickass
 	rm *.bin
 
 include kickass.mk
+include ../scripts/koala.mk
+include ../scripts/hires.mk

@@ -5,7 +5,11 @@ import "github.com/micheldebree/retrospex/internal/indexedimage"
 func koalaBinary(img *indexedimage.IndexedImage) BinaryFile {
 
 	// background is  layer 0, one region, bit pattern 00
-	backgroundColor := img.Regions[0][0].BitpatternToColor[0b00]
+	backgroundColor, present := img.Regions[0][0].ColorAssignedToBitPattern(0b00)
+
+	if !present {
+		panic("No background color present")
+	}
 
 	// layer 1 is char-sized regions, bit patterns 01 10 and 11
 	nrRegions := len(img.Regions[1])
@@ -15,11 +19,10 @@ func koalaBinary(img *indexedimage.IndexedImage) BinaryFile {
 
 		screenRam[i] = packScreenRamColors(region, 0b01, 0b10)
 
-		colorByte, present := region.BitpatternToColor[0b11]
+		colorByte, present := region.ColorAssignedToBitPattern(0b11)
 		if present {
 			colorRam[i] = byte(colorByte)
 		}
-
 	}
 
 	address := loadAddress(0x6000)

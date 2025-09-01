@@ -20,20 +20,32 @@ type Region struct {
 	IsLastLayer       bool        // is this region in the last layer?
 }
 
+// specify which bitpatterns can be used. initialize them to be assigned an empty/unknown color
 func (region *Region) initBitPatterns(layer Layer) {
 	for _, bitPattern := range layer.Bitpatterns {
 		region.BitpatternToColor[bitPattern] = UNKNOWN
 	}
 }
 
-func (region *Region) bitPatternIsAssigned(colorIndex int) bool {
+func (region *Region) ColorAssignedToBitPattern(bitPattern int) (int, bool) {
+
+	value, present := region.BitpatternToColor[bitPattern]
+
+	if present {
+		return value, value != UNKNOWN
+	}
+
+	panic(fmt.Sprintf("Unexpected bit pattern %%%b", bitPattern))
+}
+
+func (region *Region) colorHasBitPattern(colorIndex int) bool {
 	colorIndex, present := region.BitpatternToColor[colorIndex]
 	return present && colorIndex != UNKNOWN
 }
 
 // associates a bitpattern with an index in the color palette
 func (region *Region) AssignColorToBitPattern(bitPattern int, paletteIndex int) {
-	if region.bitPatternIsAssigned(bitPattern) {
+	if region.colorHasBitPattern(bitPattern) {
 		panic(fmt.Sprintf("cannot assign color %d to bit pattern %d, a color is already assigned for region %v", paletteIndex, bitPattern, region))
 	}
 	region.BitpatternToColor[bitPattern] = paletteIndex
