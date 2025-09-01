@@ -99,16 +99,24 @@ func main() {
 	var options Options
 
 	flag.StringVar(&options.OutFile, "o", defaultOptions.OutFile, "Output filename")
-	flag.StringVar(&options.Mode, "m", defaultOptions.Mode, "Graphics mode")
-	flag.StringVar(&options.Palette, "p", defaultOptions.Palette, "Palette")
-	flag.StringVar(&options.ColorSpace, "cs", defaultOptions.ColorSpace, "Colorspace conversion")
-	flag.StringVar(&options.DitherMatrix, "dm", defaultOptions.DitherMatrix, "The name of a predefined ordered dithering matrix")
+	flag.StringVar(&options.Mode, "m", defaultOptions.Mode, `Graphics mode.
+One of koala, hires, mixedcharset, mccharset, sccharset,mcibitmap,scsprites,mcsprites`)
+	flag.StringVar(&options.Palette, "p", defaultOptions.Palette, `Palette.
+One of colodore,pepto,vice,vice_old_lum,vice_371_internal,pantaloon,archmage,electric,ste,perplex_1,perplex_2,lenyn`)
+	flag.StringVar(&options.ColorSpace, "cs", defaultOptions.ColorSpace, `Colorspace conversion.
+One of rgb (no conversion), lineairRgb, xyz, xyy, lab`)
+	flag.StringVar(&options.DitherMatrix, "dm", defaultOptions.DitherMatrix, `A preset ordered dithering matrix.
+One of none,bayer2x2,bayer4x4,bayer8x8`)
 	flag.IntVar(&options.DitherDepth, "dd", defaultOptions.DitherDepth, "Dither depth (0-255). Depth of dithering.")
-	flag.StringVar(&options.BitpatternColors, "bpc", defaultOptions.BitpatternColors, "Force bitpattern/color pairs. For example 0:0 to force background black.")
+	flag.StringVar(&options.BitpatternColors, "bpc", defaultOptions.BitpatternColors, `Force bitpattern/color pairs. 
+For example 0:0 to force background black.
+For example 0:0,1:1,2:15,3:13 to force colors for all 4 bitpatterns`)
 	flag.BoolVar(&options.AllowOverwrite, "overwrite", defaultOptions.AllowOverwrite, "Allow overwriting output file")
 
 	var formatString string
-	flag.StringVar(&formatString, "f", string(defaultOptions.Format), "Output format (png or binary)")
+	flag.StringVar(&formatString, "f", string(defaultOptions.Format), `Output format.
+png for an image to convert for instance with png2prg
+bin for binary data to use in Commodore64 development (see documentation for structure)`)
 	flag.Parse()
 
 	options.Format = FormatType(formatString)
