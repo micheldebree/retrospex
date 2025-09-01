@@ -3,26 +3,25 @@
 ## Next release
 
 - [ ] Store c64 binary formats (bitmap and color data)
-    - [x] Koala
-    - [ ] Hires
-    - [ ] Mixed Hires
-    - [ ] Characters
-    - [ ] Mixed Characters
-    - [ ] Sprites
+  - [x] Koala
+  - [x] Hires
+  - [ ] Mixed Hires
+  - [ ] Characters
+  - [ ] Mixed Characters
+  - [ ] Sprites
 - [x] Override background color (or more generic, force bitpattern colors)
-- [ ] Better error handling
-- [ ] Speedup
+- [ ] Speedup when using plain RGB
 - [x] Different color spaces
+- [ ] Document binary formats
 
 ## Feature requests
 
 - [ ] Do not use panic for validations
-- [ ] Re-use characters
+- [ ] Re-use characters --> separate tool?
 - [ ] Error diffusion dithering
 - [ ] Process two pixels from the original as one, so we don't have to halve
-  multicolor in preprocessing
-- [ ] K-means clustering for reducing palette
-- [ ] Different algorithms for measuring distance
+      multicolor in preprocessing
+- [ ] (K-means) clustering for reducing palette
 - [ ] Parallel processing of images in folder (for animation)
 
 ## References

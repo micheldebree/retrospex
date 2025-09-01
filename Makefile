@@ -1,4 +1,4 @@
-VERSION := 1.0
+VERSION := 1.1
 REV := $(shell git rev-parse --short HEAD)
 SRC := $(filter-out $(wildcard *_test.go), $(wildcard *.go))
 

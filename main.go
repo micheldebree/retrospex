@@ -100,11 +100,11 @@ func main() {
 
 	flag.StringVar(&options.OutFile, "o", defaultOptions.OutFile, "Output filename")
 	flag.StringVar(&options.Mode, "m", defaultOptions.Mode, `Graphics mode.
-One of koala, hires, mixedcharset, mccharset, sccharset,mcibitmap,scsprites,mcsprites`)
+One of koala,hires,mixedcharset,mccharset,sccharset,mcibitmap,scsprites,mcsprites`)
 	flag.StringVar(&options.Palette, "p", defaultOptions.Palette, `Palette.
 One of colodore,pepto,vice,vice_old_lum,vice_371_internal,pantaloon,archmage,electric,ste,perplex_1,perplex_2,lenyn`)
 	flag.StringVar(&options.ColorSpace, "cs", defaultOptions.ColorSpace, `Colorspace conversion.
-One of rgb (no conversion), lineairRgb, xyz, xyy, lab`)
+One of rgb (no conversion),lineairRgb,xyz,xyy,lab`)
 	flag.StringVar(&options.DitherMatrix, "dm", defaultOptions.DitherMatrix, `A preset ordered dithering matrix.
 One of none,bayer2x2,bayer4x4,bayer8x8`)
 	flag.IntVar(&options.DitherDepth, "dd", defaultOptions.DitherDepth, "Dither depth (0-255). Depth of dithering.")
