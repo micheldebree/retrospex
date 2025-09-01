@@ -165,6 +165,8 @@ func main() {
 		c64io.SaveBinary(options.OutFile, &newImage, options.AllowOverwrite)
 	}
 
+	spec.Print()
+
 	fmt.Printf("%s --> %s (%s) in %s\n", infile, options.OutFile, options.Mode, time.Since(startTime))
 }
 

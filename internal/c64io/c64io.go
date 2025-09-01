@@ -95,7 +95,6 @@ func reOrderToVicBitmapOrder(input []byte, bytesPerInputRow int) []byte {
 }
 
 // get the bitmap data, in the right ordering
-// TODO: do not store byteorder in the spec, the exporter functions know
 func getVicOrderBitmapData(img *indexedimage.IndexedImage) BinaryChunk {
 	bitmapData := getBitmapData(img)
 	return BinaryChunk{"Bitmap (vic order)", reOrderToVicBitmapOrder(bitmapData, img.BytesPerRow())}

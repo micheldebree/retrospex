@@ -1,5 +1,7 @@
 package indexedimage
 
+import "fmt"
+
 type Layer struct {
 	CellWidth, CellHeight int
 	Bitpatterns           []int
@@ -17,4 +19,8 @@ type Retrospec struct {
 
 func (spec Retrospec) PixelsPerByte() int {
 	return 8 / spec.BitPatternSize
+}
+
+func (retrospec Retrospec) Print() {
+	fmt.Printf("Mode: %s\nBits per pixel: %d\n", retrospec.Name, retrospec.BitPatternSize)
 }
