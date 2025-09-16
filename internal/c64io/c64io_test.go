@@ -135,7 +135,7 @@ func TestGetBitmapData(t *testing.T) {
 	})
 }
 
-func TestReOrderToC64BitmapOrder(t *testing.T) {
+func TestReOrderToCharsOrder(t *testing.T) {
 	tests := []struct {
 		name             string
 		input            []byte
@@ -192,7 +192,7 @@ func TestReOrderToC64BitmapOrder(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := reOrderToVicBitmapOrder(tt.input, tt.bytesPerInputRow)
+			result := reOrder(tt.input, tt.bytesPerInputRow, ByteOrders[CharsByteOrder])
 			if len(result) != len(tt.expected) {
 				t.Errorf("expected length %d, got %d", len(tt.expected), len(result))
 			}

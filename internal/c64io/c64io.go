@@ -13,6 +13,24 @@ type BinaryChunk struct {
 	data  []byte
 }
 
+type ByteOrderName string
+
+type ByteOrder struct {
+	ColWidthBytes, ColHeightBytes int
+}
+
+const (
+	DefaultByteOrder ByteOrderName = "default"
+	CharsByteOrder   ByteOrderName = "chars"
+	SpritesByteOrder ByteOrderName = "sprites"
+)
+
+var ByteOrders = map[ByteOrderName]ByteOrder{
+	DefaultByteOrder: ByteOrder{1, 1},
+	CharsByteOrder:   ByteOrder{1, 8},
+	SpritesByteOrder: ByteOrder{3, 21},
+}
+
 type BinaryFile []BinaryChunk
 
 var binaryFactories = map[indexedimage.RetrospecName]func(*indexedimage.IndexedImage) BinaryFile{
@@ -70,34 +88,34 @@ func getBitmapData(img *indexedimage.IndexedImage) []byte {
 }
 
 // Reorders bytes to c64 bitmap byte ordering
-// The input is row-first, with bytesPerRow bytes per row
-// The output is row-first for a group of 8 bytes, but column first within each group of 8 bytes
-// TODO: do not use two steps; get bitmap data in the right order straight away
-func reOrderToVicBitmapOrder(input []byte, bytesPerInputRow int) []byte {
+func reOrder(input []byte, bytesPerInputRow int, byteOrder ByteOrder) []byte {
+
+	// blocks are 1 byte wide, 8 bytes high (character layout)
+	// TODO: 3 bytes wide, 21 bytes high (sprite layout)
+	// colWidthBytes, colHeightBytes := 1, 8
+
 	result := make([]byte, len(input))
-	bytesPerOutputRow := bytesPerInputRow * 8
+	bytesPerOutputRow := bytesPerInputRow * byteOrder.ColHeightBytes
 	numRows := len(input) / bytesPerOutputRow
+	numCols := bytesPerInputRow / byteOrder.ColWidthBytes
 
 	dstIndex := 0
 
 	for row := range numRows {
-		rowIndex := row * bytesPerOutputRow
-		for col := range bytesPerInputRow {
-			colIndex := rowIndex + col
-			for byteInCol := range 8 {
-				srcIndex := colIndex + byteInCol*bytesPerInputRow
-				result[dstIndex] = input[srcIndex]
-				dstIndex++
+		rowOffset := row * bytesPerOutputRow
+		for col := range numCols {
+			colOffset := rowOffset + col*byteOrder.ColWidthBytes
+			for rowInCol := range byteOrder.ColHeightBytes {
+				rowInColOffset := colOffset + rowInCol*bytesPerInputRow
+				for colInCol := range byteOrder.ColWidthBytes {
+					srcIndex := rowInColOffset + colInCol
+					result[dstIndex] = input[srcIndex]
+					dstIndex++
+				}
 			}
 		}
 	}
 	return result
-}
-
-// get the bitmap data, in the right ordering
-func getVicOrderBitmapData(img *indexedimage.IndexedImage) BinaryChunk {
-	bitmapData := getBitmapData(img)
-	return BinaryChunk{"Bitmap (vic order)", reOrderToVicBitmapOrder(bitmapData, img.BytesPerRow())}
 }
 
 // Make a chunk of two bytes denoting the load address

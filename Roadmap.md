@@ -13,6 +13,7 @@
 - [ ] Speedup when using plain RGB
 - [x] Different color spaces
 - [ ] Document binary formats
+- [ ] PALette
 
 ## Feature requests
 

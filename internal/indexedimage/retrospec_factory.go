@@ -105,8 +105,7 @@ func makeSCSpritesSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
 	return Retrospec{SCSpritesType,
 		[]Layer{
-			{w, h, []int{0b00}, false}, // d021
-			{w, h, []int{0b01}, true},  // sprite color
+			{w, h, []int{0b00, 0b01}, true}, // d021, d027,x
 		}, 1,
 	}
 }
@@ -116,10 +115,7 @@ func makeMCSpritesSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
 	return Retrospec{MCSpritesType,
 		[]Layer{
-			{w, h, []int{0b00}, false}, // d021
-			{w, h, []int{0b01}, false}, // d025
-			{w, h, []int{0b10}, false}, // d027,x
-			{w, h, []int{0b11}, true},  // d026
+			{w, h, []int{0b00, 0b01, 0b10, 0b11}, false}, // d021, d025, d027,x, d026
 		}, 2,
 	}
 }

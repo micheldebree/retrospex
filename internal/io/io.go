@@ -11,7 +11,6 @@ func AssertOverwrite(filename string, overwriteAllowed bool) {
 	}
 }
 
-// Helper function to check if a file exists
 func fileExists(filename string) bool {
 	info, err := os.Stat(filename)
 	if os.IsNotExist(err) {

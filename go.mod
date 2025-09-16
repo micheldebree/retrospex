@@ -6,4 +6,4 @@ toolchain go1.24.6
 
 require golang.org/x/exp v0.0.0-20250808145144-a408d31f581a
 
-require github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
+require github.com/lucasb-eyer/go-colorful v1.2.0

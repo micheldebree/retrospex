@@ -57,6 +57,30 @@ Options:
      One of colodore,pepto,vice,vice_old_lum,vice_371_internal,pantaloon,archmage,electric,ste,perplex_1,perplex_2,lenyn (default "colodore")
 ```
 
+## Binary output
+
+There are no restrictions on size, which means that binary data size may vary.
+Below are the sizes for a typical binary file for each mode.
+
+### Koala (multicolor bitmap)
+
+- 2 bytes loading address
+- 8000 bytes bitmap data
+- 1000 bytes of screen RAM
+- 1000 bytes of color RAM
+- 1 byte of background color
+
+### Hires bitmap
+
+- 2 bytes loading address
+- 8000 bytes bitmap data
+- 1000 bytes of screen RAM
+- 7 bytes of padding (to make it compatible with Art Studio format)
+
+### Character output
+
+- n x 8 bytes of character data for n characters
+
 ## Scripts
 
 The `/scripts` folder contains examples on how to script a build from

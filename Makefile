@@ -38,6 +38,8 @@ all: \
 clean:
 	rm scripts/*.prg || true
 	rm scripts/*.tmp*.png || true
+	rm scripts/*.koala.png || true
+	rm scripts/*.hires.png || true
 	rm retrospex*
 
 .PHONY: install
