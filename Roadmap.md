@@ -9,6 +9,7 @@
   - [ ] Characters
   - [ ] Mixed Characters
   - [ ] Sprites
+- [ ] Handle images with non-byte widths
 - [x] Override background color (or more generic, force bitpattern colors)
 - [ ] Speedup when using plain RGB
 - [x] Different color spaces
@@ -24,6 +25,7 @@
       multicolor in preprocessing
 - [ ] (K-means) clustering for reducing palette
 - [ ] Parallel processing of images in folder (for animation)
+- [ ] Custom byte orders?
 
 ## References
 

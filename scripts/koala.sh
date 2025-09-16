@@ -19,4 +19,4 @@ retrospex -m ${MODE} -overwrite -o "$1.tmp2.png" "$1.tmp1.png"
 magick "$1.tmp2.png" -sample 320x200\! "$1.${MODE}.png"
 
 # convert to prg
-png2prg --mode ${MODE} -display -o "$1.prg" "$1.${MODE}.png"
+png2prg --mode ${MODE} -display -o "$1.${MODE}.prg" "$1.${MODE}.png"

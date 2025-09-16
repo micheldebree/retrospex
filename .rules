@@ -1,2 +1,4 @@
+- You are a Golang expert
+- Focus on performance and simplicity
 - Use testify as a testing library
 - When writing or fixing tests, never, ever change the code being tested; only touch the unit test code

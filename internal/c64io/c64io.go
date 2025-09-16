@@ -8,50 +8,11 @@ import (
 	"github.com/micheldebree/retrospex/internal/io"
 )
 
-type BinaryChunk struct {
-	label string
-	data  []byte
-}
-
-type ByteOrderName string
-
-type ByteOrder struct {
-	ColWidthBytes, ColHeightBytes int
-}
-
-const (
-	DefaultByteOrder ByteOrderName = "default"
-	CharsByteOrder   ByteOrderName = "chars"
-	SpritesByteOrder ByteOrderName = "sprites"
-)
-
-var ByteOrders = map[ByteOrderName]ByteOrder{
-	DefaultByteOrder: ByteOrder{1, 1},
-	CharsByteOrder:   ByteOrder{1, 8},
-	SpritesByteOrder: ByteOrder{3, 21},
-}
-
-type BinaryFile []BinaryChunk
-
 var binaryFactories = map[indexedimage.RetrospecName]func(*indexedimage.IndexedImage) BinaryFile{
 	indexedimage.MCCharsetType: charsetBinary,
 	indexedimage.SCCharsetType: charsetBinary,
 	indexedimage.KoalaType:     koalaBinary,
 	indexedimage.HiresType:     artstudioBinary,
-}
-
-func (binaryFile BinaryFile) getBytes() []byte {
-	result := make([]byte, 0)
-	for _, chunk := range binaryFile {
-		result = append(result, chunk.data...)
-	}
-	return result
-}
-
-func (binaryFile BinaryFile) printLayout() {
-	for _, chunk := range binaryFile {
-		fmt.Printf("%s: %d bytes\n", chunk.label, len(chunk.data))
-	}
 }
 
 // Bitpatterns are packed into bytes;
@@ -82,37 +43,6 @@ func getBitmapData(img *indexedimage.IndexedImage) []byte {
 
 			result[outIndex] |= byte(pixel.BitPattern) << shiftLeft
 			byteIndex++
-		}
-	}
-	return result
-}
-
-// Reorders bytes to c64 bitmap byte ordering
-func reOrder(input []byte, bytesPerInputRow int, byteOrder ByteOrder) []byte {
-
-	// blocks are 1 byte wide, 8 bytes high (character layout)
-	// TODO: 3 bytes wide, 21 bytes high (sprite layout)
-	// colWidthBytes, colHeightBytes := 1, 8
-
-	result := make([]byte, len(input))
-	bytesPerOutputRow := bytesPerInputRow * byteOrder.ColHeightBytes
-	numRows := len(input) / bytesPerOutputRow
-	numCols := bytesPerInputRow / byteOrder.ColWidthBytes
-
-	dstIndex := 0
-
-	for row := range numRows {
-		rowOffset := row * bytesPerOutputRow
-		for col := range numCols {
-			colOffset := rowOffset + col*byteOrder.ColWidthBytes
-			for rowInCol := range byteOrder.ColHeightBytes {
-				rowInColOffset := colOffset + rowInCol*bytesPerInputRow
-				for colInCol := range byteOrder.ColWidthBytes {
-					srcIndex := rowInColOffset + colInCol
-					result[dstIndex] = input[srcIndex]
-					dstIndex++
-				}
-			}
 		}
 	}
 	return result

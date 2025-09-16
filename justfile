@@ -8,7 +8,11 @@ install:
 
 test_koala: install
     ./scripts/koala.sh ./scripts/paintface.src.png
-    open ./scripts/paintface.src.png.prg
+    open ./scripts/paintface.src.png.koala.prg
+
+test_hires: install
+    ./scripts/hires.sh ./scripts/paintface.src.png
+    open ./scripts/paintface.src.png.hires.prg
 
 coverage:
     go test ./... -coverprofile=cover.out
