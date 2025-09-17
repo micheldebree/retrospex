@@ -1,13 +1,13 @@
 .PHONY: all
 all: koala.prg hires.prg
 
-koala.prg: koala.asm ../scripts/paintface.koala.bin ./lib/vic.asm
+koala.prg: koala.asm paintface.koala.bin ./lib/vic.asm
 
-hires.prg: hires.asm ../scripts/paintface.hires.bin ./lib/vic.asm
+hires.prg: hires.asm paintface.hires.bin ./lib/vic.asm
 
 .PHONY: clean
 clean: cleankickass
-	rm *.bin
+	rm *.bin || true
 
 include kickass.mk
 include ../scripts/koala.mk

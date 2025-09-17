@@ -1,6 +1,6 @@
 #import "vic.asm"
 
-.const PICTURE      = LoadBinary("../scripts/paintface.koala.bin", BF_KOALA)
+.const PICTURE      = LoadBinary("paintface.koala.bin", BF_KOALA)
 .const SCREENRAM    = $0400
 .const BITMAP       = $2000
 

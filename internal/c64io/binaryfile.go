@@ -46,6 +46,10 @@ func (binaryFile BinaryFile) printLayout() {
 // Reorders bytes to c64 bitmap byte ordering
 func reOrder(input []byte, bytesPerInputRow int, byteOrder ByteOrder) []byte {
 
+	if bytesPerInputRow%byteOrder.ColWidthBytes != 0 {
+		panic(fmt.Sprintf("Bitmap data should be a multiple of %d", byteOrder.ColWidthBytes))
+	}
+
 	result := make([]byte, len(input))
 	bytesPerOutputRow := bytesPerInputRow * byteOrder.ColHeightBytes
 	numRows := len(input) / bytesPerOutputRow
@@ -58,9 +62,10 @@ func reOrder(input []byte, bytesPerInputRow int, byteOrder ByteOrder) []byte {
 		for range numCols {
 			rowInColOffset := colOffset
 			for range byteOrder.ColHeightBytes {
-				for colInCol := range byteOrder.ColWidthBytes {
-					srcIndex := rowInColOffset + colInCol
+				srcIndex := rowInColOffset
+				for range byteOrder.ColWidthBytes {
 					result[dstIndex] = input[srcIndex]
+					srcIndex++
 					dstIndex++
 				}
 				rowInColOffset += bytesPerInputRow

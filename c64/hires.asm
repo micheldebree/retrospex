@@ -1,7 +1,7 @@
 #import "vic.asm"
 
 .const ARTSTUDIO_TEMPLATE = "C64FILE, Bitmap=0, ScreenRam = 8000"
-.const PICTURE            = LoadBinary("../scripts/paintface.hires.bin", ARTSTUDIO_TEMPLATE)
+.const PICTURE            = LoadBinary("paintface.hires.bin", ARTSTUDIO_TEMPLATE)
 .const SCREENRAM          = $0400
 .const BITMAP             = $2000
 
