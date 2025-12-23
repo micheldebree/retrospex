@@ -1,6 +1,7 @@
 package indexedimage
 
 import (
+	"fmt"
 	"image"
 
 	"github.com/micheldebree/retrospex/internal/pixels"
@@ -27,6 +28,8 @@ func ToIndexedImage(img *image.Image, spec Retrospec, pal pixels.Palette) Indexe
 	// for each layer, create the regions
 	for layerIndex, layer := range spec.Layers {
 		regions[layerIndex] = getRegions(&result, w, h, layer)
+		fmt.Printf("Created %d regions for layer %d with bit patterns %v (cell size: %dx%d)\n",
+			len(regions[layerIndex]), layerIndex, layer.Bitpatterns, layer.CellWidth, layer.CellHeight)
 	}
 
 	return result
@@ -38,6 +41,8 @@ func getRegions(img *IndexedImage, w, h int, layer Layer) []Region {
 	nrCols, nrRows := w/layer.CellWidth, h/layer.CellHeight
 
 	regions := make([]Region, nrCols*nrRows)
+	fmt.Printf("Layer grid: %dx%d regions (%d total) for image size %dx%d\n",
+		nrCols, nrRows, nrCols*nrRows, w, h)
 
 	for cy := range nrRows {
 		for cx := range nrCols {

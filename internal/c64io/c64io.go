@@ -9,10 +9,11 @@ import (
 )
 
 var binaryFactories = map[indexedimage.RetrospecName]func(*indexedimage.IndexedImage) BinaryFile{
-	indexedimage.MCCharsetType: charsetBinary,
-	indexedimage.SCCharsetType: charsetBinary,
-	indexedimage.KoalaType:     koalaBinary,
-	indexedimage.HiresType:     artstudioBinary,
+	indexedimage.MCCharsetType:  charsetBinary,
+	indexedimage.SCCharsetType:  charsetBinary,
+	indexedimage.KoalaType:      koalaBinary,
+	indexedimage.HiresType:      artstudioBinary,
+	indexedimage.MixedHiresType: artstudioBinary,
 }
 
 // Bitpatterns are packed into bytes;

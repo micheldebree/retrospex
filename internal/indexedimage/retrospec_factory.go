@@ -9,6 +9,7 @@ import (
 const (
 	KoalaType        RetrospecName = "koala"
 	HiresType        RetrospecName = "hires"
+	MixedHiresType   RetrospecName = "mixedhires"
 	MixedCharsetType RetrospecName = "mixedcharset"
 	MCCharsetType    RetrospecName = "mccharset"
 	SCCharsetType    RetrospecName = "scccharset"
@@ -20,6 +21,7 @@ const (
 var RetrospecFactories = map[RetrospecName]func(*image.Image) Retrospec{
 	KoalaType:        makeKoalaSpec,
 	HiresType:        makeHiresSpec,
+	MixedHiresType:   makeMixedHiresSpec,
 	MixedCharsetType: makeMixedCharsetSpec,
 	MCCharsetType:    makeMCCharsetSpec,
 	SCCharsetType:    makeSCCCharsetSpec,
@@ -53,7 +55,16 @@ func makeKoalaSpec(img *image.Image) Retrospec {
 	}
 }
 
-func makeHiresSpec(_ *image.Image) Retrospec {
+func makeHiresSpec(img *image.Image) Retrospec {
+	w, h := pixels.GetDimensions(img)
+	return Retrospec{HiresType,
+		[]Layer{
+			{w, h, []int{0b00, 0b01}, true}, // 0400,x (lower nibble), 0400,x (upper nibble)
+		}, 1,
+	}
+}
+
+func makeMixedHiresSpec(_ *image.Image) Retrospec {
 	return Retrospec{HiresType,
 		[]Layer{
 			{8, 8, []int{0b00, 0b01}, true}, // 0400,x (lower nibble), 0400,x (upper nibble)

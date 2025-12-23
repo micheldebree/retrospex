@@ -16,8 +16,8 @@
       "koala",
       "-o",
       "scripts/paintface.koala.png",
-      "scripts/paintface.src.png"
-    ]
+      "scripts/paintface.src.png",
+    ],
     // "buildFlags": [],
   },
   {
@@ -31,10 +31,12 @@
     "args": [
       "-m",
       "hires",
+      "-f",
+      "bin",
       "-o",
       "scripts/paintface.hires.png",
-      "scripts/paintface.hires.1.png"
-    ]
+      "scripts/paintface.hires.1.png",
+    ],
     // "buildFlags": [],
   },
   {
@@ -50,8 +52,8 @@
       "scsprites",
       "-o",
       "scripts/paintface.scsprites.png",
-      "scripts/paintface.tmp1.png"
-    ]
+      "scripts/paintface.tmp1.png",
+    ],
     // "buildFlags": [],
   },
   {
@@ -71,8 +73,8 @@
       "pepto",
       "-o",
       "background.mchars.png",
-      "background.png"
-    ]
+      "background.png",
+    ],
     // "buildFlags": [],
-  }
+  },
 ]

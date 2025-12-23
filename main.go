@@ -100,7 +100,7 @@ func main() {
 
 	flag.StringVar(&options.OutFile, "o", defaultOptions.OutFile, "Output filename")
 	flag.StringVar(&options.Mode, "m", defaultOptions.Mode, `Graphics mode.
-One of koala,hires,mixedcharset,mccharset,sccharset,mcibitmap,scsprites,mcsprites`)
+One of koala,hires,mixedhires,mixedcharset,mccharset,sccharset,mcibitmap,scsprites,mcsprites`)
 	flag.StringVar(&options.Palette, "p", defaultOptions.Palette, `Palette.
 One of colodore,pepto,vice,vice_old_lum,vice_371_internal,pantaloon,archmage,electric,ste,perplex_1,perplex_2,lenyn`)
 	flag.StringVar(&options.ColorSpace, "cs", defaultOptions.ColorSpace, `Colorspace conversion.

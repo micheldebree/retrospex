@@ -1,9 +1,9 @@
 module github.com/micheldebree/retrospex
 
-go 1.23.0
+go 1.24.0
 
 toolchain go1.24.6
 
-require golang.org/x/exp v0.0.0-20250808145144-a408d31f581a
+require golang.org/x/exp v0.0.0-20251219203646-944ab1f22d93
 
-require github.com/lucasb-eyer/go-colorful v1.2.0
+require github.com/lucasb-eyer/go-colorful v1.3.0

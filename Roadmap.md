@@ -1,10 +1,24 @@
 # Issues and features
 
+## Branches
+
+- feature/save-binary
+  - [ ] Fix sprite modes
+  - [ ] Test Arstudio mode
+  - [ ] Test Koala mode
+  - [ ] Test MC chars mode
+  - [ ] Test Hires chars mode
+- Java
+  - Java conversion
+  - Doesn't work yet
+- Rust
+  - Doesn't work yet
+
 ## Next release
 
 - [ ] Store c64 binary formats (bitmap and color data)
-  - [x] Koala
-  - [x] Hires
+  - [x] Koala 
+  - [x] Hires (Artstudio)
   - [ ] Mixed Hires
   - [ ] Characters
   - [ ] Mixed Characters
