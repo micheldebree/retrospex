@@ -1,4 +1,3 @@
 [tools]
 go = "1.25"
-just = "1.45"
-make = "3"
+task = "3"

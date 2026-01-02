@@ -73,14 +73,21 @@ func (img *IndexedImage) SetPixel(pixel pixels.Pixel) {
 
 // Render to a 'normal' RGBA image
 func (img *IndexedImage) Render() image.Image {
+
+	pixelWidth := img.Spec.BitPatternSize
+	resultWidth, resultHeight := img.Width*pixelWidth, img.Height
+
 	result := image.NewRGBA(image.Rectangle{
 		Min: image.Point{},
-		Max: image.Point{X: img.Width, Y: img.Height},
+		Max: image.Point{X: resultWidth, Y: resultHeight},
 	})
 	for y := range img.Height {
 		for x := range img.Width {
 			pixel := img.PixelAt(x, y)
-			result.Set(x, y, pixel.GetIndexedColor(img.Palette))
+			resultX := x * pixelWidth
+			for p := range pixelWidth {
+				result.Set(resultX+p, y, pixel.GetIndexedColor(img.Palette))
+			}
 		}
 	}
 	return result

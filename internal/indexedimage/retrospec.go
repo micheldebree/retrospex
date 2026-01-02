@@ -9,11 +9,24 @@ type Layer struct {
 	IsLast bool // the last layer should quantize all remaining pixels
 }
 
+type LayerTemplate struct {
+	UseImageDimensions    bool // if true, CellWidth/Height will be set from image dimensions
+	CellWidth, CellHeight int  // used when UseImageDimensions is false
+	Bitpatterns           []int
+	IsLast                bool // the last layer should quantize all remaining pixels
+}
+
 type RetrospecName string
 
 type Retrospec struct {
 	Name           RetrospecName
 	Layers         []Layer
+	BitPatternSize int
+}
+
+type RetrospecTemplate struct {
+	Name           RetrospecName
+	Layers         []LayerTemplate
 	BitPatternSize int
 }
 

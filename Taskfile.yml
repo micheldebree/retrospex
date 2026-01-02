@@ -13,7 +13,8 @@ vars:
   LOCAL: retrospex_darwin_arm64
   EXECUTABLE: ~/bin/retrospex
   CGO: 0
-  DEMO_IMAGE: scripts/paintface.src.png
+  # DEMO_IMAGE: ./examples/paintface.src.png
+  DEMO_IMAGE: ./examples/ateam.jpg
 
 tasks:
 
@@ -88,7 +89,7 @@ tasks:
       PNG_OUTPUT: "{{.DEMO_IMAGE}}.koala.png"
       PRG_OUTPUT: "{{.DEMO_IMAGE}}.koala.prg"
     cmds:
-      - retrospex -m koala -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
+      - retrospex -m koala -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
       - open {{.PNG_OUTPUT}}
       - png2prg --mode koala -display -o {{.PRG_OUTPUT}} {{.PNG_OUTPUT}}
       - open {{.PRG_OUTPUT}}
@@ -96,27 +97,22 @@ tasks:
   hires_example:
     desc: Create a hires example PNG
     vars:
-      RESIZED_FILE: "{{.DEMO_IMAGE}}.001.png"
-      FINAL_OUTPUT: "{{.DEMO_IMAGE}}.hires.png"
+      PNG_OUTPUT: "{{.DEMO_IMAGE}}.hires.png"
       PRG_OUTPUT: "{{.DEMO_IMAGE}}.hires.prg"
     cmds:
-      - magick {{.DEMO_IMAGE}} -normalize -threshold 50% -resize 320x200^ -extent
-        320x200 -gravity center {{.RESIZED_FILE}}
-      - retrospex -m hires -overwrite -o {{.FINAL_OUTPUT}} {{.RESIZED_FILE}}
-      - defer: rm {{.RESIZED_FILE}}
-      - open {{.FINAL_OUTPUT}}
-      - png2prg --mode hires -display -o {{.PRG_OUTPUT}} {{.FINAL_OUTPUT}}
+      - retrospex -m hires -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
+      - open {{.PNG_OUTPUT}}
+      - png2prg --mode hires -display -o {{.PRG_OUTPUT}} {{.PNG_OUTPUT}}
       - open {{.PRG_OUTPUT}}
 
   mixedhires_example:
     desc: Create a mixedhires example PNG
     vars:
-      RESIZED_FILE: "{{.DEMO_IMAGE}}.001.png"
-      FINAL_OUTPUT: "{{.DEMO_IMAGE}}.mixedhires.png"
-      PRG_OUTPUT: "{{.DEMO_IMAGE}}.mixedhires.prg"
+      PNG_OUTPUT: "{{.DEMO_IMAGE}}.mixedhires.png"
     cmds:
-      - magick {{.DEMO_IMAGE}} -normalize -resize 320x200^ -extent 320x200 -gravity
-        center {{.RESIZED_FILE}}
-      - retrospex -m mixedhires -overwrite -o {{.FINAL_OUTPUT}} {{.RESIZED_FILE}}
-      - defer: rm {{.RESIZED_FILE}}
-      - open {{.FINAL_OUTPUT}}
+      - retrospex -m mixedhires -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
+      - open {{.PNG_OUTPUT}}
+
+  clean:
+    cmds:
+      - rm retrospex_*

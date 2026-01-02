@@ -4,29 +4,18 @@ version: '3'
 dotenv:
   - '.env'
 
+vars:
+  DEMO_IMAGE: ../examples/ateam.jpg
+
 tasks:
   default:
     desc: Build all programs
     sources:
       - "**/*.asm"
     deps:
-      - paintface.koala.bin
-      - paintface.hires.bin
-      - paintface.mixedhires.bin
-    generates:
       - koala.prg
       - hires.prg
       - mixedhires.prg
-    cmds:
-      - task: kickass
-        vars:
-          BASE: koala
-      - task: kickass
-        vars:
-          BASE: hires
-      - task: kickass
-        vars:
-          BASE: mixedhires
 
   # Reusable KickAss compilation task
   kickass:
@@ -38,79 +27,67 @@ tasks:
 
   # Assembly tasks
   koala.prg:
-    desc: Build koala.prg from koala.asm
     deps:
       - paintface.koala.bin
+    cmds:
+      - task: kickass
+        vars:
+          BASE: koala
+    sources:
+      - paintface.koala.bin
+      - "**/*.asm"
+    generates:
+      - koala.prg
+
+  paintface.koala.bin:
+    cmds:
+      - retrospex -f bin -m koala -resize -o "paintface.koala.bin" {{.DEMO_IMAGE}}
+    sources:
+      - "{{.DEMO_IMAGE}}"
+    generates:
+      - paintface.koala.bin
+
+  hires.prg:
+    deps:
+      - paintface.hires.bin
+    cmds:
+      - task: kickass
+        vars:
+          BASE: hires
+    sources:
+      - paintface.hires.bin
+      - "**/*.asm"
+    generates:
+      - hires.prg
 
   mixedhires.prg:
-    desc: Build mixedhires.prg from mixedhires.asm
     deps:
       - paintface.mixedhires.bin
     cmds:
-
-  # Koala image processing tasks
-  paintface.koala.1.png:
-    desc: Resize source to koala proportions
-    cmds:
-      - magick "paintface.src.png" -normalize -resize 320x200^ -extent 320x200 -gravity
-        center -resize 160x200\! "paintface.koala.1.png"
+      - task: kickass
+        vars:
+          BASE: mixedhires
     sources:
-      - paintface.src.png
+      - paintface.mixedhires.bin
+      - "**/*.asm"
     generates:
-      - paintface.koala.1.png
-
-  paintface.koala.bin:
-    desc: Convert koala image to binary
-    deps:
-      - paintface.koala.1.png
-    cmds:
-      - retrospex -f bin -m koala -o "paintface.koala.bin" "paintface.koala.1.png"
-    sources:
-      - paintface.koala.1.png
-    generates:
-      - paintface.koala.bin
-
-  # Hires image processing tasks
-  paintface.hires.1.png:
-    desc: Resize and apply b/w threshold for hires
-    cmds:
-      - magick "paintface.src.png" -normalize -threshold 50% -resize 320x200^ -extent
-        320x200 -gravity center "paintface.hires.1.png"
-    sources:
-      - paintface.src.png
-    generates:
-      - paintface.hires.1.png
+      - mixedhires.prg
 
   paintface.hires.bin:
     desc: Convert hires image to binary
-    deps:
-      - paintface.hires.1.png
     cmds:
-      - retrospex -f bin -m hires -o "paintface.hires.bin" "paintface.hires.1.png"
+      - retrospex -f bin -m hires -resize -o "paintface.hires.bin" {{.DEMO_IMAGE}}
     sources:
-      - paintface.hires.1.png
+      - "{{.DEMO_IMAGE}}"
     generates:
       - paintface.hires.bin
 
-  # Mixed hires image processing tasks
-  paintface.mixedhires.1.png:
-    desc: Resize source for mixedhires
-    cmds:
-      - magick "paintface.src.png" -normalize -resize 320x200^ -extent 320x200 -gravity
-        center "paintface.mixedhires.1.png"
-    sources:
-      - paintface.src.png
-    generates:
-      - paintface.mixedhires.1.png
-
   paintface.mixedhires.bin:
     desc: Convert mixedhires image to binary
-    deps:
-      - paintface.mixedhires.1.png
     cmds:
-      - retrospex -f bin -m mixedhires -o "paintface.mixedhires.bin" "paintface.mixedhires.1.png"
+      - retrospex -f bin -m mixedhires -resize -o "paintface.mixedhires.bin" {{.DEMO_IMAGE}}
     sources:
-      - paintface.mixedhires.1.png
+      - "{{.DEMO_IMAGE}}"
     generates:
       - paintface.mixedhires.bin
 
