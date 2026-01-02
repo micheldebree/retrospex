@@ -1,0 +1,122 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+
+vars:
+  VERSION: 1.1
+  SRC: '**/*.go'
+  GOBUILDFLAGS: -v -trimpath
+  REV:
+    sh: git rev-parse --short HEAD
+  LDFLAGS: -w -s -X main.Version={{.VERSION}}.{{.REV}}
+  BUILDCMD: go build {{.GOBUILDFLAGS}} -ldflags={{.LDFLAGS}}
+  LOCAL: retrospex_darwin_arm64
+  EXECUTABLE: ~/bin/retrospex
+  CGO: 0
+  DEMO_IMAGE: scripts/paintface.src.png
+
+tasks:
+
+  test:
+    cmds:
+      - go test ./...
+
+  install:
+    desc: Install on my local desktop
+    platforms:
+      - darwin/arm64
+    deps:
+      - retrospex_darwin_arm64
+    cmds:
+      - cp {{.LOCAL}} {{.EXECUTABLE}}
+    sources:
+      - retrospex_darwin_arm64
+    generates:
+      - "{{.EXECUTABLE}}"
+
+  retrospex_darwin_arm64:
+    sources:
+      - "{{ .SRC }}"
+    generates:
+      - retrospex_darwin_arm64
+    cmds:
+      - task: compile
+        vars:
+          GOOS: darwin
+          GOARCH: arm64
+          ARCH: macos.arm64
+
+  dist:
+    cmds:
+      - task: compile
+        vars:
+          GOOS: darwin
+          GOARCH: arm64
+          ARCH: macos.arm64
+      - task: compile
+        vars:
+          GOOS: darwin
+          GOARCH: amd64
+          ARCH: macos.amd64
+
+  zip:
+    internal: true
+    cmds:
+      - "zip -m 9 {{.FOLDER}} {{.ZIPFILE}}"
+
+  compile:
+    internal: true
+    # requires:
+    #   vars:
+    #     - GOOS
+    #     - GOARCH
+    #     - ARCH
+    vars:
+      OUTFILE: retrospex_{{.GOOS}}_{{.GOARCH}}
+    cmds:
+      - CGO_ENABLED={{.CGO}} GOOS={{.GOOS}} GOARCH={{.GOARCH}} go build {{.GOBUILDFLAGS}}
+        -ldflags="{{.LDFLAGS}} -X main.Arch={{.ARCH}}" -o {{.OUTFILE}}
+      # sources:
+      #   - '**/*.go'
+      # generates:
+      #   - "{{.OUTFILE}}"
+      # method: timestamp
+
+  koala_example:
+    desc: Create a koala example PNG
+    vars:
+      PNG_OUTPUT: "{{.DEMO_IMAGE}}.koala.png"
+      PRG_OUTPUT: "{{.DEMO_IMAGE}}.koala.prg"
+    cmds:
+      - retrospex -m koala -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
+      - open {{.PNG_OUTPUT}}
+      - png2prg --mode koala -display -o {{.PRG_OUTPUT}} {{.PNG_OUTPUT}}
+      - open {{.PRG_OUTPUT}}
+
+  hires_example:
+    desc: Create a hires example PNG
+    vars:
+      RESIZED_FILE: "{{.DEMO_IMAGE}}.001.png"
+      FINAL_OUTPUT: "{{.DEMO_IMAGE}}.hires.png"
+      PRG_OUTPUT: "{{.DEMO_IMAGE}}.hires.prg"
+    cmds:
+      - magick {{.DEMO_IMAGE}} -normalize -threshold 50% -resize 320x200^ -extent
+        320x200 -gravity center {{.RESIZED_FILE}}
+      - retrospex -m hires -overwrite -o {{.FINAL_OUTPUT}} {{.RESIZED_FILE}}
+      - defer: rm {{.RESIZED_FILE}}
+      - open {{.FINAL_OUTPUT}}
+      - png2prg --mode hires -display -o {{.PRG_OUTPUT}} {{.FINAL_OUTPUT}}
+      - open {{.PRG_OUTPUT}}
+
+  mixedhires_example:
+    desc: Create a mixedhires example PNG
+    vars:
+      RESIZED_FILE: "{{.DEMO_IMAGE}}.001.png"
+      FINAL_OUTPUT: "{{.DEMO_IMAGE}}.mixedhires.png"
+      PRG_OUTPUT: "{{.DEMO_IMAGE}}.mixedhires.prg"
+    cmds:
+      - magick {{.DEMO_IMAGE}} -normalize -resize 320x200^ -extent 320x200 -gravity
+        center {{.RESIZED_FILE}}
+      - retrospex -m mixedhires -overwrite -o {{.FINAL_OUTPUT}} {{.RESIZED_FILE}}
+      - defer: rm {{.RESIZED_FILE}}
+      - open {{.FINAL_OUTPUT}}

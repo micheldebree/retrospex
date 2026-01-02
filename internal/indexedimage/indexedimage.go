@@ -41,8 +41,6 @@ func getRegions(img *IndexedImage, w, h int, layer Layer) []Region {
 	nrCols, nrRows := w/layer.CellWidth, h/layer.CellHeight
 
 	regions := make([]Region, nrCols*nrRows)
-	fmt.Printf("Layer grid: %dx%d regions (%d total) for image size %dx%d\n",
-		nrCols, nrRows, nrCols*nrRows, w, h)
 
 	for cy := range nrRows {
 		for cx := range nrCols {

@@ -10,6 +10,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"image"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
@@ -17,10 +18,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/disintegration/imaging"
 	"github.com/micheldebree/retrospex/internal/c64io"
 	"github.com/micheldebree/retrospex/internal/conversion"
 	"github.com/micheldebree/retrospex/internal/dithering"
-
 	"github.com/micheldebree/retrospex/internal/imageio"
 	"github.com/micheldebree/retrospex/internal/indexedimage"
 	"github.com/micheldebree/retrospex/internal/pixels"
@@ -39,6 +40,7 @@ type Options struct {
 	Format           FormatType // Changed to use enum type
 	BitpatternColors string
 	AllowOverwrite   bool
+	Resize           string
 }
 
 type FormatType string
@@ -55,9 +57,10 @@ var defaultOptions = Options{
 	ColorSpace:       "lineairRgb",
 	DitherMatrix:     "bayer4x4",
 	DitherDepth:      25,
-	Format:           PNG, // Default format is png
+	Format:           PNG,
 	BitpatternColors: "",
 	AllowOverwrite:   false,
+	Resize:           "fit",
 }
 
 func parseBitpatternColors(value string) map[int]int {
@@ -90,6 +93,34 @@ func parseBitpatternColors(value string) map[int]int {
 	return result
 }
 
+func resizeImage(img image.Image, spec indexedimage.Retrospec, resizeMode string) image.Image {
+	// For 2-bit modes (targetWidth == 160) we need to squash the picture horizontally
+	// because each pixel is double width. Use a direct resize to preserve the aspect ratio
+	// vertically while halving the horizontal dimension.
+
+	originalWidth, originalHeight := pixels.GetDimensions(&img)
+	targetWidth, targetHeight := 320/spec.BitPatternSize, 200
+
+	// adjust horizontal scale when double pixels
+	if spec.BitPatternSize > 1 {
+		scaledWidth := originalWidth / spec.BitPatternSize
+		img = imaging.Resize(img, scaledWidth, originalHeight, imaging.Lanczos)
+	}
+
+	switch resizeMode {
+	case "none":
+		return img
+	case "fit":
+		// Scale to fit within target dimensions, maintaining aspect ratio
+		return imaging.Fit(img, targetWidth, targetHeight, imaging.NearestNeighbor)
+	case "fill":
+		// Scale to fill target dimensions, maintaining aspect ratio and crop excess
+		return imaging.Fill(img, targetWidth, targetHeight, imaging.Center, imaging.NearestNeighbor)
+	default:
+		panic("Unknown resize mode")
+	}
+}
+
 func main() {
 
 	startTime := time.Now()
@@ -111,6 +142,8 @@ One of none,bayer2x2,bayer4x4,bayer8x8`)
 	flag.StringVar(&options.BitpatternColors, "bpc", defaultOptions.BitpatternColors, `Force bitpattern/color pairs. 
 For example 0:0 to force background black.
 For example 0:0,1:1,2:15,3:13 to force colors for all 4 bitpatterns`)
+	flag.StringVar(&options.Resize, "resize", defaultOptions.Resize, `Resize input image. 
+One of fit,fill,none.`)
 	flag.BoolVar(&options.AllowOverwrite, "overwrite", defaultOptions.AllowOverwrite, "Allow overwriting output file")
 
 	var formatString string
@@ -158,6 +191,13 @@ bin for binary data to use in Commodore64 development (see documentation for str
 	}
 
 	spec := indexedimage.MakeSpec(indexedimage.RetrospecName(options.Mode), &img)
+
+	// Resize image if resize option is specified and not 'none'
+	if options.Resize != "" && options.Resize != "none" {
+		img = resizeImage(img, spec, options.Resize)
+		// Recreate spec with the resized image
+		spec = indexedimage.MakeSpec(indexedimage.RetrospecName(options.Mode), &img)
+	}
 	indexedImage := indexedimage.ToIndexedImage(&img, spec, palette)
 	dithering.OrderedDither(&indexedImage, ditherMatrix, options.DitherDepth)
 
