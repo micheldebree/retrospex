@@ -77,14 +77,6 @@ func MakeTemplate(specName RetrospecName) RetrospecTemplate {
 	return factory()
 }
 
-func GetSupportedModes() []string {
-	modes := make([]string, 0, len(RetrospecFactories))
-	for mode := range RetrospecFactories {
-		modes = append(modes, string(mode))
-	}
-	return modes
-}
-
 // +----+----+----+----+----+----+----+----+----+----+----+----+
 // | 11 | 10 |  9 |  8 |  7 |  6 |  5 |  4 |  3 |  2 |  1 |  0 |
 // +----+----+----+----+----+----+----+----+----+----+----+----+

@@ -101,13 +101,10 @@ func main() {
 	var options Options
 
 	flag.StringVar(&options.OutFile, "o", defaultOptions.OutFile, "Output filename")
-	flag.StringVar(&options.Mode, "m", defaultOptions.Mode, fmt.Sprintf("Graphics mode.\nOne of %s", strings.Join(indexedimage.GetSupportedModes(), ", ")))
-	flag.StringVar(&options.Palette, "p", defaultOptions.Palette, `Palette.
-One of colodore,pepto,vice,vice_old_lum,vice_371_internal,pantaloon,archmage,electric,ste,perplex_1,perplex_2,lenyn`)
-	flag.StringVar(&options.ColorSpace, "cs", defaultOptions.ColorSpace, `Colorspace conversion.
-One of rgb (no conversion),lineairRgb,xyz,xyy,lab`)
-	flag.StringVar(&options.DitherMatrix, "dm", defaultOptions.DitherMatrix, `A preset ordered dithering matrix.
-One of none,bayer2x2,bayer4x4,bayer8x8`)
+	flag.StringVar(&options.Mode, "m", defaultOptions.Mode, fmt.Sprintf("Graphics mode.\nOne of %s", KeysToString(indexedimage.RetrospecFactories)))
+	flag.StringVar(&options.Palette, "p", defaultOptions.Palette, fmt.Sprintf("Palette.\nOne of %s", KeysToString(pixels.C64Palettes)))
+	flag.StringVar(&options.ColorSpace, "cs", defaultOptions.ColorSpace, fmt.Sprintf("Colorspace conversion.\nOne of %s", KeysToString(conversion.ColorSpaceConverters)))
+	flag.StringVar(&options.DitherMatrix, "dm", defaultOptions.DitherMatrix, fmt.Sprintf("A preset ordered dithering matrix.\nOne of %s", KeysToString(dithering.DitherMatrices)))
 	flag.IntVar(&options.DitherDepth, "dd", defaultOptions.DitherDepth, "Dither depth (0-255). Depth of dithering.")
 	flag.StringVar(&options.BitpatternColors, "bpc", defaultOptions.BitpatternColors, `Force bitpattern/color pairs. 
 For example 0:0 to force background black.
@@ -181,6 +178,14 @@ bin for binary data to use in Commodore64 development (see documentation for str
 	spec.Print()
 
 	fmt.Printf("%s --> %s (%s) in %s\n", infile, options.OutFile, options.Mode, time.Since(startTime))
+}
+
+func KeysToString[K comparable, V any](m map[K]V) string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, fmt.Sprintf("%v", k))
+	}
+	return strings.Join(keys, ", ")
 }
 
 func printError(message string) {

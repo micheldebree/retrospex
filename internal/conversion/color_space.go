@@ -12,11 +12,19 @@ type ColorspaceName string
 
 const (
 	RGB        ColorspaceName = "rgb"
-	LINEAR_RGB ColorspaceName = "lineairRgb"
+	LINEAR_RGB ColorspaceName = "linearRgb"
 	XYZ        ColorspaceName = "xyz"
 	XYY        ColorspaceName = "xyy"
 	LAB        ColorspaceName = "lab"
 )
+
+var ColorSpaceConverters = map[ColorspaceName]func(colorful.Color) (float64, float64, float64){
+	RGB:        func(color colorful.Color) (float64, float64, float64) { return color.R, color.G, color.B },
+	LINEAR_RGB: func(color colorful.Color) (float64, float64, float64) { return color.LinearRgb() },
+	XYZ:        func(color colorful.Color) (float64, float64, float64) { return color.Xyz() },
+	XYY:        func(color colorful.Color) (float64, float64, float64) { return color.Xyy() },
+	LAB:        func(color colorful.Color) (float64, float64, float64) { return color.Lab() },
+}
 
 func euclidianDistance(color1, color2 color.Color, colorspace ColorspaceName) float64 {
 
@@ -38,19 +46,12 @@ func toColorSpace(aColor color.Color, colorspace ColorspaceName) (float64, float
 		panic("Could not convert to colorspace")
 	}
 
-	switch colorspace {
-	case RGB:
-		return colorfulColor.R, colorfulColor.G, colorfulColor.B
-	case LINEAR_RGB:
-		return colorfulColor.LinearRgb()
-	case XYZ:
-		return colorfulColor.Xyz()
-	case XYY:
-		return colorfulColor.Xyy()
-	case LAB:
-		return colorfulColor.Lab()
-	default:
+	converter, isPresent := ColorSpaceConverters[colorspace]
+
+	if !isPresent {
 		panic(fmt.Sprintf("Colorspace %s is not supported", colorspace))
 	}
+
+	return converter(colorfulColor)
 
 }
