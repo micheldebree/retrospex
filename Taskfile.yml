@@ -84,7 +84,6 @@ tasks:
       # method: timestamp
 
   koala_example:
-    desc: Create a koala example PNG
     vars:
       PNG_OUTPUT: "{{.DEMO_IMAGE}}.koala.png"
       PRG_OUTPUT: "{{.DEMO_IMAGE}}.koala.prg"
@@ -95,7 +94,6 @@ tasks:
       - open {{.PRG_OUTPUT}}
 
   hires_example:
-    desc: Create a hires example PNG
     vars:
       PNG_OUTPUT: "{{.DEMO_IMAGE}}.hires.png"
       PRG_OUTPUT: "{{.DEMO_IMAGE}}.hires.prg"
@@ -105,13 +103,15 @@ tasks:
       - png2prg --mode hires -display -o {{.PRG_OUTPUT}} {{.PNG_OUTPUT}}
       - open {{.PRG_OUTPUT}}
 
-  mixedhires_example:
-    desc: Create a mixedhires example PNG
+  sccharset_example:
     vars:
-      PNG_OUTPUT: "{{.DEMO_IMAGE}}.mixedhires.png"
+      PNG_OUTPUT: "{{.DEMO_IMAGE}}.sccharset.png"
+      PRG_OUTPUT: "{{.DEMO_IMAGE}}.sccharset.prg"
     cmds:
-      - retrospex -m mixedhires -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
+      - retrospex -m sccharset -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
       - open {{.PNG_OUTPUT}}
+      - png2prg --mode sccharset -display -o {{.PRG_OUTPUT}} {{.PNG_OUTPUT}}
+      - open {{.PRG_OUTPUT}}
 
   clean:
     cmds:

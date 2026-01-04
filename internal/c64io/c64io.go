@@ -9,11 +9,10 @@ import (
 )
 
 var binaryFactories = map[indexedimage.RetrospecName]func(*indexedimage.IndexedImage) BinaryFile{
-	indexedimage.MCCharsetType:  charsetBinary,
-	indexedimage.SCCharsetType:  charsetBinary,
-	indexedimage.KoalaType:      koalaBinary,
-	indexedimage.HiresType:      artstudioBinary,
-	indexedimage.MixedHiresType: artstudioBinary,
+	indexedimage.MCCharsetType: charsetBinary,
+	indexedimage.SCCharsetType: charsetBinary,
+	indexedimage.KoalaType:     koalaBinary,
+	indexedimage.HiresType:     artstudioBinary,
 }
 
 // Bitpatterns are packed into bytes;
@@ -21,7 +20,7 @@ var binaryFactories = map[indexedimage.RetrospecName]func(*indexedimage.IndexedI
 // if the image's spec has a bitPatternSize of 2, 4 bit patterns are packed into one byte, msb to lsb order
 func getBitmapData(img *indexedimage.IndexedImage) []byte {
 	width, height := img.Width, img.Height
-	bitPatternSize := img.Spec.BitPatternSize
+	bitPatternSize := img.Spec.BitsPerPixel
 	pixelsPerByte := img.Spec.PixelsPerByte()
 
 	if width%pixelsPerByte != 0 {

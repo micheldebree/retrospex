@@ -24,7 +24,7 @@ func TestGetBitmapData(t *testing.T) {
 				Width:  8,
 				Height: 2,
 				Spec: indexedimage.Retrospec{
-					BitPatternSize: 2,
+					BitsPerPixel: 2,
 				},
 				Pixels: []pixels.Pixel{
 					{X: 0, Y: 0, Color: irrelevantColor, BitPattern: 0b01},
@@ -57,7 +57,7 @@ func TestGetBitmapData(t *testing.T) {
 				Width:  16,
 				Height: 2,
 				Spec: indexedimage.Retrospec{
-					BitPatternSize: 1,
+					BitsPerPixel: 1,
 				},
 				Pixels: []pixels.Pixel{
 					{X: 0, Y: 0, Color: irrelevantColor, BitPattern: 0b0},
@@ -120,7 +120,7 @@ func TestGetBitmapData(t *testing.T) {
 			Width:  8,
 			Height: 8,
 			Spec: indexedimage.Retrospec{
-				BitPatternSize: 1,
+				BitsPerPixel: 1,
 			},
 			Pixels: []pixels.Pixel{
 				{X: 0, Y: 0, Color: color.RGBA{0xff, 0x00, 0x00, 0xff}, BitPattern: -1}, // No bit pattern

@@ -23,8 +23,8 @@
   - [ ] Characters
   - [ ] Mixed Characters
   - [ ] Sprites
-- [ ] Simple resizer
-  - [ ] Remove scripts
+- [x] Simple resizer
+  - [x] Remove scripts
 - [ ] Handle images with non-byte widths
 - [x] Override background color (or more generic, force bitpattern colors)
 - [x] Different color spaces

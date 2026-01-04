@@ -19,21 +19,21 @@ type LayerTemplate struct {
 type RetrospecName string
 
 type Retrospec struct {
-	Name           RetrospecName
-	Layers         []Layer
-	BitPatternSize int
+	Name         RetrospecName
+	Layers       []Layer
+	BitsPerPixel int
 }
 
 type RetrospecTemplate struct {
-	Name           RetrospecName
-	Layers         []LayerTemplate
-	BitPatternSize int
+	Name         RetrospecName
+	Layers       []LayerTemplate
+	BitsPerPixel int
 }
 
 func (spec Retrospec) PixelsPerByte() int {
-	return 8 / spec.BitPatternSize
+	return 8 / spec.BitsPerPixel
 }
 
 func (retrospec Retrospec) Print() {
-	fmt.Printf("Mode: %s\nBits per pixel: %d\n", retrospec.Name, retrospec.BitPatternSize)
+	fmt.Printf("Mode: %s\nBits per pixel: %d\n", retrospec.Name, retrospec.BitsPerPixel)
 }

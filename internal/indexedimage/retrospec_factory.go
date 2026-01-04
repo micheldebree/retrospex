@@ -7,53 +7,39 @@ import (
 )
 
 const (
-	KoalaType        RetrospecName = "koala"
-	HiresType        RetrospecName = "hires"
-	MixedHiresType   RetrospecName = "mixedhires"
-	MixedCharsetType RetrospecName = "mixedcharset"
-	MCCharsetType    RetrospecName = "mccharset"
-	SCCharsetType    RetrospecName = "scccharset"
-	MCIBitmapType    RetrospecName = "mcibitmap"
-	SCSpritesType    RetrospecName = "scsprites"
-	MCSpritesType    RetrospecName = "mcsprites"
+	KoalaType     RetrospecName = "koala"
+	HiresType     RetrospecName = "hires"
+	MCCharsetType RetrospecName = "mccharset"
+	SCCharsetType RetrospecName = "sccharset"
+	SCSpritesType RetrospecName = "scsprites"
+	MCSpritesType RetrospecName = "mcsprites"
 )
 
-// BitPatternSizeMap provides hardcoded bitpattern sizes per mode to solve chicken-egg problem
-// This allows image resizing before spec creation
-var BitPatternSizeMap = map[RetrospecName]int{
-	KoalaType:        2, // multicolor modes use 2-bit patterns (160x200 effective)
-	HiresType:        1, // hires modes use 1-bit patterns (320x200)
-	MixedHiresType:   1, // mixed hires uses 1-bit patterns (320x200)
-	MixedCharsetType: 2, // mixed charset uses 2-bit patterns (160x200 effective)
-	MCCharsetType:    2, // multicolor charset uses 2-bit patterns (160x200 effective)
-	SCCharsetType:    1, // single-color charset uses 1-bit patterns (320x200)
-	MCIBitmapType:    2, // multicolor hires bitmap uses 2-bit patterns (160x200 effective)
-	SCSpritesType:    1, // single-color sprites use 1-bit patterns (320x200)
-	MCSpritesType:    2, // multicolor sprites use 2-bit patterns (160x200 effective)
+var BitsPerPixel = map[RetrospecName]int{
+	KoalaType:     2,
+	HiresType:     1,
+	MCCharsetType: 2,
+	SCCharsetType: 1,
+	SCSpritesType: 1,
+	MCSpritesType: 2,
 }
 
 var RetrospecFactories = map[RetrospecName]func(*image.Image) Retrospec{
-	KoalaType:        makeKoalaSpec,
-	HiresType:        makeHiresSpec,
-	MixedHiresType:   makeMixedHiresSpec,
-	MixedCharsetType: makeMixedCharsetSpec,
-	MCCharsetType:    makeMCCharsetSpec,
-	SCCharsetType:    makeSCCCharsetSpec,
-	MCIBitmapType:    makeMCiBitmapSpec,
-	SCSpritesType:    makeSCSpritesSpec,
-	MCSpritesType:    makeMCSpritesSpec,
+	KoalaType:     makeKoalaSpec,
+	HiresType:     makeHiresSpec,
+	MCCharsetType: makeMCCharsetSpec,
+	SCCharsetType: makeSCCCharsetSpec,
+	SCSpritesType: makeSCSpritesSpec,
+	MCSpritesType: makeMCSpritesSpec,
 }
 
 var RetrospecTemplateFactories = map[RetrospecName]func() RetrospecTemplate{
-	KoalaType:        makeKoalaTemplate,
-	HiresType:        makeHiresTemplate,
-	MixedHiresType:   makeMixedHiresTemplate,
-	MixedCharsetType: makeMixedCharsetTemplate,
-	MCCharsetType:    makeMCCharsetTemplate,
-	SCCharsetType:    makeSCCCharsetTemplate,
-	MCIBitmapType:    makeMCiBitmapTemplate,
-	SCSpritesType:    makeSCSpritesTemplate,
-	MCSpritesType:    makeMCSpritesTemplate,
+	KoalaType:     makeKoalaTemplate,
+	HiresType:     makeHiresTemplate,
+	MCCharsetType: makeMCCharsetTemplate,
+	SCCharsetType: makeSCCCharsetTemplate,
+	SCSpritesType: makeSCSpritesTemplate,
+	MCSpritesType: makeMCSpritesTemplate,
 }
 
 func MakeSpec(specName RetrospecName, img *image.Image) Retrospec {
@@ -70,12 +56,12 @@ func MakeSpec(specName RetrospecName, img *image.Image) Retrospec {
 		}
 	}
 
-	return Retrospec{template.Name, layers, template.BitPatternSize}
+	return Retrospec{template.Name, layers, template.BitsPerPixel}
 }
 
 // GetBitPatternSize returns the hardcoded bitpattern size for a given mode
 func GetBitPatternSize(modeName RetrospecName) int {
-	size, isPresent := BitPatternSizeMap[modeName]
+	size, isPresent := BitsPerPixel[modeName]
 	if !isPresent {
 		panic("Unknown mode")
 	}
@@ -108,30 +94,11 @@ func makeKoalaSpec(img *image.Image) Retrospec {
 	}
 }
 
-func makeHiresSpec(img *image.Image) Retrospec {
-	w, h := pixels.GetDimensions(img)
-	return Retrospec{HiresType,
-		[]Layer{
-			{w, h, []int{0b00, 0b01}, true}, // 0400,x (lower nibble), 0400,x (upper nibble)
-		}, 1,
-	}
-}
-
-func makeMixedHiresSpec(_ *image.Image) Retrospec {
+func makeHiresSpec(_ *image.Image) Retrospec {
 	return Retrospec{HiresType,
 		[]Layer{
 			{8, 8, []int{0b00, 0b01}, true}, // 0400,x (lower nibble), 0400,x (upper nibble)
 		}, 1,
-	}
-}
-
-func makeMixedCharsetSpec(img *image.Image) Retrospec {
-	w, h := pixels.GetDimensions(img)
-	return Retrospec{MixedCharsetType,
-		[]Layer{
-			{w, h, []int{0b00, 0b01, 0b10}, false}, // d021, d022, d023
-			{4, 8, []int{0b11}, true},              // d800,x
-		}, 2,
 	}
 }
 
@@ -151,16 +118,6 @@ func makeSCCCharsetSpec(img *image.Image) Retrospec {
 			{w, h, []int{0b00}, false}, // d021
 			{8, 8, []int{0b01}, true},  // d800,x
 		}, 1,
-	}
-}
-
-func makeMCiBitmapSpec(img *image.Image) Retrospec {
-	w, h := pixels.GetDimensions(img)
-	return Retrospec{MCIBitmapType,
-		[]Layer{
-			{w, h, []int{0b00}, false},            // d021
-			{8, 8, []int{0b01, 0b10, 0b11}, true}, // 0400,x (upper nibble), 0400,x (lower nibble), d800,x
-		}, 2,
 	}
 }
 
@@ -197,25 +154,8 @@ func makeKoalaTemplate() RetrospecTemplate {
 func makeHiresTemplate() RetrospecTemplate {
 	return RetrospecTemplate{HiresType,
 		[]LayerTemplate{
-			{true, 0, 0, []int{0b00, 0b01}, true}, // 0400,x (lower nibble), 0400,x (upper nibble)
-		}, 1,
-	}
-}
-
-func makeMixedHiresTemplate() RetrospecTemplate {
-	return RetrospecTemplate{HiresType,
-		[]LayerTemplate{
 			{false, 8, 8, []int{0b00, 0b01}, true}, // 0400,x (lower nibble), 0400,x (upper nibble)
 		}, 1,
-	}
-}
-
-func makeMixedCharsetTemplate() RetrospecTemplate {
-	return RetrospecTemplate{MixedCharsetType,
-		[]LayerTemplate{
-			{true, 0, 0, []int{0b00, 0b01, 0b10}, false}, // d021, d022, d023
-			{false, 4, 8, []int{0b11}, true},             // d800,x
-		}, 2,
 	}
 }
 
@@ -233,15 +173,6 @@ func makeSCCCharsetTemplate() RetrospecTemplate {
 			{true, 0, 0, []int{0b00}, false}, // d021
 			{false, 8, 8, []int{0b01}, true}, // d800,x
 		}, 1,
-	}
-}
-
-func makeMCiBitmapTemplate() RetrospecTemplate {
-	return RetrospecTemplate{MCIBitmapType,
-		[]LayerTemplate{
-			{true, 0, 0, []int{0b00}, false},             // d021
-			{false, 8, 8, []int{0b01, 0b10, 0b11}, true}, // 0400,x (upper nibble), 0400,x (lower nibble), d800,x
-		}, 2,
 	}
 }
 

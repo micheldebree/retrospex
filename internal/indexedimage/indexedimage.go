@@ -74,7 +74,7 @@ func (img *IndexedImage) SetPixel(pixel pixels.Pixel) {
 // Render to a 'normal' RGBA image
 func (img *IndexedImage) Render() image.Image {
 
-	pixelWidth := img.Spec.BitPatternSize
+	pixelWidth := img.Spec.BitsPerPixel
 	resultWidth, resultHeight := img.Width*pixelWidth, img.Height
 
 	result := image.NewRGBA(image.Rectangle{

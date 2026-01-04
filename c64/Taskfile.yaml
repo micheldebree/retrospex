@@ -10,20 +10,28 @@ vars:
 tasks:
   default:
     desc: Build all programs
-    sources:
-      - "**/*.asm"
     deps:
       - koala.prg
       - hires.prg
       - mixedhires.prg
 
-  # Reusable KickAss compilation task
   kickass:
     internal: true
     desc: Compile a program with KickAss
+    requires:
+      vars:
+        - MODE
     cmds:
-      - java -jar $KICKASS -debugdump -bytedumpfile "{{.BASE}}.prg.txt" -symbolfile
-        -vicesymbols -libdir ./lib -o "{{.BASE}}.prg" "{{.BASE}}.asm"
+      - java -jar $KICKASS -debugdump -bytedumpfile "{{.MODE}}.prg.txt" -symbolfile
+        -vicesymbols -libdir ./lib -o "{{.MODE}}.prg" "{{.MODE}}.asm"
+
+  retrospex:
+    internal: true
+    requires:
+      vars:
+        - MODE
+    cmds:
+      - retrospex -f bin -m {{.MODE}} -resize -o "paintface.{{.MODE}}.bin" {{.DEMO_IMAGE}}
 
   # Assembly tasks
   koala.prg:
@@ -32,7 +40,7 @@ tasks:
     cmds:
       - task: kickass
         vars:
-          BASE: koala
+          MODE: koala
     sources:
       - paintface.koala.bin
       - "**/*.asm"
@@ -41,7 +49,9 @@ tasks:
 
   paintface.koala.bin:
     cmds:
-      - retrospex -f bin -m koala -resize -o "paintface.koala.bin" {{.DEMO_IMAGE}}
+      - task: retrospex
+        vars:
+          MODE: koala
     sources:
       - "{{.DEMO_IMAGE}}"
     generates:
@@ -53,7 +63,7 @@ tasks:
     cmds:
       - task: kickass
         vars:
-          BASE: hires
+          MODE: hires
     sources:
       - paintface.hires.bin
       - "**/*.asm"
@@ -66,7 +76,7 @@ tasks:
     cmds:
       - task: kickass
         vars:
-          BASE: mixedhires
+          MODE: mixedhires
     sources:
       - paintface.mixedhires.bin
       - "**/*.asm"
@@ -76,7 +86,9 @@ tasks:
   paintface.hires.bin:
     desc: Convert hires image to binary
     cmds:
-      - retrospex -f bin -m hires -resize -o "paintface.hires.bin" {{.DEMO_IMAGE}}
+      - task: retrospex
+        vars:
+          MODE: hires
     sources:
       - "{{.DEMO_IMAGE}}"
     generates:
@@ -85,7 +97,9 @@ tasks:
   paintface.mixedhires.bin:
     desc: Convert mixedhires image to binary
     cmds:
-      - retrospex -f bin -m mixedhires -resize -o "paintface.mixedhires.bin" {{.DEMO_IMAGE}}
+      - task: retrospex
+        vars:
+          MODE: mixedhires
     sources:
       - "{{.DEMO_IMAGE}}"
     generates:

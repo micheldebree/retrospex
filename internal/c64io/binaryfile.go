@@ -10,7 +10,7 @@ type BinaryChunk struct {
 
 type ByteOrderName int
 
-// The c64 specific order of bytes for bitmap data
+// how the bytes are ordered in the output
 type ByteOrder struct {
 	ColWidthBytes, ColHeightBytes int
 }
