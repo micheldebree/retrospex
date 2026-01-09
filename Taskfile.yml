@@ -10,13 +10,19 @@ vars:
     sh: git rev-parse --short HEAD
   LDFLAGS: -w -s -X main.Version={{.VERSION}}.{{.REV}}
   BUILDCMD: go build {{.GOBUILDFLAGS}} -ldflags={{.LDFLAGS}}
-  LOCAL: retrospex_darwin_arm64
-  EXECUTABLE: ~/bin/retrospex
   CGO: 0
   # DEMO_IMAGE: ./examples/paintface.src.png
   DEMO_IMAGE: ./examples/ateam.jpg
 
 tasks:
+
+  build:
+    cmds:
+      - go build
+    sources:
+      - '{{.SRC}}'
+    generates:
+      - ./retrospex
 
   test:
     cmds:
@@ -26,31 +32,6 @@ tasks:
     cmds:
       - go test ./... -coverprofile=cover.out
       - go tool cover -html=cover.out
-
-  install:
-    desc: Install on my local desktop
-    platforms:
-      - darwin/arm64
-    deps:
-      - retrospex_darwin_arm64
-    cmds:
-      - cp {{.LOCAL}} {{.EXECUTABLE}}
-    sources:
-      - retrospex_darwin_arm64
-    generates:
-      - '{{.EXECUTABLE}}'
-
-  retrospex_darwin_arm64:
-    sources:
-      - '{{ .SRC }}'
-    generates:
-      - retrospex_darwin_arm64
-    cmds:
-      - task: compile
-        vars:
-          GOOS: darwin
-          GOARCH: arm64
-          ARCH: macos.arm64
 
   dist:
     cmds:
@@ -72,58 +53,49 @@ tasks:
 
   compile:
     internal: true
-    # requires:
-    #   vars:
-    #     - GOOS
-    #     - GOARCH
-    #     - ARCH
     vars:
       OUTFILE: retrospex_{{.GOOS}}_{{.GOARCH}}
     cmds:
       - CGO_ENABLED={{.CGO}} GOOS={{.GOOS}} GOARCH={{.GOARCH}} go build {{.GOBUILDFLAGS}}
         -ldflags="{{.LDFLAGS}} -X main.Arch={{.ARCH}}" -o {{.OUTFILE}}
-      # sources:
-      #   - '**/*.go'
-      # generates:
-      #   - "{{.OUTFILE}}"
-      # method: timestamp
 
   koala_example:
     deps:
-      - install
+      - build
     vars:
       PNG_OUTPUT: '{{.DEMO_IMAGE}}.koala.png'
       PRG_OUTPUT: '{{.DEMO_IMAGE}}.koala.prg'
     cmds:
-      - retrospex -m koala -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
+      - ./retrospex -m koala -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
       - open {{.PNG_OUTPUT}}
       - png2prg --mode koala -display -o {{.PRG_OUTPUT}} {{.PNG_OUTPUT}}
       - open {{.PRG_OUTPUT}}
 
   hires_example:
     deps:
-      - install
+      - build
     vars:
       PNG_OUTPUT: '{{.DEMO_IMAGE}}.hires.png'
       PRG_OUTPUT: '{{.DEMO_IMAGE}}.hires.prg'
     cmds:
-      - retrospex -m hires -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
+      - ./retrospex -m hires -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
       - open {{.PNG_OUTPUT}}
       - png2prg --mode hires -display -o {{.PRG_OUTPUT}} {{.PNG_OUTPUT}}
       - open {{.PRG_OUTPUT}}
 
   sccharset_example:
     deps:
-      - install
+      - build
     vars:
       PNG_OUTPUT: '{{.DEMO_IMAGE}}.sccharset.png'
       PRG_OUTPUT: '{{.DEMO_IMAGE}}.sccharset.prg'
     cmds:
-      - retrospex -m sccharset -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
+      - './retrospex -m sccharset -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}'
       - open {{.PNG_OUTPUT}}
       - png2prg --mode sccharset -display -o {{.PRG_OUTPUT}} {{.PNG_OUTPUT}}
       - open {{.PRG_OUTPUT}}
 
   clean:
     cmds:
+      - rm ./retrospex
       - rm retrospex_*
