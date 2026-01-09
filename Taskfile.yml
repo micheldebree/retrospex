@@ -22,6 +22,11 @@ tasks:
     cmds:
       - go test ./...
 
+  coverage:
+    cmds:
+      - go test ./... -coverprofile=cover.out
+      - go tool cover -html=cover.out
+
   install:
     desc: Install on my local desktop
     platforms:
@@ -33,11 +38,11 @@ tasks:
     sources:
       - retrospex_darwin_arm64
     generates:
-      - "{{.EXECUTABLE}}"
+      - '{{.EXECUTABLE}}'
 
   retrospex_darwin_arm64:
     sources:
-      - "{{ .SRC }}"
+      - '{{ .SRC }}'
     generates:
       - retrospex_darwin_arm64
     cmds:
@@ -63,7 +68,7 @@ tasks:
   zip:
     internal: true
     cmds:
-      - "zip -m 9 {{.FOLDER}} {{.ZIPFILE}}"
+      - 'zip -m 9 {{.FOLDER}} {{.ZIPFILE}}'
 
   compile:
     internal: true
@@ -84,9 +89,11 @@ tasks:
       # method: timestamp
 
   koala_example:
+    deps:
+      - install
     vars:
-      PNG_OUTPUT: "{{.DEMO_IMAGE}}.koala.png"
-      PRG_OUTPUT: "{{.DEMO_IMAGE}}.koala.prg"
+      PNG_OUTPUT: '{{.DEMO_IMAGE}}.koala.png'
+      PRG_OUTPUT: '{{.DEMO_IMAGE}}.koala.prg'
     cmds:
       - retrospex -m koala -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
       - open {{.PNG_OUTPUT}}
@@ -94,9 +101,11 @@ tasks:
       - open {{.PRG_OUTPUT}}
 
   hires_example:
+    deps:
+      - install
     vars:
-      PNG_OUTPUT: "{{.DEMO_IMAGE}}.hires.png"
-      PRG_OUTPUT: "{{.DEMO_IMAGE}}.hires.prg"
+      PNG_OUTPUT: '{{.DEMO_IMAGE}}.hires.png'
+      PRG_OUTPUT: '{{.DEMO_IMAGE}}.hires.prg'
     cmds:
       - retrospex -m hires -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
       - open {{.PNG_OUTPUT}}
@@ -104,9 +113,11 @@ tasks:
       - open {{.PRG_OUTPUT}}
 
   sccharset_example:
+    deps:
+      - install
     vars:
-      PNG_OUTPUT: "{{.DEMO_IMAGE}}.sccharset.png"
-      PRG_OUTPUT: "{{.DEMO_IMAGE}}.sccharset.prg"
+      PNG_OUTPUT: '{{.DEMO_IMAGE}}.sccharset.png'
+      PRG_OUTPUT: '{{.DEMO_IMAGE}}.sccharset.prg'
     cmds:
       - retrospex -m sccharset -resize -overwrite -o {{.PNG_OUTPUT}} {{.DEMO_IMAGE}}
       - open {{.PNG_OUTPUT}}

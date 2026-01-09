@@ -53,7 +53,7 @@ var defaultOptions = Options{
 	OutFile:          "out.png",
 	Mode:             "koala",
 	Palette:          "colodore",
-	ColorSpace:       "lineairRgb",
+	ColorSpace:       "linearRgb",
 	DitherMatrix:     "bayer4x4",
 	DitherDepth:      25,
 	Format:           PNG,
