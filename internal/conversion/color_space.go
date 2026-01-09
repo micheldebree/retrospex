@@ -1,11 +1,8 @@
 package conversion
 
 import (
-	"fmt"
-	"image/color"
-	"math"
-
 	"github.com/lucasb-eyer/go-colorful"
+	"image/color"
 )
 
 type ColorspaceName string
@@ -35,23 +32,11 @@ func euclidianDistance(color1, color2 color.Color, colorspace ColorspaceName) fl
 	diff2 := (bch2 - ach2)
 	diff3 := (bch3 - ach3)
 
-	return math.Sqrt(diff1*diff1 + diff2*diff2 + diff3*diff3)
+	return diff1*diff1 + diff2*diff2 + diff3*diff3
 }
 
 func toColorSpace(aColor color.Color, colorspace ColorspaceName) (float64, float64, float64) {
-
-	colorfulColor, success := colorful.MakeColor(aColor)
-
-	if !success {
-		panic("Could not convert to colorspace")
-	}
-
-	converter, isPresent := ColorSpaceConverters[colorspace]
-
-	if !isPresent {
-		panic(fmt.Sprintf("Colorspace %s is not supported", colorspace))
-	}
-
+	colorfulColor, _ := colorful.MakeColor(aColor)
+	converter := ColorSpaceConverters[colorspace]
 	return converter(colorfulColor)
-
 }

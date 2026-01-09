@@ -31,18 +31,17 @@ func getBitmapData(img *indexedimage.IndexedImage) []byte {
 	numBytes := (numPixels + pixelsPerByte - 1) / pixelsPerByte // Ceiling division
 
 	result := make([]byte, numBytes)
-	byteIndex := 0
 
 	for y := range height {
-		for x := range width {
-			pixel := img.PixelAt(x, y)
-			pixel.AssertHasBitPattern()
-
-			outIndex := byteIndex / pixelsPerByte
-			shiftLeft := bitPatternSize * (pixelsPerByte - 1 - byteIndex%pixelsPerByte)
-
-			result[outIndex] |= byte(pixel.BitPattern) << shiftLeft
-			byteIndex++
+		for x := 0; x < width; x += pixelsPerByte {
+			var b byte
+			for i := 0; i < pixelsPerByte; i++ {
+				pixel := img.PixelAt(x+i, y)
+				pixel.AssertHasBitPattern()
+				shiftLeft := bitPatternSize * (pixelsPerByte - 1 - i)
+				b |= byte(pixel.BitPattern) << shiftLeft
+			}
+			result[(y*width+x)/pixelsPerByte] = b
 		}
 	}
 	return result
