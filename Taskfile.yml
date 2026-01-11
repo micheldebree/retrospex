@@ -2,6 +2,8 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: '3'
 
+failfast: true
+
 vars:
   VERSION: 1.1
   SRC: '**/*.go'
@@ -97,5 +99,5 @@ tasks:
 
   clean:
     cmds:
-      - rm ./retrospex
-      - rm retrospex_*
+      - rm ./retrospex || true
+      - rm retrospex_* || true
