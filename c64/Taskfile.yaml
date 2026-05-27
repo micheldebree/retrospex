@@ -1,0 +1,125 @@
+---
+version: '3'
+
+dotenv:
+  - '.env'
+
+vars:
+  DEMO_IMAGE: ../examples/ateam.jpg
+
+tasks:
+  default:
+    desc: Build all programs
+    deps:
+      - koala.prg
+      - hires.prg
+      - mixedhires.prg
+
+  kickass:
+    internal: true
+    desc: Compile a program with KickAss
+    requires:
+      vars:
+        - MODE
+    cmds:
+      - java -jar $KICKASS -debugdump -bytedumpfile "{{.MODE}}.prg.txt" -symbolfile
+        -vicesymbols -libdir ./lib -o "{{.MODE}}.prg" "{{.MODE}}.asm"
+
+  retrospex:
+    internal: true
+    requires:
+      vars:
+        - MODE
+    cmds:
+      - ../retrospex -f bin -m {{.MODE}} -resize -o "paintface.{{.MODE}}.bin" {{.DEMO_IMAGE}}
+
+  # Assembly tasks
+  koala.prg:
+    deps:
+      - paintface.koala.bin
+    cmds:
+      - task: kickass
+        vars:
+          MODE: koala
+    sources:
+      - paintface.koala.bin
+      - "**/*.asm"
+    generates:
+      - koala.prg
+
+  paintface.koala.bin:
+    cmds:
+      - task: retrospex
+        vars:
+          MODE: koala
+    sources:
+      - "{{.DEMO_IMAGE}}"
+    generates:
+      - paintface.koala.bin
+
+  hires.prg:
+    deps:
+      - paintface.hires.bin
+    cmds:
+      - task: kickass
+        vars:
+          MODE: hires
+    sources:
+      - paintface.hires.bin
+      - "**/*.asm"
+    generates:
+      - hires.prg
+
+  mixedhires.prg:
+    deps:
+      - paintface.mixedhires.bin
+    cmds:
+      - task: kickass
+        vars:
+          MODE: mixedhires
+    sources:
+      - paintface.mixedhires.bin
+      - "**/*.asm"
+    generates:
+      - mixedhires.prg
+
+  paintface.hires.bin:
+    desc: Convert hires image to binary
+    cmds:
+      - task: retrospex
+        vars:
+          MODE: hires
+    sources:
+      - "{{.DEMO_IMAGE}}"
+    generates:
+      - paintface.hires.bin
+
+  paintface.mixedhires.bin:
+    desc: Convert mixedhires image to binary
+    cmds:
+      - task: retrospex
+        vars:
+          MODE: mixedhires
+    sources:
+      - "{{.DEMO_IMAGE}}"
+    generates:
+      - paintface.mixedhires.bin
+
+  # Cleanup tasks
+  clean:
+    desc: Clean all generated files
+    cmds:
+      - for:
+          - bin
+          - prg
+          - exe.prg
+          - sym
+          - vs
+          - dbg
+          - d64
+          - out
+          - map
+          - labels
+          - txt
+          - 1.png
+        cmd: rm -f *.{{ .ITEM }}

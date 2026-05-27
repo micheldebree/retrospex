@@ -1,0 +1,80 @@
+// Project-local debug tasks
+//
+// For more documentation on how to configure debug tasks,
+// see: https://zed.dev/docs/debugger
+[
+  {
+    "label": "koala",
+    "adapter": "Delve",
+    "request": "launch",
+    "mode": "debug",
+    "dlvFlags": ["--check-go-version=false"],
+    // For Delve, the program can be a package name
+    "program": ".",
+    "args": [
+      "-m",
+      "koala",
+      "-o",
+      "scripts/paintface.koala.png",
+      "scripts/paintface.src.png",
+    ],
+    // "buildFlags": [],
+  },
+  {
+    "label": "hires",
+    "adapter": "Delve",
+    "request": "launch",
+    "mode": "debug",
+    "dlvFlags": ["--check-go-version=false"],
+    // For Delve, the program can be a package name
+    "program": ".",
+    "args": [
+      "-m",
+      "hires",
+      "-f",
+      "bin",
+      "-o",
+      "scripts/paintface.hires.png",
+      "scripts/paintface.hires.1.png",
+    ],
+    // "buildFlags": [],
+  },
+  {
+    "label": "scsprites",
+    "adapter": "Delve",
+    "request": "launch",
+    "mode": "debug",
+    "dlvFlags": ["--check-go-version=false"],
+    // For Delve, the program can be a package name
+    "program": ".",
+    "args": [
+      "-m",
+      "scsprites",
+      "-o",
+      "scripts/paintface.scsprites.png",
+      "scripts/paintface.tmp1.png",
+    ],
+    // "buildFlags": [],
+  },
+  {
+    "label": "background",
+    "adapter": "Delve",
+    "request": "launch",
+    "mode": "debug",
+    "dlvFlags": ["--check-go-version=false"],
+    // For Delve, the program can be a package name
+    "program": ".",
+    "args": [
+      "-m",
+      "mccharset",
+      "-dm",
+      "none",
+      "-p",
+      "pepto",
+      "-o",
+      "background.mchars.png",
+      "background.png",
+    ],
+    // "buildFlags": [],
+  },
+]

@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Hires bin" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="retrospex" />
+    <working_directory value="$PROJECT_DIR$" />
+    <parameters value="-m hires -f bin --overwrite -o out.bin c64/paintface.hires.1.png" />
+    <kind value="PACKAGE" />
+    <package value="github.com/micheldebree/retrospex" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/main.go" />
+    <method v="2" />
+  </configuration>
+</component>

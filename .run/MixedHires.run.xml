@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MixedHires" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="retrospex" />
+    <working_directory value="$PROJECT_DIR$" />
+    <parameters value="-m mixedhires -f png --overwrite -o out.png c64/paintface.mixedhires.1.png" />
+    <kind value="PACKAGE" />
+    <package value="github.com/micheldebree/retrospex" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/main.go" />
+    <method v="2" />
+  </configuration>
+</component>
