@@ -93,7 +93,7 @@ func (img *IndexedImage) Render() image.Image {
 	return result
 }
 
-// TODO: this is not true for sprites
+// BytesPerRow TODO: this is not true for sprites
 func (img *IndexedImage) BytesPerRow() int {
 	return img.Width / img.Spec.PixelsPerByte()
 }

@@ -2,7 +2,7 @@ package c64io
 
 import "fmt"
 
-// A chunk inside a binary file
+// BinaryChunk A chunk inside a binary file
 type BinaryChunk struct {
 	label string // a name for reporting the output layout to the user
 	data  []byte

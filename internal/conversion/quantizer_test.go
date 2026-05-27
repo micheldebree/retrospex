@@ -17,11 +17,11 @@ func TestQuantizePixel(t *testing.T) {
 		{
 			name: "Red pixel quantizes to red",
 			pixel: pixels.Pixel{
-				Color: color.RGBA{0xff, 0x00, 0x00, 0xff},
+				Color: color.RGBA{R: 0xff, A: 0xff},
 			},
 			palette: pixels.Palette{
-				0: color.RGBA{0xff, 0x00, 0x00, 0xff},
-				1: color.RGBA{0x00, 0xff, 0x00, 0xff},
+				0: color.RGBA{R: 0xff, A: 0xff},
+				1: color.RGBA{G: 0xff, A: 0xff},
 			},
 			expected: 0,
 		},

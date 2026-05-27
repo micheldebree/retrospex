@@ -31,9 +31,9 @@ func bestIndex(p *pixels.Pixel, pal pixels.Palette, colorspace ColorspaceName) (
 	for i, v := range pal {
 		vColorSpace1, vColorSpace2, vColorSpace3 := toColorSpace(v, colorspace)
 
-		diff1 := (vColorSpace1 - pColorSpace1)
-		diff2 := (vColorSpace2 - pColorSpace2)
-		diff3 := (vColorSpace3 - pColorSpace3)
+		diff1 := vColorSpace1 - pColorSpace1
+		diff2 := vColorSpace2 - pColorSpace2
+		diff3 := vColorSpace3 - pColorSpace3
 
 		distance := diff1*diff1 + diff2*diff2 + diff3*diff3
 
@@ -85,7 +85,7 @@ func quantizeRegion(region indexedimage.Region, bitpatternToColor map[int]int, c
 	}
 }
 
-// quantize all the pixels in the image according to the image specs
+// Quantize quantize all the pixels in the image according to the image specs
 func Quantize(img indexedimage.IndexedImage, bitpatternToColor map[int]int, colorspace ColorspaceName) indexedimage.IndexedImage {
 	result := img
 
@@ -116,9 +116,9 @@ func bestIndexWithConvertedPalette(p *pixels.Pixel, pal pixels.Palette, colorspa
 	for i := range pal {
 		cv := convertedPalette[i]
 
-		diff1 := (cv.c1 - pColorSpace1)
-		diff2 := (cv.c2 - pColorSpace2)
-		diff3 := (cv.c3 - pColorSpace3)
+		diff1 := cv.c1 - pColorSpace1
+		diff2 := cv.c2 - pColorSpace2
+		diff3 := cv.c3 - pColorSpace3
 
 		distance := diff1*diff1 + diff2*diff2 + diff3*diff3
 

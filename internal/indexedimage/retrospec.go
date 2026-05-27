@@ -34,6 +34,6 @@ func (spec Retrospec) PixelsPerByte() int {
 	return 8 / spec.BitsPerPixel
 }
 
-func (retrospec Retrospec) Print() {
-	fmt.Printf("Mode: %s\nBits per pixel: %d\n", retrospec.Name, retrospec.BitsPerPixel)
+func (spec Retrospec) Print() {
+	fmt.Printf("Mode: %s\nBits per pixel: %d\n", spec.Name, spec.BitsPerPixel)
 }

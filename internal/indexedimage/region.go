@@ -43,7 +43,7 @@ func (region *Region) colorHasBitPattern(colorIndex int) bool {
 	return present && colorIndex != UNKNOWN
 }
 
-// associates a bitpattern with an index in the color palette
+// AssignColorToBitPattern associates a bitpattern with an index in the color palette
 func (region *Region) AssignColorToBitPattern(bitPattern int, paletteIndex int) {
 	if region.colorHasBitPattern(bitPattern) {
 		panic(fmt.Sprintf("cannot assign color %d to bit pattern %d, a color is already assigned for region %v", paletteIndex, bitPattern, region))
@@ -52,7 +52,7 @@ func (region *Region) AssignColorToBitPattern(bitPattern int, paletteIndex int) 
 	region.colorToBitpattern[paletteIndex] = bitPattern
 }
 
-// if a bitpattern is associated with the pixel's quantized color, assign the bitpattern to the pixel
+// AssignBitpatternToPixel if a bitpattern is associated with the pixel's quantized color, assign the bitpattern to the pixel
 func (region *Region) AssignBitpatternToPixel(pixel *pixels.Pixel) bool {
 	pixel.AssertQuantized()
 
@@ -78,7 +78,7 @@ func (region *Region) GetUnmappedBitpatterns() []int {
 	return result
 }
 
-// create a pallete containing only the colors assigned to a bitpattern
+// GetPalette create a pallete containing only the colors assigned to a bitpattern
 func (region *Region) GetPalette() pixels.Palette {
 
 	result := make(pixels.Palette)

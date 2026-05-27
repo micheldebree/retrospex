@@ -2,8 +2,6 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: '3'
 
-failfast: true
-
 vars:
   VERSION: 1.1
   SRC: '**/*.go'

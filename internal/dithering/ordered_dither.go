@@ -58,7 +58,7 @@ func OrderedDither(img *indexedimage.IndexedImage, matrix IntMatrix, depth int) 
 		gOffset := toByteWithOverflow(g) + matrixV
 		bOffset := toByteWithOverflow(b) + matrixV
 
-		pixel.Color = color.RGBA{capToByte(rOffset), capToByte(gOffset), capToByte(bOffset), 0xff}
+		pixel.Color = color.RGBA{R: capToByte(rOffset), G: capToByte(gOffset), B: capToByte(bOffset), A: 0xff}
 	}
 }
 
