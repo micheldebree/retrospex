@@ -106,7 +106,8 @@ func makeMCCharsetSpec(img *image.Image) Retrospec {
 	w, h := pixels.GetDimensions(img)
 	return Retrospec{MCCharsetType,
 		[]Layer{
-			{w, h, []int{0b00, 0b01, 0b10, 0b11}, true}, // d021, d022, d023, d800...
+			{w, h, []int{0b00, 0b01, 0b10}, false}, // d021, d022, d023
+			{4, 8, []int{0b11}, true},              // d800,x
 		}, 2,
 	}
 }
@@ -162,7 +163,8 @@ func makeHiresTemplate() RetrospecTemplate {
 func makeMCCharsetTemplate() RetrospecTemplate {
 	return RetrospecTemplate{MCCharsetType,
 		[]LayerTemplate{
-			{true, 0, 0, []int{0b00, 0b01, 0b10, 0b11}, true}, // d021, d022, d023, d800...
+			{true, 0, 0, []int{0b00, 0b01, 0b10}, false}, // d021, d022, d023
+			{false, 4, 8, []int{0b11}, true},             // d800,x
 		}, 2,
 	}
 }

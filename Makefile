@@ -15,7 +15,7 @@ run: examples
 	open scripts/paintface.koala.prg
 
 .PHONY: examples
-examples: install \
+examples: retrospex \
 	scripts/paintface.koala.prg \
 	scripts/paintface.hires.prg \
 	scripts/paintface.scsprites.prg \
@@ -36,15 +36,7 @@ all: \
 
 .PHONY: clean
 clean:
-	rm scripts/*.prg || true
-	rm scripts/*.tmp*.png || true
-	rm scripts/*.koala.png || true
-	rm scripts/*.hires.png || true
 	rm retrospex*
-
-.PHONY: install
-install: $(SRC)
-	$(BUILDCMD) -o "${HOME}/bin/retrospex"
 
 %.zip: %
 	zip -m -9 $@ $<

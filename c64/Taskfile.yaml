@@ -31,7 +31,7 @@ tasks:
       vars:
         - MODE
     cmds:
-      - retrospex -f bin -m {{.MODE}} -resize -o "paintface.{{.MODE}}.bin" {{.DEMO_IMAGE}}
+      - ../retrospex -f bin -m {{.MODE}} -resize -o "paintface.{{.MODE}}.bin" {{.DEMO_IMAGE}}
 
   # Assembly tasks
   koala.prg:

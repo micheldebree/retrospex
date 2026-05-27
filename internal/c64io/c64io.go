@@ -35,7 +35,7 @@ func getBitmapData(img *indexedimage.IndexedImage) []byte {
 	for y := range height {
 		for x := 0; x < width; x += pixelsPerByte {
 			var b byte
-			for i := 0; i < pixelsPerByte; i++ {
+			for i := range pixelsPerByte {
 				pixel := img.PixelAt(x+i, y)
 				pixel.AssertHasBitPattern()
 				shiftLeft := bitPatternSize * (pixelsPerByte - 1 - i)

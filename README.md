@@ -84,6 +84,16 @@ Below are the sizes for a typical binary file for each mode.
 - 1000 bytes of screen RAM
 - 7 bytes of padding (to make it compatible with Art Studio format)
 
-### Character output
+### sccharset (single color charset)
 
-- n x 8 bytes of character data for n characters
+- n x 8 bytes of character data for n characters.
+
+### mccharset (multicolor charset)
+
+The output format consists of three parts:
+- **Bitmap Data** (8 * n bytes): 8x8 character cell based bitmap data for n characters.
+- **D800 Data** (n bytes): Individual color RAM for each character (extracted from bit pattern `11`).
+- **Global Colors** (3 bytes): Global multicolor colors (extracted from bit patterns `00`, `01`, and `10`).
+
+The total size is `(9 * n) + 3` bytes. For a fullscreen 1000-character image (40x25 characters), the size is exactly 9003 bytes.
+Oversized images are not truncated; all characters present in the input image are exported.

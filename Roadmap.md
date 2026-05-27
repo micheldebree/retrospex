@@ -4,10 +4,10 @@
 
 - feature/save-binary
   - [ ] Fix sprite modes
-  - [ ] Test Artstudio mode
-  - [ ] Test Koala mode
-  - [ ] Test MC chars mode
-  - [ ] Test Hires chars mode
+  - [x] Test Artstudio mode
+  - [x] Test Koala mode
+  - [x] Test MC chars mode
+  - [x] Test Hires chars mode
 - Java
   - Java conversion
   - Doesn't work yet
@@ -20,7 +20,7 @@
   - [x] Koala
   - [x] Hires (Artstudio)
   - [x] Mixed Hires
-  - [ ] Characters
+  - [x] Characters
   - [ ] Mixed Characters
   - [ ] Sprites
 - [x] Simple resizer

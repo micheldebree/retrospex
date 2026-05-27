@@ -169,7 +169,6 @@ bin for binary data to use in Commodore64 development (see documentation for str
 
 	switch options.Format {
 	case PNG:
-		// TODO: add overwrite flag
 		imageio.WriteImage(options.OutFile, newImage.Render(), options.AllowOverwrite)
 	case BIN:
 		c64io.SaveBinary(options.OutFile, &newImage, options.AllowOverwrite)
